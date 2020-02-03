@@ -1,7 +1,9 @@
 
 # compliance-cases-api
 
-This is a placeholder README.md for a new repository
+Part of the MDTP Protect Connect APIs
+
+This service is intended to run on port 7052
 
 ### License
 

@@ -36,7 +36,7 @@ case class CaseflowCaseModel(
                               Filter1: Option[String],
                               Filter2: Option[String],
                               LastDateForEnquiry: Option[String],
-                              ConfidenceScore: Double,
+                              ConfidenceScore: Option[Double],
                               ArchiveApproach: Option[String],
                               InterventionSubType: Option[String],
                               InteractionTitle: Option[String],
@@ -62,7 +62,7 @@ object CaseflowCaseModel {
       (__ \ "Filter1").readNullable[String] and
       (__ \ "Filter2").readNullable[String] and
       (__ \ "LastDateForEnquiry").readNullable[String] and
-      (__ \ "ConfidenceScore").read[Double] and
+      (__ \ "ConfidenceScore").readNullable[Double] and
       (__ \ "ArchiveApproach").readNullable[String] and
       (__ \ "InterventionSubType").readNullable[String] and
       (__ \ "InteractionTitle").readNullable[String] and

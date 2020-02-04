@@ -30,7 +30,7 @@ class ComplianceInvestigationsModelSpec extends WordSpec with Matchers {
       ComplianceInvestigationsModel(
         CaseflowCaseModel(
           "CFSC", "474013587585 ", 150000, "CID-6269", "PID-6480", "YieldBearing ", None, None, None, None,
-          "123456789 ", None, None, None, None, 7.00, None, None, None, None,
+          "123456789 ", None, None, None, None, None, None, None, None, None,
           RisksModel(RiskModel("VAT ", "Example  ", 9.1 , "2008-04-06", "2009-04-05", None, None, None, None, None, None, None, None, None)),
           TaxpayersModel(TaxpayerModel("SoleTrader", None, None, None, None, None, None, None, None, None, None, None, None, None, None, None))
         )
@@ -44,7 +44,6 @@ class ComplianceInvestigationsModelSpec extends WordSpec with Matchers {
                          |    "ProjectID": "PID-6480",
                          |    "CaseType": "YieldBearing ",
                          |    "VATOfficeCode": "123456789 ",
-                         |    "ConfidenceScore": 7.000000 ,
                          |    "Risks": {
                          |      "Risk": {
                          |        "TaxRegime": "VAT ",

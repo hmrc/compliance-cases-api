@@ -17,58 +17,90 @@
 package controllers
 
 import akka.stream.Materializer
+import connectors.ComplianceCasesConnector
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Matchers, WordSpec}
+import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.Mockito.when
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.http.Status
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HttpResponse
+
+import scala.concurrent.Future
 
 
-class ComplianceApiControllerSpec extends WordSpec with Matchers with GuiceOneAppPerSuite {
+class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSugar with GuiceOneAppPerSuite {
+
+  private val connector: ComplianceCasesConnector = mock[ComplianceCasesConnector]
+  override lazy val app: Application = {
+    import play.api.inject._
+
+    new GuiceApplicationBuilder()
+      .overrides(
+        bind[ComplianceCasesConnector].toInstance(connector)
+      ).build()
+  }
 
   implicit lazy val materializer: Materializer = app.materializer
 
+  val name = "Mr Test Name"
+  val age = 20
+
+  val minimumJson = s"""{
+                       |  "Case": {
+                       |    "SourceSysRef": "CFSC",
+                       |    "SourceSysID": "474013587585 ",
+                       |    "CaseFlowID": 150000,
+                       |    "CampaignID": "CID-6269",
+                       |    "ProjectID": "PID-6480",
+                       |    "CaseType": "YieldBearing ",
+                       |    "VATOfficeCode": "123456789 ",
+                       |    "ConfidenceScore": 7.000000 ,
+                       |    "Risks": {
+                       |      "Risk": {
+                       |        "TaxRegime": "VAT ",
+                       |        "Description": "Example  ",
+                       |        "Score": 9.1 ,
+                       |        "TaxPeriodFrom": "2008-04-06",
+                       |        "TaxPeriodTo": "2009-04-05"
+                       |      }
+                       |    },
+                       |    "Taxpayers": {
+                       |      "Taxpayer": {
+                       |        "Type": "SoleTrader"
+                       |      }
+                       |    }
+                       |  }
+                       |}""".stripMargin
+
+  val incorrectJson = s"""{
+                         | "Invalid": "$name",
+                         | "age": $age
+                         |}""".stripMargin
+
+  val exampleJsonResponse: String = """
+                                      |{
+                                      |  "Response" : "CFSC",
+                                      |  "Code" : 202
+                                      |}
+                                      |""".stripMargin
+
+  val exampleErrorResponse: String = """
+                                       |POST of 'http://localhost:7052/compliance-cases/risking' returned 400 (Bad Request).
+                                       |Response body '{"errors":["object has missing required properties ([\"Case\"])"]}'
+                                       |""".stripMargin
+
   "The Compliance Api Controller" when {
     "serving Investigations api" should {
-      val caseRef = "CSFC-1234567890"
-      val name = "Mr Test Name"
-      val age = 20
-
-      val minimumJson = s"""{
-                           |  "Case": {
-                           |    "SourceSysRef": "CFSC",
-                           |    "SourceSysID": "474013587585 ",
-                           |    "CaseFlowID": 150000,
-                           |    "CampaignID": "CID-6269",
-                           |    "ProjectID": "PID-6480",
-                           |    "CaseType": "YieldBearing ",
-                           |    "VATOfficeCode": "123456789 ",
-                           |    "ConfidenceScore": 7.000000 ,
-                           |    "Risks": {
-                           |      "Risk": {
-                           |        "TaxRegime": "VAT ",
-                           |        "Description": "Example  ",
-                           |        "Score": 9.1 ,
-                           |        "TaxPeriodFrom": "2008-04-06",
-                           |        "TaxPeriodTo": "2009-04-05"
-                           |      }
-                           |    },
-                           |    "Taxpayers": {
-                           |      "Taxpayer": {
-                           |        "Type": "SoleTrader"
-                           |      }
-                           |    }
-                           |  }
-                           |}""".stripMargin
-
-      val incorrectJson =
-        s"""{
-           | "Invalid": "$name",
-           | "age": $age
-           |}""".stripMargin
-
       "return Accepted for valid input" in {
+        when(connector.complianceInvestigations(any())(any(), any()))
+            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonResponse)))))
+
         route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumJson))).map {
           result => status(result) shouldBe Status.ACCEPTED
         }

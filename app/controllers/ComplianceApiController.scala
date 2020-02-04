@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import models.ComplianceInvestigationsModel
 import play.api.http.ContentTypes
 import play.api.libs.json.{JsError, JsNull, JsPath, JsSuccess, JsValue, Json, JsonValidationError}
-import services.{ResourceService, ValidationService}
+import services.{ComplianceCasesService, ResourceService, ValidationService}
 import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ComplianceApiController @Inject()(
                                          validator: ValidationService,
                                          resources: ResourceService,
-                                         complianceCasesConnector: ComplianceCasesConnector,
+                                         complianceCasesService: ComplianceCasesService,
                                          appConfig: AppConfig,
                                          cc: ControllerComponents
                                        )(implicit ec: ExecutionContext) extends BackendController(cc) {
@@ -46,7 +46,7 @@ class ComplianceApiController @Inject()(
     validator.validate(schema, input) match {
       case Right(_) => {
         Json.fromJson[ComplianceInvestigationsModel](input) match {
-          case JsSuccess(value, path) => complianceCasesConnector.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
+          case JsSuccess(value, path) => complianceCasesService.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
           case JsError(errors) => Future.successful(BadRequest(mappingErrorResponse(errors)))
         }
       }

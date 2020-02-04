@@ -24,12 +24,13 @@ class ComplianceInvestigationsSpec extends WordSpec with Matchers {
   val caseRef = "CSFC-1234567890"
   val name = "Mr Test Name"
   val age = 20
+  val id = 150000
 
   "Compliance Investigations model" when {
     val filledModel =
       ComplianceInvestigations(
         CaseflowCase(
-          "CFSC", "474013587585 ", 150000, "CID-6269", "PID-6480", "YieldBearing ", None, None, None, None,
+          "CFSC", "474013587585 ", id, "CID-6269", "PID-6480", "YieldBearing ", None, None, None, None,
           "123456789 ", None, None, None, None, None, None, None, None, None,
           Risks(Risk("VAT ", "Example  ", 9.1 , "2008-04-06", "2009-04-05", None, None, None, None, None, None, None, None, None)),
           Taxpayers(Taxpayer("SoleTrader", None, None, None, None, None, None, None, None, None, None, None, None, None, None, None))

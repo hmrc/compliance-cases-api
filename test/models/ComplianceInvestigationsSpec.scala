@@ -19,7 +19,7 @@ package models
 import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.Json
 
-class ComplianceInvestigationsModelSpec extends WordSpec with Matchers {
+class ComplianceInvestigationsSpec extends WordSpec with Matchers {
 
   val caseRef = "CSFC-1234567890"
   val name = "Mr Test Name"
@@ -27,12 +27,12 @@ class ComplianceInvestigationsModelSpec extends WordSpec with Matchers {
 
   "Compliance Investigations model" when {
     val filledModel =
-      ComplianceInvestigationsModel(
-        CaseflowCaseModel(
+      ComplianceInvestigations(
+        CaseflowCase(
           "CFSC", "474013587585 ", 150000, "CID-6269", "PID-6480", "YieldBearing ", None, None, None, None,
           "123456789 ", None, None, None, None, None, None, None, None, None,
-          RisksModel(RiskModel("VAT ", "Example  ", 9.1 , "2008-04-06", "2009-04-05", None, None, None, None, None, None, None, None, None)),
-          TaxpayersModel(TaxpayerModel("SoleTrader", None, None, None, None, None, None, None, None, None, None, None, None, None, None, None))
+          Risks(Risk("VAT ", "Example  ", 9.1 , "2008-04-06", "2009-04-05", None, None, None, None, None, None, None, None, None)),
+          Taxpayers(Taxpayer("SoleTrader", None, None, None, None, None, None, None, None, None, None, None, None, None, None, None))
         )
       )
     val minimumJson = s"""{
@@ -69,10 +69,10 @@ class ComplianceInvestigationsModelSpec extends WordSpec with Matchers {
 
     "binding json data to a model" should {
       "produce a full model" in {
-        Json.fromJson[ComplianceInvestigationsModel](Json.parse(minimumJson)).getOrElse(None) shouldBe filledModel
+        Json.fromJson[ComplianceInvestigations](Json.parse(minimumJson)).getOrElse(None) shouldBe filledModel
       }
       "return Errors if missing data" in {
-        Json.fromJson[ComplianceInvestigationsModel](Json.parse(incorrectJson)).isError shouldBe true
+        Json.fromJson[ComplianceInvestigations](Json.parse(incorrectJson)).isError shouldBe true
       }
     }
   }

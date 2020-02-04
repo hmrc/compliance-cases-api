@@ -21,7 +21,7 @@ import connectors.ComplianceCasesConnector
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
-import models.ComplianceInvestigationsModel
+import models.ComplianceInvestigations
 import play.api.http.ContentTypes
 import play.api.libs.json.{JsError, JsNull, JsPath, JsSuccess, JsValue, Json, JsonValidationError}
 import services.{ComplianceCasesService, ResourceService, ValidationService}
@@ -40,12 +40,12 @@ class ComplianceApiController @Inject()(
 
   private val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
 
-  def risking(): Action[AnyContent] = Action.async {implicit request =>
+  def risking(): Action[AnyContent] = Action.async { implicit request =>
     val input = request.body.asJson.getOrElse(JsNull)
 
     validator.validate(schema, input) match {
       case Right(_) => {
-        Json.fromJson[ComplianceInvestigationsModel](input) match {
+        Json.fromJson[ComplianceInvestigations](input) match {
           case JsSuccess(value, path) => complianceCasesService.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
           case JsError(errors) => Future.successful(BadRequest(mappingErrorResponse(errors)))
         }

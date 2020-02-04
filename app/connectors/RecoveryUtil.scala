@@ -39,7 +39,8 @@ trait RecoveryUtil {
       HttpResponse(upstream5xxResponse.upstreamResponseCode, responseString = Some(upstream5xxResponse.message))
 
     case e: Exception =>
+      import play.api.http.Status.INTERNAL_SERVER_ERROR
       Logger.error(s"Exception from $api API - ${e.getMessage}")
-      HttpResponse(500, responseString = Some(e.getMessage))
+      HttpResponse(INTERNAL_SERVER_ERROR, responseString = Some(e.getMessage))
   }
 }

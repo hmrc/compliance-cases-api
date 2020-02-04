@@ -20,7 +20,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-case class AddressModel(
+case class Address(
                          Line1: Option[String],
                          Line2: Option[String],
                          Line3: Option[String],
@@ -28,8 +28,8 @@ case class AddressModel(
                          Postcode: Option[String],
                          Phone: Option[String])
 
-object AddressModel {
-  implicit def reads: Reads[AddressModel] = (
+object Address {
+  implicit def reads: Reads[Address] = (
 
     (__ \ "Line1").readNullable[String] and
       (__ \ "Line2").readNullable[String] and
@@ -38,5 +38,5 @@ object AddressModel {
       (__ \ "Postcode").readNullable[String] and
       (__ \ "Phone").readNullable[String]
 
-    ) (AddressModel.apply _)
+    ) (Address.apply _)
 }

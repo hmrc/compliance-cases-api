@@ -17,10 +17,9 @@
 package controllers
 
 import akka.stream.Materializer
-import connectors.ComplianceCasesConnector
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{Matchers, WordSpec}
-import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -29,6 +28,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
+import services.ComplianceCasesService
 import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
@@ -36,13 +36,13 @@ import scala.concurrent.Future
 
 class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSugar with GuiceOneAppPerSuite {
 
-  private val connector: ComplianceCasesConnector = mock[ComplianceCasesConnector]
+  private val service: ComplianceCasesService = mock[ComplianceCasesService]
   override lazy val app: Application = {
     import play.api.inject._
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[ComplianceCasesConnector].toInstance(connector)
+        bind[ComplianceCasesService].toInstance(service)
       ).build()
   }
 
@@ -98,7 +98,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
   "The Compliance Api Controller" when {
     "serving Investigations api" should {
       "return Accepted for valid input" in {
-        when(connector.complianceInvestigations(any())(any(), any()))
+        when(service.complianceInvestigations(any())(any(), any()))
             .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonResponse)))))
 
         route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumJson))).map {

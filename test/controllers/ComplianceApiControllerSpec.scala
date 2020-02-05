@@ -17,6 +17,7 @@
 package controllers
 
 import akka.stream.Materializer
+import config.AppConfig
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{Matchers, WordSpec}
 import org.mockito.Matchers.any
@@ -26,9 +27,10 @@ import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
-import services.ComplianceCasesService
+import services.{ComplianceCasesService, ResourceService, ValidationService}
 import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
@@ -78,35 +80,71 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
                        |  }
                        |}""".stripMargin
 
+  val addressJson = s"""{
+                       |  "Case": {
+                       |    "SourceSysRef": "CFSC",
+                       |    "SourceSysID": "474013587585 ",
+                       |    "CaseFlowID": 150000,
+                       |    "CampaignID": "CID-6269",
+                       |    "ProjectID": "PID-6480",
+                       |    "CaseType": "YieldBearing ",
+                       |    "VATOfficeCode": "123456789 ",
+                       |    "ConfidenceScore": 7.000000 ,
+                       |    "Risks": {
+                       |      "Risk": {
+                       |        "TaxRegime": "VAT ",
+                       |        "Description": "Example  ",
+                       |        "Score": 9.1 ,
+                       |        "TaxPeriodFrom": "2008-04-06",
+                       |        "TaxPeriodTo": "2009-04-05"
+                       |      }
+                       |    },
+                       |    "Taxpayers": {
+                       |      "Taxpayer": {
+                       |        "Type": "SoleTrader",
+                       |        "HomeAddress":{
+                       |          "Line1": "Wow son this is a street for sure",
+                       |          "Line2": "Damn 2nd liner too",
+                       |          "Line3": "3 tho what bruh",
+                       |          "Town": "Buddinge"
+                       |        }
+                       |      }
+                       |    }
+                       |  }
+                       |}""".stripMargin
+
   val incorrectJson = s"""{
                          | "Invalid": "$name",
                          | "age": $age
                          |}""".stripMargin
 
-  val exampleJsonResponse: String = """
-                                      |{
-                                      |  "Response" : "CFSC",
-                                      |  "Code" : 202
-                                      |}
-                                      |""".stripMargin
 
-  val exampleErrorResponse: String = """
-                                       |POST of 'http://localhost:7052/compliance-cases/risking' returned 400 (Bad Request).
-                                       |Response body '{"errors":["object has missing required properties ([\"Case\"])"]}'
-                                       |""".stripMargin
 
   "The Compliance Api Controller" when {
     "serving Investigations api" should {
       "return Accepted for valid input" in {
         when(service.complianceInvestigations(any())(any(), any()))
-            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonResponse)))))
+            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(models.ExamplePayloads.exampleJsonResponse)))))
 
         route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumJson))).map {
           result => status(result) shouldBe Status.ACCEPTED
         }
       }
+      "return Accepted for valid input with address" in {
+        when(service.complianceInvestigations(any())(any(), any()))
+            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(models.ExamplePayloads.exampleJsonResponse)))))
+
+        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(addressJson))).map {
+          result => status(result) shouldBe Status.ACCEPTED
+        }
+      }
       "return BadRequest for invalid input" in {
         route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(incorrectJson))).map {
+          result => status(result) shouldBe Status.BAD_REQUEST
+        }
+      }
+      "return BadRequest for no json" in {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url)).map {
           result => status(result) shouldBe Status.BAD_REQUEST
         }
       }

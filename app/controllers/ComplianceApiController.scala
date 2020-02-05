@@ -63,9 +63,9 @@ class ComplianceApiController @Inject()(
     val excludedHeaders = List(CONTENT_TYPE, CONTENT_LENGTH)
 
     val headers = for {
-      (k, v) <- response.allHeaders
-      if !excludedHeaders.contains(k)
-    } yield k -> v.mkString(", ")
+      (key, values) <- response.allHeaders
+      if !excludedHeaders.contains(key)
+    } yield key -> values.mkString(", ")
 
     Status(response.status)
       .apply(response.body)

@@ -17,15 +17,13 @@
 package controllers
 
 import config.AppConfig
-import connectors.ComplianceCasesConnector
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
-import models.ComplianceInvestigations
 import play.api.http.ContentTypes
-import play.api.libs.json.{JsError, JsNull, JsPath, JsSuccess, JsValue, Json, JsonValidationError}
+import play.api.libs.json.{JsNull, Json}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import services.{ComplianceCasesService, ResourceService, ValidationService}
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,19 +42,9 @@ class ComplianceApiController @Inject()(
     val input = request.body.asJson.getOrElse(JsNull)
 
     validator.validate(schema, input) match {
-      case Right(_) => {
-        Json.fromJson[ComplianceInvestigations](input) match {
-          case JsSuccess(value, path) => complianceCasesService.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
-          case JsError(errors) => Future.successful(BadRequest(mappingErrorResponse(errors)))
-        }
-      }
+      case Right(_) => complianceCasesService.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
       case Left(errors) => Future.successful(BadRequest(errors))
     }
-  }
-
-  private def mappingErrorResponse(errors: Seq[(JsPath, Seq[JsonValidationError])]): JsValue = {
-    val response = errors.map(x => Map(x._1.toString -> x._2.map(_.message)))
-    Json.toJson(Map("MappingErrors" -> response))
   }
 
   private def mappingConnectorResponse(response: HttpResponse): Result = {

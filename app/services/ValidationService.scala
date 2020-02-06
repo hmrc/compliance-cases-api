@@ -20,8 +20,9 @@ import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonschema.core.report.{ListReportProvider, LogLevel}
 import com.github.fge.jsonschema.main.JsonSchemaFactory
 import com.google.inject.Inject
+import models.ComplianceInvestigations
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, JsValue, Json, JsonValidationError}
 import play.api.mvc.Results._
 import play.api.mvc._
 
@@ -37,28 +38,36 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
     .freeze()
   private val logger = Logger(this.getClass)
 
-  def validate(schemaString: String, jsValue: JsValue): Either[JsValue, Unit] = {
+  def validate(schemaString: String, input: JsValue): Either[JsValue, Unit] = {
 
     val schemaJson = JsonLoader.fromString(schemaString)
-    val json = JsonLoader.fromString(Json.stringify(jsValue))
+    val json = JsonLoader.fromString(Json.stringify(input))
     val schema = factory.getJsonSchema(schemaJson)
     val result = schema.validate(json, true)
 
     if (result.isSuccess) {
-      Right(())
+      Json.fromJson[ComplianceInvestigations](input) match {
+        case JsSuccess(value, path) => Right()
+        case JsError(errors) => Left(mappingErrorResponse(errors))
+      }
     } else {
 
       val errors = result.iterator.asScala.toList.map {
         _.getMessage
       }
 
-      logger.error(Json.prettyPrint(jsValue))
+      logger.error(Json.prettyPrint(input))
       errors.foreach(logger.error(_))
 
       Left(Json.obj(
         "errors" -> errors
       ))
     }
+  }
+
+  private def mappingErrorResponse(errors: Seq[(JsPath, Seq[JsonValidationError])]): JsValue = {
+    val response = errors.map(x => Map(x._1.toString -> x._2.map(_.message)))
+    Json.toJson(Map("MappingErrors" -> response))
   }
 
   def apply(schemaString: String): ActionFilter[Request] with ActionBuilder[Request, AnyContent] =

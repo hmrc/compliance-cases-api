@@ -22,16 +22,18 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Environment
 import play.api.libs.json.Json
+import play.api.mvc.BodyParsers
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ResourceServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
+class ValidationServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
   with ScalaFutures with IntegrationPatience {
 
-  private val env = Environment.simple()
+  import scala.concurrent.ExecutionContext.Implicits.global
+  import play.api.mvc._
 
   implicit lazy val hc: HeaderCarrier = HeaderCarrier(sessionId = None)
 
-  val service = new ResourceService(env)
+  val service = new ValidationService(BodyParsers)
 
   val schema: String =
     """|{

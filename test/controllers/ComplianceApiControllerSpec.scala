@@ -30,6 +30,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HttpResponse
+import data.ComplianceCasesExamples._
 
 import scala.concurrent.Future
 
@@ -48,66 +49,33 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
 
   implicit lazy val materializer: Materializer = app.materializer
 
-  val name = "Mr Test Name"
-  val age = 20
-
-  val minimumJson = s"""{
-                       |  "Case": {
-                       |    "SourceSysRef": "CFSC",
-                       |    "SourceSysID": "474013587585 ",
-                       |    "CaseFlowID": 150000,
-                       |    "CampaignID": "CID-6269",
-                       |    "ProjectID": "PID-6480",
-                       |    "CaseType": "YieldBearing ",
-                       |    "VATOfficeCode": "123456789 ",
-                       |    "ConfidenceScore": 7.000000 ,
-                       |    "Risks": {
-                       |      "Risk": {
-                       |        "TaxRegime": "VAT ",
-                       |        "Description": "Example  ",
-                       |        "Score": 9.1 ,
-                       |        "TaxPeriodFrom": "2008-04-06",
-                       |        "TaxPeriodTo": "2009-04-05"
-                       |      }
-                       |    },
-                       |    "Taxpayers": {
-                       |      "Taxpayer": {
-                       |        "Type": "SoleTrader"
-                       |      }
-                       |    }
-                       |  }
-                       |}""".stripMargin
-
-  val incorrectJson = s"""{
-                         | "Invalid": "$name",
-                         | "age": $age
-                         |}""".stripMargin
-
-  val exampleJsonResponse: String = """
-                                      |{
-                                      |  "Response" : "CFSC",
-                                      |  "Code" : 202
-                                      |}
-                                      |""".stripMargin
-
-  val exampleErrorResponse: String = """
-                                       |POST of 'http://localhost:7052/compliance-cases/risking' returned 400 (Bad Request).
-                                       |Response body '{"errors":["object has missing required properties ([\"Case\"])"]}'
-                                       |""".stripMargin
-
   "The Compliance Api Controller" when {
     "serving Investigations api" should {
       "return Accepted for valid input" in {
         when(connector.complianceInvestigations(any())(any(), any()))
-            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonResponse)))))
+            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)))))
 
         route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumJson))).map {
-          result => status(result) shouldBe Status.ACCEPTED
+          result => {
+            status(result) shouldBe Status.ACCEPTED
+            contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+          }
         }
       }
-      "return BadRequest for invalid input" in {
+      "return BadRequest for invalid input (validation error in controller)" in {
         route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(incorrectJson))).map {
           result => status(result) shouldBe Status.BAD_REQUEST
+        }
+      }
+      "return BadRequest for valid input (error passed back from connector)" in {
+        when(connector.complianceInvestigations(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, Some(Json.parse(exampleJsonErrorResponse)))))
+
+        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumJson))).map {
+          result => {
+            status(result) shouldBe Status.BAD_REQUEST
+            contentAsJson(result) shouldBe Json.parse(exampleJsonErrorResponse)
+          }
         }
       }
     }

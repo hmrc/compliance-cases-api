@@ -18,22 +18,23 @@ package models
 
 import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.Json
-import data.ComplianceCasesExamples._
+import caseData.ComplianceCasesExamples._
 
-class ComplianceInvestigationsModelSpec extends WordSpec with Matchers {
+class ComplianceInvestigationsSpec extends WordSpec with Matchers {
 
   val caseRef = "CSFC-1234567890"
   val name = "Mr Test Name"
   val age = 20
+  val id = 150000
 
   "Compliance Investigations model" when {
 
     "binding json data to a model" should {
       "produce a full model" in {
-        Json.fromJson[ComplianceInvestigationsModel](Json.parse(minimumJson)).getOrElse(None) shouldBe filledMinimumModel
+        Json.fromJson[ComplianceInvestigations](Json.parse(minimumJson)).getOrElse(None) shouldBe filledMinimumModel
       }
       "return Errors if missing data" in {
-        Json.fromJson[ComplianceInvestigationsModel](Json.parse(incorrectJson)).isError shouldBe true
+        Json.fromJson[ComplianceInvestigations](Json.parse(incorrectJson)).isError shouldBe true
       }
     }
   }

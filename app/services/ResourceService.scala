@@ -34,6 +34,5 @@ class ResourceService @Inject()(environment: Environment) {
     Source.fromInputStream(stream).mkString
   }
 
-  def getJson(resource: String): JsValue =
-    Json.parse(getFile(resource))
+  def getJson(resource: String): JsValue = Json.parse(getFile(resource))
 }

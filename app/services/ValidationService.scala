@@ -16,17 +16,18 @@
 
 package services
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.github.fge.jackson.JsonLoader
-import com.github.fge.jsonschema.core.report.{ListReportProvider, LogLevel}
-import com.github.fge.jsonschema.main.JsonSchemaFactory
+import com.github.fge.jsonschema.core.report.{ListReportProvider, LogLevel, ProcessingReport}
+import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.google.inject.Inject
+import models.ComplianceInvestigations
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.Results._
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
                                  (implicit val ec: ExecutionContext) {
@@ -37,40 +38,38 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
     .freeze()
   private val logger = Logger(this.getClass)
 
-  def validate(schemaString: String, jsValue: JsValue): Either[JsValue, Unit] = {
+  def validateAgainstSchema(json: JsonNode, schema: JsonSchema): ProcessingReport = {
+    schema.validate(json, true)
+  }
+
+  def validate(schemaString: String, input: JsValue): Either[JsValue, Unit] = {
 
     val schemaJson = JsonLoader.fromString(schemaString)
-    val json = JsonLoader.fromString(Json.stringify(jsValue))
+    val json = JsonLoader.fromString(Json.stringify(input))
     val schema = factory.getJsonSchema(schemaJson)
-    val result = schema.validate(json, true)
+    val result = validateAgainstSchema(json, schema)
 
     if (result.isSuccess) {
-      Right(())
+      Json.fromJson[ComplianceInvestigations](input) match {
+        case JsSuccess(value, path) => Right()
+        case JsError(errors) => Left(mappingErrorResponse(errors))
+      }
     } else {
 
-      val errors = result.iterator.asScala.toList.map {
-        _.getMessage
-      }
+      val errors = result.iterator.asScala.toList.map(_.getMessage)
 
-      logger.error(Json.prettyPrint(jsValue))
+      //Uncomment if want to log request json
+      //logger.debug(Json.prettyPrint(input))
       errors.foreach(logger.error(_))
 
-      Left(Json.obj(
-        "errors" -> errors
-      ))
+      Left(Json.obj("errors" -> errors))
     }
   }
 
-  def apply(schemaString: String): ActionFilter[Request] with ActionBuilder[Request, AnyContent] =
-    new ActionFilter[Request] with ActionBuilder[Request, AnyContent] {
-      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
-        validate(schemaString, request.body.asInstanceOf[JsValue]) match {
-          case Right(_) => Future.successful(None)
-          case Left(errors) => Future.successful(Some(BadRequest(errors)))
-        }
+  private def mappingErrorResponse(mappingErrors: Seq[(JsPath, Seq[JsonValidationError])]): JsValue = {
 
-      override def parser: BodyParser[AnyContent] = bodyParser
+    val errors = mappingErrors.map(x => s"${x._1.toString()} - ${x._2.map(_.message).mkString(",")}")
 
-      override protected def executionContext: ExecutionContext = ec
-    }
+    Json.obj("mappingErrors" -> errors)
+  }
 }

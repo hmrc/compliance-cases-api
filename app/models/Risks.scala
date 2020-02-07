@@ -20,13 +20,13 @@ import play.api.libs.json.Reads
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-case class RisksModel(Risk: RiskModel)
+case class Risks(Risk: Risk)
 
-object RisksModel {
-  implicit def reads: Reads[RisksModel] = (__ \ "Risk").read[RiskModel].map(RisksModel.apply)
+object Risks {
+  implicit def reads: Reads[Risks] = (__ \ "Risk").read[Risk].map(Risks.apply)
 }
 
-case class RiskModel(
+case class Risk(
                       TaxRegime: String,
                       Description: String,
                       Score: Double,
@@ -42,8 +42,8 @@ case class RiskModel(
                       PotentialBehaviour: Option[String],
                       EmergingBehaviour: Option[String])
 
-object RiskModel {
-  implicit def reads: Reads[RiskModel] = (
+object Risk {
+  implicit def reads: Reads[Risk] = (
 
     (__ \ "TaxRegime").read[String] and
       (__ \ "Description").read[String] and
@@ -60,6 +60,6 @@ object RiskModel {
       (__ \ "PotentialBehaviour").readNullable[String] and
       (__ \ "EmergingBehaviour").readNullable[String]
 
-    ) (RiskModel.apply _)
+    ) (Risk.apply _)
 }
 

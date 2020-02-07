@@ -20,13 +20,13 @@ import play.api.libs.json.Reads
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-case class TaxpayersModel(Taxpayer: TaxpayerModel)
+case class Taxpayers(Taxpayer: Taxpayer)
 
-object TaxpayersModel {
-  implicit def reads: Reads[TaxpayersModel] = (__ \ "Taxpayer").read[TaxpayerModel].map(TaxpayersModel.apply)
+object Taxpayers {
+  implicit def reads: Reads[Taxpayers] = (__ \ "Taxpayer").read[Taxpayer].map(Taxpayers.apply)
 }
 
-case class TaxpayerModel(
+case class Taxpayer(
                           Type: String,
                           OUID: Option[String],
                           Title: Option[String],
@@ -39,13 +39,13 @@ case class TaxpayerModel(
                           Reference: Option[String],
                           TypeOfReference: Option[String],
                           ValueOfReference: Option[String],
-                          HomeAddress: Option[AddressModel],
+                          HomeAddress: Option[Address],
                           BusinessName: Option[String],
-                          BusinessAddress: Option[AddressModel],
+                          BusinessAddress: Option[Address],
                           email: Option[String])
 
-object TaxpayerModel {
-  implicit def reads: Reads[TaxpayerModel] = (
+object Taxpayer {
+  implicit def reads: Reads[Taxpayer] = (
 
     (__ \ "Type").read[String] and
       (__ \ "OUID").readNullable[String] and
@@ -59,11 +59,11 @@ object TaxpayerModel {
       (__ \ "Reference").readNullable[String] and
       (__ \ "TypeOfReference").readNullable[String] and
       (__ \ "ValueOfReference").readNullable[String] and
-      (__ \ "HomeAddress").readNullable[AddressModel] and
+      (__ \ "HomeAddress").readNullable[Address] and
       (__ \ "BusinessName").readNullable[String] and
-      (__ \ "BusinessAddress").readNullable[AddressModel] and
+      (__ \ "BusinessAddress").readNullable[Address] and
       (__ \ "email").readNullable[String]
 
-    ) (TaxpayerModel.apply _)
+    ) (Taxpayer.apply _)
 }
 

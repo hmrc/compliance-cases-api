@@ -20,32 +20,32 @@ import play.api.libs.json.Reads
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-case class CaseflowCaseModel(
-                              SourceSysRef: String,
-                              SourceSysID: String,
-                              CaseFlowID: Int,
-                              CampaignID: String,
-                              ProjectID: String,
-                              CaseType: String,
-                              TargetRIS: Option[String],
-                              ComplianceStream: Option[String],
-                              EnguiryType: Option[String],
-                              Segment: Option[String],
-                              VATOfficeCode: String,
-                              ProjectedYield: Option[String],
-                              Filter1: Option[String],
-                              Filter2: Option[String],
-                              LastDateForEnquiry: Option[String],
-                              ConfidenceScore: Option[Double],
-                              ArchiveApproach: Option[String],
-                              InterventionSubType: Option[String],
-                              InteractionTitle: Option[String],
-                              AuthorisationType: Option[String],
-                              Risks: RisksModel,
-                              Taxpayers: TaxpayersModel)
+case class CaseflowCase(
+                         SourceSysRef: String,
+                         SourceSysID: String,
+                         CaseFlowID: Int,
+                         CampaignID: String,
+                         ProjectID: String,
+                         CaseType: String,
+                         TargetRIS: Option[String],
+                         ComplianceStream: Option[String],
+                         EnguiryType: Option[String],
+                         Segment: Option[String],
+                         VATOfficeCode: String,
+                         ProjectedYield: Option[String],
+                         Filter1: Option[String],
+                         Filter2: Option[String],
+                         LastDateForEnquiry: Option[String],
+                         ConfidenceScore: Option[Double],
+                         ArchiveApproach: Option[String],
+                         InterventionSubType: Option[String],
+                         InteractionTitle: Option[String],
+                         AuthorisationType: Option[String],
+                         Risks: Risks,
+                         Taxpayers: Taxpayers)
 
-object CaseflowCaseModel {
-  implicit def reads: Reads[CaseflowCaseModel] = (
+object CaseflowCase {
+  implicit def reads: Reads[CaseflowCase] = (
 
     (__ \ "SourceSysRef").read[String] and
       (__ \ "SourceSysID").read[String] and
@@ -67,8 +67,8 @@ object CaseflowCaseModel {
       (__ \ "InterventionSubType").readNullable[String] and
       (__ \ "InteractionTitle").readNullable[String] and
       (__ \ "AuthorisationType").readNullable[String] and
-      (__ \ "Risks").read[RisksModel] and
-      (__ \ "Taxpayers").read[TaxpayersModel]
+      (__ \ "Risks").read[Risks] and
+      (__ \ "Taxpayers").read[Taxpayers]
 
-    ) (CaseflowCaseModel.apply _)
+    ) (CaseflowCase.apply _)
 }

@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-package connectors
+package services
 
-import config.AppConfig
-import javax.inject.{Inject, Singleton}
-import play.api.http.{ContentTypes, HeaderNames}
+import connectors.ComplianceCasesConnector
+import javax.inject.Inject
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: AppConfig) extends RecoveryUtil {
-
-  private val headers = Seq(HeaderNames.CONTENT_TYPE -> ContentTypes.JSON)
-
-  implicit val api: String = "complianceInvestigations"
+class ComplianceCasesService @Inject()(connector: ComplianceCasesConnector) {
 
   def complianceInvestigations(request: JsValue)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
-
-    val endpoint = config.complianceInvestigationsUrl
-    httpClient.POST[JsValue, HttpResponse](endpoint, request, headers).recover(recovery)
+    connector.complianceInvestigations(request)
   }
 }

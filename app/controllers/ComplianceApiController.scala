@@ -17,15 +17,13 @@
 package controllers
 
 import config.AppConfig
-import connectors.ComplianceCasesConnector
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
-import models.ComplianceInvestigationsModel
 import play.api.http.ContentTypes
-import play.api.libs.json.{JsError, JsNull, JsPath, JsSuccess, JsValue, Json, JsonValidationError}
-import services.{ResourceService, ValidationService}
+import play.api.libs.json.{JsNull, Json}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import services.{ComplianceCasesService, ResourceService, ValidationService}
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,39 +31,29 @@ import scala.concurrent.{ExecutionContext, Future}
 class ComplianceApiController @Inject()(
                                          validator: ValidationService,
                                          resources: ResourceService,
-                                         complianceCasesConnector: ComplianceCasesConnector,
+                                         complianceCasesService: ComplianceCasesService,
                                          appConfig: AppConfig,
                                          cc: ControllerComponents
                                        )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   private val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
 
-  def risking(): Action[AnyContent] = Action.async {implicit request =>
+  def risking(): Action[AnyContent] = Action.async { implicit request =>
     val input = request.body.asJson.getOrElse(JsNull)
 
     validator.validate(schema, input) match {
-      case Right(_) => {
-        Json.fromJson[ComplianceInvestigationsModel](input) match {
-          case JsSuccess(value, path) => complianceCasesConnector.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
-          case JsError(errors) => Future.successful(BadRequest(mappingErrorResponse(errors)))
-        }
-      }
+      case Right(_) => complianceCasesService.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
       case Left(errors) => Future.successful(BadRequest(errors))
     }
-  }
-
-  private def mappingErrorResponse(errors: Seq[(JsPath, Seq[JsonValidationError])]): JsValue = {
-    val response = errors.map(x => Map(x._1.toString -> x._2.map(_.message)))
-    Json.toJson(Map("MappingErrors" -> response))
   }
 
   private def mappingConnectorResponse(response: HttpResponse): Result = {
     val excludedHeaders = List(CONTENT_TYPE, CONTENT_LENGTH)
 
     val headers = for {
-      (k, v) <- response.allHeaders
-      if !excludedHeaders.contains(k)
-    } yield k -> v.mkString(", ")
+      (key, values) <- response.allHeaders
+      if !excludedHeaders.contains(key)
+    } yield key -> values.mkString(", ")
 
     Status(response.status)
       .apply(response.body)

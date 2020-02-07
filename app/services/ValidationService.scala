@@ -23,12 +23,11 @@ import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.google.inject.Inject
 import models.ComplianceInvestigations
 import play.api.Logger
-import play.api.libs.json.{JsError, JsPath, JsSuccess, JsValue, Json, JsonValidationError}
-import play.api.mvc.Results._
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
                                  (implicit val ec: ExecutionContext) {
@@ -59,8 +58,9 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
 
       val errors = result.iterator.asScala.toList.map(_.getMessage)
 
-      logger.debug(Json.prettyPrint(input))
-      errors.foreach(logger.debug(_))
+      //Uncomment if want to log request json
+      //logger.debug(Json.prettyPrint(input))
+      errors.foreach(logger.error(_))
 
       Left(Json.obj("errors" -> errors))
     }
@@ -72,17 +72,4 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
 
     Json.obj("mappingErrors" -> errors)
   }
-
-  def apply(schemaString: String): ActionFilter[Request] with ActionBuilder[Request, AnyContent] =
-    new ActionFilter[Request] with ActionBuilder[Request, AnyContent] {
-      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
-        validate(schemaString, request.body.asInstanceOf[JsValue]) match {
-          case Right(_) => Future.successful(None)
-          case Left(errors) => Future.successful(Some(BadRequest(errors)))
-        }
-
-      override def parser: BodyParser[AnyContent] = bodyParser
-
-      override protected def executionContext: ExecutionContext = ec
-    }
 }

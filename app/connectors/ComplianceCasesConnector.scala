@@ -19,7 +19,7 @@ package connectors
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import play.api.http.{ContentTypes, HeaderNames}
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 

@@ -17,22 +17,20 @@
 package controllers
 
 import akka.stream.Materializer
-import config.AppConfig
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import caseData.ComplianceCasesExamples._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import play.api.test.Helpers._
 import play.api.test.FakeRequest
-import services.{ComplianceCasesService, ResourceService, ValidationService}
+import play.api.test.Helpers._
+import services.ComplianceCasesService
 import uk.gov.hmrc.http.HttpResponse
-import caseData.ComplianceCasesExamples._
 
 import scala.concurrent.Future
 
@@ -55,7 +53,9 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
     "serving Investigations api" should {
       "return Accepted for valid input" in {
         when(service.complianceInvestigations(any())(any(), any()))
-            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)))))
+            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
+              Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
+            ))
 
         route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumJson))).map {
           result => {

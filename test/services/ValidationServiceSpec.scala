@@ -23,6 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
+import caseData.ComplianceCasesExamples._
 
 class ValidationServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
   with ScalaFutures with IntegrationPatience {
@@ -39,7 +40,7 @@ class ValidationServiceSpec extends WordSpec with MustMatchers with GuiceOneAppP
 
   "validationService" should {
     "return json errors when schema validation passes but model does not map" in {
-      validationService.validate(models.ExamplePayloads.testSchema, Json.parse(models.ExamplePayloads.testJson2)).left.get mustBe Json.parse(
+      validationService.validate(testSchema, Json.parse(testJson2)).left.get mustBe Json.parse(
         """
           |{
           |   "mappingErrors":
@@ -51,7 +52,7 @@ class ValidationServiceSpec extends WordSpec with MustMatchers with GuiceOneAppP
     }
 
     "return json schema errors" in {
-      validationService.validate(models.ExamplePayloads.schema, Json.parse("""{"Case":[]}""")).left.get mustBe Json.parse(
+      validationService.validate(schema, Json.parse("""{"Case":[]}""")).left.get mustBe Json.parse(
         """
           |{
           |   "errors":

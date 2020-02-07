@@ -18,6 +18,7 @@ package models
 
 import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.Json
+import caseData.ComplianceCasesExamples._
 
 class ComplianceInvestigationsSpec extends WordSpec with Matchers {
 
@@ -27,50 +28,10 @@ class ComplianceInvestigationsSpec extends WordSpec with Matchers {
   val id = 150000
 
   "Compliance Investigations model" when {
-    val filledModel =
-      ComplianceInvestigations(
-        CaseflowCase(
-          "CFSC", "474013587585 ", id, "CID-6269", "PID-6480", "YieldBearing ", None, None, None, None,
-          "123456789 ", None, None, None, None, None, None, None, None, None,
-          Risks(Risk("VAT ", "Example  ", 9.1 , "2008-04-06", "2009-04-05", None, None, None, None, None, None, None, None, None)),
-          Taxpayers(Taxpayer("SoleTrader", None, None, None, None, None, None, None, None, None, None, None, None, None, None, None))
-        )
-      )
-    val minimumJson = s"""{
-                         |  "Case": {
-                         |    "SourceSysRef": "CFSC",
-                         |    "SourceSysID": "474013587585 ",
-                         |    "CaseFlowID": 150000,
-                         |    "CampaignID": "CID-6269",
-                         |    "ProjectID": "PID-6480",
-                         |    "CaseType": "YieldBearing ",
-                         |    "VATOfficeCode": "123456789 ",
-                         |    "Risks": {
-                         |      "Risk": {
-                         |        "TaxRegime": "VAT ",
-                         |        "Description": "Example  ",
-                         |        "Score": 9.1 ,
-                         |        "TaxPeriodFrom": "2008-04-06",
-                         |        "TaxPeriodTo": "2009-04-05"
-                         |      }
-                         |    },
-                         |    "Taxpayers": {
-                         |      "Taxpayer": {
-                         |        "Type": "SoleTrader"
-                         |      }
-                         |    }
-                         |  }
-                         |}""".stripMargin
-
-    val incorrectJson =
-      s"""{
-        | "Invalid": "$name",
-        | "age": $age
-        |}""".stripMargin
 
     "binding json data to a model" should {
       "produce a full model" in {
-        Json.fromJson[ComplianceInvestigations](Json.parse(minimumJson)).getOrElse(None) shouldBe filledModel
+        Json.fromJson[ComplianceInvestigations](Json.parse(minimumJson)).getOrElse(None) shouldBe filledMinimumModel
       }
       "return Errors if missing data" in {
         Json.fromJson[ComplianceInvestigations](Json.parse(incorrectJson)).isError shouldBe true

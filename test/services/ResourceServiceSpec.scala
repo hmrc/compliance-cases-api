@@ -23,6 +23,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Environment
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
+import caseData.ComplianceCasesExamples._
 
 class ResourceServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
   with ScalaFutures with IntegrationPatience {
@@ -48,11 +49,11 @@ class ResourceServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPer
     }
 
     "return json" in {
-      service.getJson("/schemas/caseflowCreateCaseSchema.json") mustBe Json.parse(models.ExamplePayloads.schema)
+      service.getJson("/schemas/caseflowCreateCaseSchema.json") mustBe Json.parse(schema)
     }
 
     "return file" in {
-      service.getFile("/schemas/caseflowCreateCaseSchema.json") mustBe models.ExamplePayloads.schema
+      service.getFile("/schemas/caseflowCreateCaseSchema.json") mustBe schema
 
     }
   }

@@ -16,7 +16,7 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
+import caseData.ComplianceCasesExamples._
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{MustMatchers, WordSpec}
@@ -33,6 +33,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite
   with WireMockHelper with ScalaFutures with IntegrationPatience {
 
+
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .configure("microservice.services.compliance-cases.port" -> server.port)
     .build()
@@ -40,7 +41,8 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
   private implicit lazy val hc: HeaderCarrier = HeaderCarrier()
   private lazy val connector = app.injector.instanceOf[ComplianceCasesConnector]
 
-  "ComplianceCasesConnector method" should {
+  "Compliance Cases Connector" should {
+
     "return a HttpResponse when valid body is provided" in {
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
@@ -48,14 +50,14 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
         .willReturn(
           aResponse()
             .withStatus(ACCEPTED)
-            .withBody(models.ExamplePayloads.exampleJsonResponse)
+            .withBody(exampleJsonSuccessResponse)
             .withHeader("contentType", "application/json")
         )
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(models.ExamplePayloads.exampleJson))) { response => response }
+      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
       response.status mustBe ACCEPTED
-      response.json mustBe Json.parse(models.ExamplePayloads.exampleJsonResponse)
+      response.json mustBe Json.parse(exampleJsonSuccessResponse)
     }
 
     "return an 500 when call fails" in {
@@ -65,21 +67,28 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
         .willReturn(serverError)
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(models.ExamplePayloads.exampleJson))) { response => response }
+
+      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
 
       response.status mustBe INTERNAL_SERVER_ERROR
     }
+
     "return an 400 when call fails" in {
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
-        .willReturn(badRequest())
+        .willReturn(
+          aResponse()
+            .withStatus(BAD_REQUEST)
+            .withBody(exampleJsonErrorResponse)
+            .withHeader("contentType", "application/json")
+        )
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(models.ExamplePayloads.exampleJson))) { response => response }
-
+      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
       response.status mustBe BAD_REQUEST
     }
+
     "return an 404 when call fails" in {
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
@@ -87,10 +96,11 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
         .willReturn(notFound())
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(models.ExamplePayloads.exampleJson))) { response => response }
+      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
 
       response.status mustBe NOT_FOUND
     }
+
     "return an 401 when call fails" in {
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
@@ -98,13 +108,15 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
         .willReturn(unauthorized())
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(models.ExamplePayloads.exampleJson))) { response => response }
+      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
 
       response.status mustBe UNAUTHORIZED
     }
+
     "return an exception when call fails" in {
 
       val code = 600
+
       def exception = aResponse.withStatus(code)
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
@@ -112,7 +124,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
         .willReturn(exception)
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(models.ExamplePayloads.exampleJson))) { response => response }
+      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
 
       response.status mustBe INTERNAL_SERVER_ERROR
     }

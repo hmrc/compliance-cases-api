@@ -16,9 +16,10 @@
 
 package services
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.github.fge.jackson.JsonLoader
-import com.github.fge.jsonschema.core.report.{ListReportProvider, LogLevel}
-import com.github.fge.jsonschema.main.JsonSchemaFactory
+import com.github.fge.jsonschema.core.report.{ListReportProvider, LogLevel, ProcessingReport}
+import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.google.inject.Inject
 import models.ComplianceInvestigations
 import play.api.Logger
@@ -38,12 +39,16 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
     .freeze()
   private val logger = Logger(this.getClass)
 
+  def validateAgainstSchema(json: JsonNode, schema: JsonSchema): ProcessingReport = {
+    schema.validate(json, true)
+  }
+
   def validate(schemaString: String, input: JsValue): Either[JsValue, Unit] = {
 
     val schemaJson = JsonLoader.fromString(schemaString)
     val json = JsonLoader.fromString(Json.stringify(input))
     val schema = factory.getJsonSchema(schemaJson)
-    val result = schema.validate(json, true)
+    val result = validateAgainstSchema(json, schema)
 
     if (result.isSuccess) {
       Json.fromJson[ComplianceInvestigations](input) match {
@@ -52,22 +57,20 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
       }
     } else {
 
-      val errors = result.iterator.asScala.toList.map {
-        _.getMessage
-      }
+      val errors = result.iterator.asScala.toList.map(_.getMessage)
 
-      logger.error(Json.prettyPrint(input))
-      errors.foreach(logger.error(_))
+      logger.debug(Json.prettyPrint(input))
+      errors.foreach(logger.debug(_))
 
-      Left(Json.obj(
-        "errors" -> errors
-      ))
+      Left(Json.obj("errors" -> errors))
     }
   }
 
-  private def mappingErrorResponse(errors: Seq[(JsPath, Seq[JsonValidationError])]): JsValue = {
-    val response = errors.map(x => Map(x._1.toString -> x._2.map(_.message)))
-    Json.toJson(Map("MappingErrors" -> response))
+  private def mappingErrorResponse(mappingErrors: Seq[(JsPath, Seq[JsonValidationError])]): JsValue = {
+
+    val errors = mappingErrors.map(x => s"${x._1.toString()} - ${x._2.map(_.message).mkString(",")}")
+
+    Json.obj("mappingErrors" -> errors)
   }
 
   def apply(schemaString: String): ActionFilter[Request] with ActionBuilder[Request, AnyContent] =

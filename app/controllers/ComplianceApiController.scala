@@ -18,6 +18,7 @@ package controllers
 
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
+import models.ComplianceInvestigations
 import play.api.http.ContentTypes
 import play.api.libs.json.{JsNull, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
@@ -41,7 +42,7 @@ class ComplianceApiController @Inject()(
   def risking(): Action[AnyContent] = Action.async { implicit request =>
     val input = request.body.asJson.getOrElse(JsNull)
 
-    validator.validate(schema, input) match {
+    validator.validate[ComplianceInvestigations](schema, input) match {
       case Right(_) => complianceCasesService.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
       case Left(errors) => Future.successful(BadRequest(errors))
     }

@@ -42,7 +42,7 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
     schema.validate(json, true)
   }
 
-  def validate(schemaString: String, input: JsValue): Either[JsValue, Unit] = {
+  def validate[A](schemaString: String, input: JsValue)(implicit rds: Reads[A]): Either[JsValue, Unit] = {
 
     val schemaJson = JsonLoader.fromString(schemaString)
     val json = JsonLoader.fromString(Json.stringify(input))
@@ -50,7 +50,7 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default)
     val result = validateAgainstSchema(json, schema)
 
     if (result.isSuccess) {
-      Json.fromJson[ComplianceInvestigations](input) match {
+      Json.fromJson[A](input) match {
         case JsSuccess(value, path) => Right()
         case JsError(errors) => Left(mappingErrorResponse(errors))
       }

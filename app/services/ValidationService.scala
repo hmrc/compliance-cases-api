@@ -21,7 +21,6 @@ import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonschema.core.report.{ListReportProvider, LogLevel, ProcessingReport}
 import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.google.inject.Inject
-import models.ComplianceInvestigations
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._

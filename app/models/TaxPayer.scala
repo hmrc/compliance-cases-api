@@ -19,18 +19,14 @@ package models
 import play.api.libs.json.Reads
 import play.api.libs.json._
 
+case class TaxPayer(
+                     taxPayerType: String,
+                     segment: Option[String],
+                     referenceNumber: ReferenceNumber,
+                     nameDetails: Option[NameDetails],
+                     addresses: Seq[Address],
+                   )
 
-case class Address(
-                    correspondenceAddress: Boolean,
-                    addressType: String,
-                    addressLine1: String,
-                    addressLine2: Option[String],
-                    city: Option[String],
-                    county: Option[String],
-                    country: Option[String],
-                    postcode: Option[String]
-                  )
-
-object Address {
-  implicit def reads: Reads[Address] = Json.reads[Address]
+object TaxPayer {
+  implicit def reads: Reads[TaxPayer] = Json.reads[TaxPayer]
 }

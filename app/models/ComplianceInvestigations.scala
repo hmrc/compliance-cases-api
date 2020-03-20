@@ -19,9 +19,8 @@ package models
 import play.api.libs.json.Reads
 import play.api.libs.json._
 
-case class ComplianceInvestigations(Case: CaseflowCase)
+case class ComplianceInvestigations(sourceSystemId: String, sourceSystemKey: String, `case`: CaseflowCase)
 
 object ComplianceInvestigations {
-  implicit def reads: Reads[ComplianceInvestigations] =
-    (__ \ "Case").read[CaseflowCase].map(ComplianceInvestigations.apply)
+  implicit def reads: Reads[ComplianceInvestigations] = Json.reads[ComplianceInvestigations]
 }

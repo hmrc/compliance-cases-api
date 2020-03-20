@@ -31,6 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ComplianceCasesService
 import uk.gov.hmrc.http.HttpResponse
+import views.html.helper.input
 
 import scala.concurrent.Future
 
@@ -53,11 +54,37 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
     "serving Investigations api" should {
       "return Accepted for valid input" in {
         when(service.complianceInvestigations(any())(any(), any()))
-            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
-              Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
-            ))
+          .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
+            Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
+          ))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumJson))).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumRepaymentOrganisationJson))).map {
+          result => {
+            status(result) shouldBe Status.ACCEPTED
+            contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+          }
+        }
+      }
+
+      "return Accepted for valid full individual repayment input" in {
+        when(service.complianceInvestigations(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)))))
+
+        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(fullCaseJson))).map {
+          result => {
+            status(result) shouldBe Status.ACCEPTED
+            contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+          }
+        }
+      }
+
+      "return Accepted for valid risk input" in {
+        when(service.complianceInvestigations(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
+            Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
+          ))
+
+        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumRiskJson))).map {
           result => {
             status(result) shouldBe Status.ACCEPTED
             contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
@@ -90,7 +117,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
         when(service.complianceInvestigations(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, Some(Json.parse(exampleJsonErrorResponse)))))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumJson))).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumRepaymentOrganisationJson))).map {
           result => {
             status(result) shouldBe Status.BAD_REQUEST
             contentAsJson(result) shouldBe Json.parse(exampleJsonErrorResponse)

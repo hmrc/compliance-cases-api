@@ -41,24 +41,25 @@ class ValidationServiceSpec extends WordSpec with MustMatchers with GuiceOneAppP
 
   "validationService" should {
     "return json errors when schema validation passes but model does not map" in {
-      validationService.validate[ComplianceInvestigations](testSchema, Json.parse(testJson2)).left.get mustBe Json.parse(
+      validationService.validate[ComplianceInvestigations]("{}", Json.parse(requestJsonWithoutSourceSystemId)).left.get mustBe Json.parse(
         """
           |{
           |   "mappingErrors":
           |     [
-          |       "/Case/CampaignID - error.expected.jsstring"
+          |       "/sourceSystemId - error.path.missing"
           |     ]
           |}
           |""".stripMargin)
     }
 
     "return json schema errors" in {
-      validationService.validate[ComplianceInvestigations](schema, Json.parse("""{"Case":[]}""")).left.get mustBe Json.parse(
+      validationService.validate[ComplianceInvestigations](schema,
+        Json.parse("""{"sourceSystemId": "CNT", "sourceSystemKey": [], "case": []}""")).left.get mustBe Json.parse(
         """
           |{
           |   "errors":
           |     [
-          |       "instance type (array) does not match any allowed primitive type (allowed: [\"object\"])"
+          |       "instance failed to match exactly one schema (matched 0 out of 2)","instance type (array) does not match any allowed primitive type (allowed: [\"string\"])"
           |     ]
           |}
           |""".stripMargin)

@@ -24,7 +24,7 @@ case class TaxPayer(
                      segment: Option[String],
                      referenceNumber: ReferenceNumber,
                      nameDetails: Option[NameDetails],
-                     addresses: Seq[Address],
+                     addresses: Seq[Address]
                    )
 
 object TaxPayer {

@@ -18,57 +18,32 @@ package models
 
 import play.api.libs.json.Reads
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
-case class CaseflowCase(
-                         SourceSysRef: String,
-                         SourceSysID: String,
-                         CaseFlowID: Int,
-                         CampaignID: String,
-                         ProjectID: String,
-                         CaseType: String,
-                         TargetRIS: Option[String],
-                         ComplianceStream: Option[String],
-                         EnguiryType: Option[String],
-                         Segment: Option[String],
-                         VATOfficeCode: String,
-                         ProjectedYield: Option[String],
-                         Filter1: Option[String],
-                         Filter2: Option[String],
-                         LastDateForEnquiry: Option[String],
-                         ConfidenceScore: Option[Double],
-                         ArchiveApproach: Option[String],
-                         InterventionSubType: Option[String],
-                         InteractionTitle: Option[String],
-                         AuthorisationType: Option[String],
-                         Risks: Risks,
-                         Taxpayers: Taxpayers)
+trait CaseflowCase
+
+case class RepaymentCase(
+                         caseType: String,
+                         sourceSystemRef: String,
+                         repaymentAmount: Double,
+                         taxRegime: String,
+                         taxPeriodStart: String,
+                         taxPeriodEnd: String,
+                         caseOwnerId: Option[Long],
+                         triggeredRiskRuleRef: Option[String],
+                         taxPayer: TaxPayer
+                       ) extends CaseflowCase
+
+case class RiskCase(
+                   caseType: String,
+                   sourceSystemRef: String
+                   ) extends CaseflowCase
 
 object CaseflowCase {
-  implicit def reads: Reads[CaseflowCase] = (
+  implicit def caseFlowCaseReads: Reads[RepaymentCase] = Json.reads[RepaymentCase]
 
-    (__ \ "SourceSysRef").read[String] and
-      (__ \ "SourceSysID").read[String] and
-      (__ \ "CaseFlowID").read[Int] and
-      (__ \ "CampaignID").read[String] and
-      (__ \ "ProjectID").read[String] and
-      (__ \ "CaseType").read[String] and
-      (__ \ "TargetRIS").readNullable[String] and
-      (__ \ "ComplianceStream").readNullable[String] and
-      (__ \ "EnguiryType").readNullable[String] and
-      (__ \ "Segment").readNullable[String] and
-      (__ \ "VATOfficeCode").read[String] and
-      (__ \ "ProjectedYield").readNullable[String] and
-      (__ \ "Filter1").readNullable[String] and
-      (__ \ "Filter2").readNullable[String] and
-      (__ \ "LastDateForEnquiry").readNullable[String] and
-      (__ \ "ConfidenceScore").readNullable[Double] and
-      (__ \ "ArchiveApproach").readNullable[String] and
-      (__ \ "InterventionSubType").readNullable[String] and
-      (__ \ "InteractionTitle").readNullable[String] and
-      (__ \ "AuthorisationType").readNullable[String] and
-      (__ \ "Risks").read[Risks] and
-      (__ \ "Taxpayers").read[Taxpayers]
+  implicit def riskCaseReads: Reads[RiskCase] = Json.reads[RiskCase]
 
-    ) (CaseflowCase.apply _)
+  implicit def casesReads: Reads[CaseflowCase] = (json: JsValue) => {
+    json.validate[RepaymentCase] orElse json.validate[RiskCase]
+  }
 }

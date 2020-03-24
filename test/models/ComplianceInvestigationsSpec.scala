@@ -30,8 +30,14 @@ class ComplianceInvestigationsSpec extends WordSpec with Matchers {
   "Compliance Investigations model" when {
 
     "binding json data to a model" should {
-      "produce a full model" in {
-        Json.fromJson[ComplianceInvestigations](Json.parse(minimumJson)).getOrElse(None) shouldBe filledMinimumModel
+      "produce a full repayment model with organisation name" in {
+        Json.fromJson[ComplianceInvestigations](Json.parse(minimumRepaymentOrganisationJson)).getOrElse(None) shouldBe filledMinimumRepaymentOrganisationModel
+      }
+      "produce a full risk model" in {
+        Json.fromJson[ComplianceInvestigations](Json.parse(minimumRiskJson)) getOrElse(None) shouldBe filledMinimumRiskModel
+      }
+      "produce a full repayment model with human name" in {
+        Json.fromJson[ComplianceInvestigations](Json.parse(minimumRepaymentHumanJson)) getOrElse(None) shouldBe filledMinimumRepaymentHumanModel
       }
       "return Errors if missing data" in {
         Json.fromJson[ComplianceInvestigations](Json.parse(incorrectJson)).isError shouldBe true

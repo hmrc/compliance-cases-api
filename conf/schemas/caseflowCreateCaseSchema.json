@@ -1,524 +1,290 @@
 {
-  "definitions": {},
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://example.com/root.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "API#1561 -  Create Case Request Schema v0.1.0",
   "type": "object",
-  "title": "Caseflow Case Create Update Schema",
+  "additionalProperties": false,
   "required": [
-    "Case"
+    "sourceSystemId",
+    "sourceSystemKey",
+    "case"
   ],
   "properties": {
-    "Case": {
-      "$id": "#/properties/Case",
+    "sourceSystemId": {
+      "description": "To identify the source system. Currently only 'CNT' (Connect) supported",
+      "type": "string",
+      "enum": [
+        "CNT"
+      ]
+    },
+    "sourceSystemKey": {
+      "description": "Primary key on the source system",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9\/\\$\\.\\-]{1,64}$"
+    },
+    "case": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "caseType",
+            "sourceSystemRef",
+            "repaymentAmount",
+            "taxRegime",
+            "taxPeriodStart",
+            "taxPeriodEnd",
+            "taxPayer"
+          ],
+          "properties": {
+            "caseType": {
+              "description": "Mandatory. Must be 'Repayment' for a   repayment case",
+              "type": "string",
+              "enum": [
+                "Repayment"
+              ]
+            },
+            "sourceSystemRef": {
+              "description": "Mandatory. An identify reference; 'CFSRP' for a   'Repayment'",
+              "type": "string",
+              "enum": [
+                "CFSRP"
+              ]
+            },
+            "repaymentAmount": {
+              "description": "Mandatory. The amount to be repaid; min: 0.01, max: 999999999999999.99 (15 pound digits, 2   pence digits)",
+              "type": "number",
+              "multipleOf": 0.01,
+              "minimum": 0.01,
+              "maximum": 999999999999999.99
+            },
+            "taxRegime": {
+              "type": "string",
+              "description": "Mandatory. The tax regime of the case",
+              "pattern": "^[a-zA-Z_]{2,15}$",
+              "examples": [
+                "VAT"
+              ]
+            },
+            "taxPeriodStart": {
+              "description": "Mandatory. The start of the tax period in the format CCYY-MM-DD",
+              "$ref": "#/definitions/dateType"
+            },
+            "taxPeriodEnd": {
+              "description": "Mandatory. The end of the tax period in the format CCYY-MM-DD",
+              "$ref": "#/definitions/dateType"
+            },
+            "caseOwnerId": {
+              "description": "Optional. The numeric id of the owner of the case.",
+              "type": "number",
+              "multipleOf": 1,
+              "minimum": 1,
+              "maximum": 9999999
+            },
+            "triggeredRiskRuleRef": {
+              "description": "Optional. A   reference for the triggered risk rule on the source system",
+              "type": "string",
+              "pattern": "^[A-Za-z0-9\\$\\.\\-]{1,10}$",
+              "examples": [
+                "A-23"
+              ]
+            },
+            "taxPayer": {
+              "description": "Mandatory. All the details of the tax payer.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "taxPayerType",
+                "referenceNumber",
+                "addresses"
+              ],
+              "properties": {
+                "taxPayerType": {
+                  "description": "Mandatory. A   categorisation of the tax payer e.g. Individual, Partnership, Organisation",
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9\\/\\-\\. ]{1,40}$"
+                },
+                "segment": {
+                  "description": "Optional. The segment of the tax payer e.g. Micro A; needed for an organistion type tax payer",
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9\\/\\- ]{1,40}$"
+                },
+                "nameDetails": {
+                  "description": "Optional. The name of the individual or organisation tax payer ",
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "firstName",
+                        "lastName"
+                      ],
+                      "properties": {
+                        "title": {
+                          "description": "Optional. The person's title.",
+                          "type": "string",
+                          "enum": [
+                            "NOT KNOWN",
+                            "MR",
+                            "MISS",
+                            "MS",
+                            "DR",
+                            "REV",
+                            "PROF"
+                          ]
+                        },
+                        "firstName": {
+                          "description": "Mandatory. The person's first name.",
+                          "$ref": "#/definitions/nameType"
+                        },
+                        "lastName": {
+                          "description": "Mandatory. The person's last name.",
+                          "$ref": "#/definitions/nameType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "organisationName"
+                      ],
+                      "properties": {
+                        "organisationName": {
+                          "description": "Mandatory. The organisation's name.",
+                          "$ref": "#/definitions/organisationNameType"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "referenceNumber": {
+                  "description": "Mandatory. A   key/value pair reference for the repayment.",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "referenceType",
+                    "referenceValue"
+                  ],
+                  "properties": {
+                    "referenceType": {
+                      "description": "Mandatory. The type of the reference.",
+                      "type": "string",
+                      "pattern": "^[A-Za-z\\/\\-\\. ]{1,100}$"
+                    },
+                    "referenceValue": {
+                      "description": "Mandatory. The value of the reference.",
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9\\/\\-\\.]{5,25}$"
+                    }
+                  }
+                },
+                "addresses": {
+                  "description": "Mandatory. A   list of addresses of the tax payer",
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 50,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/definitions/addressEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "caseType"
+          ],
+          "properties": {
+            "caseType": {
+              "type": "string",
+              "enum": [
+                "Risk"
+              ]
+            },
+            "sourceSystemRef": {
+              "description": "An identify reference; 'CFSRK' for a   'Risk'",
+              "type": "string",
+              "enum": [
+                "CFSRK"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "dateType": {
+      "description": "A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.",
+      "type": "string",
+      "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\\-]02[\\-]29|((19|20)[0-9]{2}[\\-](0[469]|11)[\\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\\-](0[13578]|1[02])[\\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\\-]02[\\-](0[1-9]|1[0-9]|2[0-8])))$"
+    },
+    "nameType": {
+      "type": "string",
+      "pattern": "^[a-zA-Z &`\\-\\'\\.^]{1,35}$"
+    },
+    "organisationNameType": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9 &`\\-\\'\\.^]{1,70}$"
+    },
+    "addressLineType": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9 \\-,.&'\\/]{1,35}$"
+    },
+    "addressEntry": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
-        "SourceSysRef",
-        "SourceSysID",
-        "CaseFlowID",
-        "CampaignID",
-        "ProjectID",
-        "CaseType",
-        "VATOfficeCode",
-        "Risks",
-        "Taxpayers"
+        "addressLine1",
+        "correspondenceAddress",
+        "addressType"
       ],
       "properties": {
-        "SourceSysRef": {
-          "$id": "#/properties/Case/properties/SourceSysRef",
+        "correspondenceAddress": {
+          "description": "Mandatory. Whether this address is a   correspondence one (true) or not (false).",
+          "type": "boolean"
+        },
+        "addressType": {
+          "description": "Mandatory. The type of the address.",
           "type": "string",
+          "pattern": "^[A-Za-z ]{4,20}$",
           "examples": [
-            "CFSC"
+            "Home",
+            "Holiday house",
+            "Business"
           ]
-
         },
-        "SourceSysID": {
-          "$id": "#/properties/Case/properties/SourceSysID",
+        "addressLine1": {
+          "description": "Mandatory. First line of the address.",
+          "$ref": "#/definitions/addressLineType"
+        },
+        "addressLine2": {
+          "description": "Optional. Second line of the address.",
+          "$ref": "#/definitions/addressLineType"
+        },
+        "city": {
+          "description": "Optional.",
           "type": "string",
-          "examples": [
-            "991234010001"
-          ]
-
+          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{4,50}$"
         },
-        "CaseFlowID": {
-          "$id": "#/properties/Case/properties/CaseFlowID",
-          "type": "integer",
-          "examples": [
-            123456
-          ]
-        },
-        "CampaignID": {
-          "$id": "#/properties/Case/properties/CampaignID",
+        "county": {
+          "description": "Optional.",
           "type": "string",
-          "examples": [
-            "123456"
-          ]
+          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{4,30}$"
         },
-        "ProjectID": {
-          "$id": "#/properties/Case/properties/ProjectID",
+        "country": {
+          "description": "Optional.",
           "type": "string",
-          "examples": [
-            "9999"
-          ]
+          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{1,50}$"
         },
-        "CaseType": {
-          "$id": "#/properties/Case/properties/CaseType",
+        "postcode": {
+          "description": "Optional.",
           "type": "string",
-          "examples": [
-            "YieldBearing"
-          ]
-        },
-        "TargetRIS": {
-          "$id": "#/properties/Case/properties/TargetRIS",
-          "type": "string",
-          "examples": [
-            "VAT"
-          ]
-        },
-        "ComplianceStream": {
-          "$id": "#/properties/Case/properties/ComplianceStream",
-          "type": "string",
-          "examples": [
-            "TEEL"
-          ]
-        },
-        "EnguiryType": {
-          "$id": "#/properties/Case/properties/EnguiryType",
-          "type": "string",
-          "examples": [
-            "Full"
-          ]
-        },
-        "Segment": {
-          "$id": "#/properties/Case/properties/Segment",
-          "type": "string",
-          "examples": [
-            "Medium"
-          ]
-        },
-        "VATOfficeCode": {
-          "$id": "#/properties/Case/properties/VATOfficeCode",
-          "type": "string",
-          "examples": [
-            "123"
-          ]
-        },
-        "ProjectedYield": {
-          "$id": "#/properties/Case/properties/ProjectedYield",
-          "type": "string",
-          "examples": [
-            "123400.00"
-          ]
-
-        },
-        "Filter1": {
-          "$id": "#/properties/Case/properties/Filter1",
-          "type": "string",
-          "examples": [
-            "string"
-          ]
-
-        },
-        "Filter2": {
-          "$id": "#/properties/Case/properties/Filter2",
-          "type": "string",
-          "examples": [
-            "string"
-          ]
-
-        },
-        "LastDateForEnquiry": {
-          "$id": "#/properties/Case/properties/LastDateForEnquiry",
-          "type": "string",
-          "format": "date",
-          "examples": [
-            "2009-04-30"
-          ]
-
-        },
-        "ConfidenceScore": {
-          "$id": "#/properties/Case/properties/ConfidenceScore",
-          "type": "number",
-          "examples": [
-            "6.0"
-          ]
-
-        },
-        "ArchiveApproach": {
-          "$id": "#/properties/Case/properties/ArchiveApproach",
-          "type": "string",
-          "examples": [
-            "test"
-          ]
-
-        },
-        "InterventionSubType": {
-          "$id": "#/properties/Case/properties/InterventionSubType",
-          "type": "string",
-          "examples": [
-            "Compliance Return"
-          ]
-
-        },
-        "InteractionTitle": {
-          "$id": "#/properties/Case/properties/InteractionTitle",
-          "type": "string",
-          "examples": [
-            "String"
-          ]
-        },
-        "AuthorisationType": {
-          "$id": "#/properties/Case/properties/AuthorisationType",
-          "type": "string",
-          "examples": [
-            "Mandatory"
-          ]
-
-        },
-        "Risks": {
-          "$id": "#/properties/Case/properties/Risks",
-          "type": "object",
-          "required": [
-            "Risk"
-          ],
-          "properties": {
-            "Risk": {
-              "$id": "#/properties/Case/properties/Risks/properties/Risk",
-              "type": "object",
-              "title": "The Risk Schema",
-              "required": [
-                "TaxRegime",
-                "Description",
-                "Score",
-                "TaxPeriodFrom",
-                "TaxPeriodTo"
-              ],
-              "properties": {
-                "TaxRegime": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/TaxRegime",
-                  "type": "string",
-                  "examples": [
-                    "VAT"
-                  ]
-                },
-                "Description": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/Description",
-                  "type": "string",
-                  "examples": [
-                    "string"
-                  ]
-
-                },
-                "Score": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/Score",
-                  "type": "number",
-                  "examples": [
-                    "8.5"
-                  ]
-
-                },
-                "TaxPeriodFrom": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/TaxPeriodFrom",
-                  "type": "string",
-                  "format": "date",
-                  "examples": [
-                    "2008-04-6"
-                  ]
-
-                },
-                "TaxPeriodTo": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/TaxPeriodTo",
-                  "type": "string",
-                  "format": "date",
-                  "examples": [
-                    "2009-04-05"
-                  ]
-                },
-                "SubRegime": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/SubRegime",
-                  "type": "string",
-                  "examples": [
-                    "VAT"
-                  ]
-                },
-                "ComplianceCheck1": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/ComplianceCheck1",
-                  "type": "string",
-                  "examples": [
-                    "Nons9A12ACReview"
-                  ]
-                },
-                "ComplianceCheck2": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/ComplianceCheck2",
-                  "type": "string",
-                  "examples": [
-                    "AspectDiscov"
-                  ]
-                },
-                "InaccuracyCategory": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/InaccuracyCategory",
-                  "type": "string",
-                  "examples": [
-                    "Avoidance"
-                  ]
-                },
-                "InaccuracyDescription": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/InaccuracyDescription",
-                  "type": "string",
-                  "examples": [
-                    "Avoidance"
-                  ]
-
-                },
-                "PotentialAmount": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/PotentialAmount",
-                  "type": "number",
-                  "title": "The Potentialamount Schema",
-
-                  "examples": [
-                    "100.00"
-                  ]
-                },
-                "ExpectedAmount": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/ExpectedAmount",
-                  "type": "number",
-                  "examples": [
-                    "100.00"
-                  ]
-
-                },
-                "PotentialBehaviour": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/PotentialBehaviour",
-                  "type": "string",
-                  "examples": [
-                    "Mistake"
-                  ]
-
-                },
-                "EmergingBehaviour": {
-                  "$id": "#/properties/Case/properties/Risks/properties/Risk/properties/EmergingBehaviour",
-                  "type": "string",
-                  "examples": [
-                    "Mistake"
-                  ]
-
-                }
-              }
-            }
-          }
-        },
-        "Taxpayers": {
-          "$id": "#/properties/Case/properties/Taxpayers",
-          "type": "object",
-          "required": [
-            "Taxpayer"
-          ],
-          "properties": {
-            "Taxpayer": {
-              "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer",
-              "type": "object",
-              "required": [
-                "Type"
-              ],
-              "properties": {
-                "Type": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/Type",
-                  "type": "string",
-                  "examples": [
-                    "SoleTrader"
-                  ]
-                },
-                "OUID": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/OUID",
-                  "type": "string",
-                  "examples": [
-                    "111"
-                  ]
-                },
-                "Title": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/Title",
-                  "type": "string",
-                  "examples": [
-                    "Mrs"
-                  ]
-                },
-                "FirstName": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/FirstName",
-                  "type": "string",
-                  "examples": [
-                    "String"
-                  ]
-                },
-                "Surname": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/Surname",
-                  "type": "string",
-                  "examples": [
-                    "Tax-Payer"
-                  ]
-                },
-                "NINO": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/NINO",
-                  "type": "string",
-                  "examples": [
-                    "WL1234567890"
-                  ]
-                },
-                "UTR": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/UTR",
-                  "type": "string",
-                  "examples": [
-                    "string"
-                  ]
-                },
-                "EmpPAYERef": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/EmpPAYERef",
-                  "type": "string",
-                  "examples": [
-                    "string"
-                  ]
-                },
-                "VATNumber": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/VATNumber",
-                  "type": "string",
-                  "examples": [
-                    "string"
-                  ]
-                },
-                "Reference": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/Reference",
-                  "type": "string",
-                  "examples": [
-                    "string"
-                  ]
-                },
-                "TypeOfReference": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/TypeOfReference",
-                  "type": "string",
-                  "maxLength": 15,
-                  "examples": [
-                    "VatRegistrationNumber"
-                  ]
-                },
-                "ValueOfReference": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/ValueOfReference",
-                  "type": "string",
-                  "examples": [
-                    "Other"
-                  ]
-                },
-                "HomeAddress": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/HomeAddress",
-                  "type": "object",
-                  "properties": {
-                    "Line1": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/HomeAddress/properties/Line1",
-                      "type": "string",
-                      "examples": [
-                        "2, The Tree line cul de sac"
-                      ]
-                    },
-                    "Line2": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/HomeAddress/properties/Line2",
-                      "type": "string",
-                      "examples": [
-                        "string"
-                      ]
-                    },
-                    "Line3": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/HomeAddress/properties/Line3",
-                      "type": "string",
-                      "examples": [
-                        "string"
-                      ]
-                    },
-                    "Town": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/HomeAddress/properties/Town",
-                      "type": "string",
-                      "examples": [
-                        "nice suburb"
-                      ]
-                    },
-                    "Postcode": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/HomeAddress/properties/Postcode",
-                      "type": "string",
-                      "examples": [
-                        "ns1 1pc"
-                      ]
-                    },
-                    "Phone": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/HomeAddress/properties/Phone",
-                      "type": "string",
-                      "examples": [
-                        "123-123-1234"
-                      ]
-                    }
-                  }
-                },
-                "BusinessName": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/BusinessName",
-                  "type": "string",
-                  "examples": [
-                    "The Village Pub"
-                  ]
-                },
-                "BusinessAddress": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/BusinessAddress",
-                  "type": "object",
-                  "properties": {
-                    "Line1": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/BusinessAddress/properties/Line1",
-                      "type": "string",
-                      "examples": [
-                        "1, The High Street"
-                      ]
-                    },
-                    "Line2": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/BusinessAddress/properties/Line2",
-                      "type": "string",
-                      "examples": [
-                        "string"
-                      ]
-                    },
-                    "Line3": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/BusinessAddress/properties/Line3",
-                      "type": "string",
-                      "examples": [
-                        "string"
-                      ]
-                    },
-                    "Town": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/BusinessAddress/properties/Town",
-                      "type": "string",
-                      "examples": [
-                        "Niceville"
-                      ]
-                    },
-                    "Postcode": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/BusinessAddress/properties/Postcode",
-                      "type": "string",
-                      "examples": [
-                        "PP1 1YZ"
-                      ]
-                    },
-                    "Phone": {
-                      "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/BusinessAddress/properties/Phone",
-                      "type": "string",
-                      "examples": [
-                        "0123456"
-                      ]
-                    }
-                  }
-                },
-                "email": {
-                  "$id": "#/properties/Case/properties/Taxpayers/properties/Taxpayer/properties/email",
-                  "type": "string",
-                  "examples": [
-                    "tax.payer@yahoo.com"
-                  ]
-
-                }
-              }
-            }
-          }
+          "pattern": "^[A-Z0-9 ]{3,10}$"
         }
       }
     }

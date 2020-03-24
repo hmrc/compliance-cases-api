@@ -20,17 +20,11 @@ import play.api.libs.json.Reads
 import play.api.libs.json._
 
 
-case class Address(
-                    correspondenceAddress: Boolean,
-                    addressType: String,
-                    addressLine1: String,
-                    addressLine2: Option[String],
-                    city: Option[String],
-                    county: Option[String],
-                    country: Option[String],
-                    postcode: Option[String]
-                  )
+case class ReferenceNumber(
+                            referenceType: String,
+                            referenceValue: String
+                          )
 
-object Address {
-  implicit def reads: Reads[Address] = Json.reads[Address]
+object ReferenceNumber {
+  implicit def reads: Reads[ReferenceNumber] = Json.reads[ReferenceNumber]
 }

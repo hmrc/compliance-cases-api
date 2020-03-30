@@ -49,9 +49,9 @@ object ComplianceCasesExamples {
         taxPayerType = "Organisation",
         segment = None,
         referenceNumber = ReferenceNumber("ValueAddedTax", "VAT-666"),
-        nameDetails = Some(OrganisationNameDetails("Smiths Store")),
+        nameDetails = Some(OrganisationNameDetails("A Fake Organisation")),
         addresses = Seq(
-          Address(correspondenceAddress = true, "Holiday house", "1 Makebelieve Avenue", None, None, None, None, None)
+          Address(correspondenceAddress = true, "Holiday house", "1 A Fake Road", None, None, None, None, None)
         )
       )
     )
@@ -73,9 +73,9 @@ object ComplianceCasesExamples {
         taxPayerType = "Individual",
         segment = None,
         referenceNumber = ReferenceNumber("ValueAddedTax", "VAT-666"),
-        nameDetails = Some(HumanNameDetails("MR", "John", "Smith")),
+        nameDetails = Some(HumanNameDetails("MR", "FirstName", "LastName")),
         addresses = Seq(
-          Address(correspondenceAddress = true, "Holiday house", "1 Makebelieve Avenue", None, None, None, None, None)
+          Address(correspondenceAddress = true, "Holiday house", "1 A Fake Road", None, None, None, None, None)
         )
       )
     )
@@ -105,8 +105,8 @@ object ComplianceCasesExamples {
       |     "taxPayerType": "Individual",
       |     "nameDetails": {
       |       "title": "MR",
-      |       "firstName": "John",
-      |       "lastName": "Smith"
+      |       "firstName": "FirstName",
+      |       "lastName": "LastName"
       |     },
       |     "referenceNumber": {
       |       "referenceType": "ValueAddedTax",
@@ -116,7 +116,7 @@ object ComplianceCasesExamples {
       |       {
       |         "correspondenceAddress": true,
       |         "addressType": "Holiday house",
-      |         "addressLine1": "1 Makebelieve Avenue"
+      |         "addressLine1": "1 A Fake Road"
       |       }
       |     ]
       |   }
@@ -147,7 +147,7 @@ object ComplianceCasesExamples {
       |   "taxPayer": {
       |     "taxPayerType": "Organisation",
       |     "nameDetails": {
-      |       "organisationName": "Smiths Store"
+      |       "organisationName": "A Fake Organisation"
       |     },
       |     "referenceNumber": {
       |       "referenceType": "ValueAddedTax",
@@ -157,7 +157,7 @@ object ComplianceCasesExamples {
       |       {
       |         "correspondenceAddress": true,
       |         "addressType": "Holiday house",
-      |         "addressLine1": "1 Makebelieve Avenue"
+      |         "addressLine1": "1 A Fake Road"
       |       }
       |     ]
       |   }
@@ -185,12 +185,12 @@ object ComplianceCasesExamples {
        |       {
        |         "correspondenceAddress": true,
        |         "addressType": "Home",
-       |         "addressLine1": "1 Downtoearth Street",
-       |         "addressLine2": "Mundanesville",
-       |         "city": "Bored City",
-       |         "county": "Sleepy State",
-       |         "country": "US of A",
-       |         "postcode": "CA17745"
+       |         "addressLine1": "1 A Fake Road",
+       |         "addressLine2": "A Fake Place",
+       |         "city": "A Fake City",
+       |         "county": "A Fake County",
+       |         "country": "A Fake Country",
+       |         "postcode": "AB0 0CD"
        |       }
        |     ]
        |   }
@@ -227,19 +227,19 @@ object ComplianceCasesExamples {
       |     },
       |     "nameDetails": {
       |       "title": "MR",
-      |       "firstName": "John",
-      |       "lastName": "Smith"
+      |       "firstName": "FirstName",
+      |       "lastName": "LastName"
       |     },
       |     "addresses": [
       |       {
       |         "correspondenceAddress": true,
       |         "addressType": "Holiday house",
-      |         "addressLine1": "1 Makebelieve Avenue",
-      |         "addressLine2": "Johns Place",
-      |         "city": "A Real City",
-      |         "county": "Johns County",
-      |         "country": "Johns Country",
-      |         "postcode": "QW1 1QW"
+      |         "addressLine1": "1 A Fake Road",
+      |         "addressLine2": "A Fake Place",
+      |         "city": "A Fake City",
+      |         "county": "A Fake County",
+      |         "country": "A Fake Country",
+      |         "postcode": "AB0 0CD"
       |       }
       |     ]
       |   }
@@ -541,8 +541,8 @@ object ComplianceCasesExamples {
       |     "taxPayerType": "Individual",
       |     "nameDetails": {
       |       "title": "MR",
-      |       "firstName": "John",
-      |       "lastName": "Smith"
+      |       "firstName": "FirstName",
+      |       "lastName": "LastName"
       |     },
       |     "referenceNumber": {
       |       "referenceType": "ValueAddedTax",
@@ -552,7 +552,7 @@ object ComplianceCasesExamples {
       |       {
       |         "correspondenceAddress": true,
       |         "addressType": "Holiday house",
-      |         "addressLine1": "1 Makebelieve Avenue"
+      |         "addressLine1": "1 A Fake Road"
       |       }
       |     ]
       |   }
@@ -574,8 +574,8 @@ object ComplianceCasesExamples {
       |     "taxPayerType": "Individual",
       |     "nameDetails": {
       |       "title": "MR",
-      |       "firstName": "John",
-      |       "lastName": "Smith"
+      |       "firstName": "FirstName",
+      |       "lastName": "LastName"
       |     },
       |     "referenceNumber": {
       |       "referenceType": "ValueAddedTax",
@@ -585,7 +585,7 @@ object ComplianceCasesExamples {
       |       {
       |         "correspondenceAddress": true,
       |         "addressType": "Holiday house",
-      |         "addressLine1": "1 Makebelieve Avenue"
+      |         "addressLine1": "1 A Fake Road"
       |       }
       |     ]
       |   }
@@ -656,7 +656,7 @@ object ComplianceCasesExamples {
        |        {
        |          "correspondenceAddress": true,
        |          "addressType": "Holidayhouse",
-       |          "addressLine1": "1MakebelieveAvenue"
+       |          "addressLine1": "1 A Fake Road"
        |        }
        |      ]
        |    }
@@ -690,7 +690,7 @@ object ComplianceCasesExamples {
        |        {
        |          "correspondenceAddress": true,
        |          "addressType": "Holidayhouse",
-       |          "addressLine1": "1MakebelieveAvenue"
+       |          "addressLine1": "1 A Fake Road"
        |        }
        |      ]
        |    }

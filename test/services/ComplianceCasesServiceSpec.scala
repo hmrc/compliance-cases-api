@@ -16,34 +16,24 @@
 
 package services
 
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.test.FakeRequest
-import play.api.{Configuration, Environment, _}
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
-import config.AppConfig
+import caseData.ComplianceCasesExamples._
 import connectors.ComplianceCasesConnector
-import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Matchers
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import caseData.ComplianceCasesExamples._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
   with ScalaFutures with IntegrationPatience {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import play.api.http.Status._
-
-  private val fakeRequest = FakeRequest("GET", "/")
-  private val env           = Environment.simple()
-  private val configuration = Configuration.load(env)
-  private val serviceConfig = new ServicesConfig(configuration, new RunMode(configuration, Mode.Dev))
-  private val appConfig     = new AppConfig(configuration, serviceConfig)
   private val complianceCasesConnector = mock[ComplianceCasesConnector]
   private val service: ComplianceCasesService = new ComplianceCasesService(complianceCasesConnector)
 

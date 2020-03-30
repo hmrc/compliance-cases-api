@@ -16,7 +16,7 @@
 
 package caseData
 
-import models.{Address, ComplianceInvestigations, HumanNameDetails, NameDetails, OrganisationNameDetails, ReferenceNumber, RepaymentCase, RiskCase, TaxPayer}
+import models.{Address, ComplianceInvestigations, HumanNameDetails, OrganisationNameDetails, ReferenceNumber, RepaymentCase, RiskCase, TaxPayer}
 
 
 object ComplianceCasesExamples {

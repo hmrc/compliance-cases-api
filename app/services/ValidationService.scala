@@ -46,12 +46,6 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
     schema.validate(json, true)
   }
 
-  def getErrorMessage(processingMessage: ProcessingMessage) = {
-    //
-    //processingMessage.getMessage
-    "an invalid value provided"
-  }
-
   def getFieldName(processingMessage: ProcessingMessage, prefix: String = "") = {
     processingMessage.asJson().get("instance").asScala.map(instanceName => prefix + instanceName.asText).headOption.getOrElse("Field cannot be found")
   }
@@ -65,7 +59,7 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
   def validateCaseType(caseJson: JsValue): Either[BadRequestErrorResponse, Unit] = {
     def getResult(schema: String, caseType: String): Either[BadRequestErrorResponse, Unit] = {
       val result = validateInternallyAgainstSchema(schema, caseJson)
-      if (result.isSuccess) Right() else {
+      if (result.isSuccess) Right(()) else {
         val errors = getJsonObjs(result, "/case")
         errors.foreach(g => logger.error(g.toString()))
         Left(
@@ -94,7 +88,7 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
     if (result.isSuccess) {
       validateCaseType((input \ "case").as[JsValue]).flatMap(_ =>
         Json.fromJson[A](input) match {
-          case JsSuccess(value, path) => Right()
+          case JsSuccess(value, path) => Right(())
           case JsError(errors) => Left(mappingErrorResponse(errors))
         }
       ).fold(invalid => Left(Json.toJson(invalid)), valid => Right(valid))

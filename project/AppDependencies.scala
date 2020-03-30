@@ -7,7 +7,7 @@ object AppDependencies {
 
   val compile = Seq(
 
-    "uk.gov.hmrc"             %% "bootstrap-play-26"        % "1.5.0",
+    "uk.gov.hmrc"             %% "bootstrap-play-26"        % "1.6.0",
     "com.github.java-json-tools" % "json-schema-validator" % "2.2.13"
   )
 

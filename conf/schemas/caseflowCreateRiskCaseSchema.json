@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "API#1561 -  Create Case Request Schema v0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "caseType"
+  ],
+  "properties": {
+    "caseType": {
+      "type": "string",
+      "enum": [
+        "Risk"
+      ]
+    },
+    "sourceSystemRef": {
+      "description": "An identify reference; 'CFSRK' for a   'Risk'",
+      "type": "string",
+      "enum": [
+        "CFSRK"
+      ]
+    }
+  },
+  "definitions": {
+  }
+}

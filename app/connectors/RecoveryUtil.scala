@@ -17,10 +17,10 @@
 package connectors
 
 import play.api.Logger
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HttpResponse, NotFoundException, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http._
 
 trait RecoveryUtil {
-  def recovery(implicit hc: HeaderCarrier, api: String): PartialFunction[Throwable, HttpResponse] = {
+  def recovery(implicit api: String): PartialFunction[Throwable, HttpResponse] = {
 
     case badRequest: BadRequestException =>
       Logger.error(s"Bad Request response from $api API - ${badRequest.message}")

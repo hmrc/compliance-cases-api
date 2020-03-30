@@ -16,6 +16,7 @@
 
 package services
 
+import caseData.ComplianceCasesExamples._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
@@ -23,7 +24,6 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Environment
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
-import caseData.ComplianceCasesExamples._
 
 class ResourceServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
   with ScalaFutures with IntegrationPatience {
@@ -49,12 +49,19 @@ class ResourceServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPer
     }
 
     "return json" in {
-      service.getJson("/schemas/caseflowCreateCaseSchema.json") mustBe Json.parse(schema)
+      service.getJson("/schemas/caseflowCreateCaseSchema.json") mustBe Json.parse(caseflowCreateCaseSchema)
     }
 
-    "return file" in {
-      service.getFile("/schemas/caseflowCreateCaseSchema.json") mustBe schema
+    "return create case schema" in {
+      service.getFile("/schemas/caseflowCreateCaseSchema.json") mustBe caseflowCreateCaseSchema
+    }
 
+    "return create repayment case schema" in {
+      service.getFile("/schemas/caseflowCreateRepaymentCaseSchema.json") mustBe caseflowCreateRepaymentCaseSchema
+    }
+
+    "return create risk case schema" in {
+      service.getFile("/schemas/caseflowCreateRiskCaseSchema.json") mustBe caseflowCreateRiskCaseSchema
     }
   }
 }

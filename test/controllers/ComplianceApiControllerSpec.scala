@@ -31,7 +31,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ComplianceCasesService
 import uk.gov.hmrc.http.HttpResponse
-import views.html.helper.input
 
 import scala.concurrent.Future
 

@@ -72,7 +72,9 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
       case JsSuccess("Repayment", _) => getResult(repaymentCaseSchema, "Repayment")
       case JsSuccess("Risk", _) => getResult(riskCaseSchema, "Risk")
       case JsSuccess(_, _) => Left(mappingErrorResponse(JsError(__ \ "case" \ "caseType", "invalid case type provided").errors))
-      case JsError(errors) => Left(mappingErrorResponse(errors))
+      case JsError(errors) => Left(mappingErrorResponse(errors.map{
+        case (_, errors) => (__ \ "case" \ "caseType", errors)
+      }))
     }
   }
 

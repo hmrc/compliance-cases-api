@@ -126,7 +126,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
           |"message": "The provided JSON was unable to be validated",
           |"errors":
           |[
-          |{"code":"BAD_REQUEST","message":"an invalid value provided","path":""}
+          |{"code":"BAD_REQUEST","message":"an invalid value provided","path":"/case/caseType"}
           |]
           |}
           |""".stripMargin

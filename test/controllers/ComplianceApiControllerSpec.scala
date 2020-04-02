@@ -57,7 +57,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
             Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
           ))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumRepaymentOrganisationJson))).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(minimumRepaymentOrganisationJson))).map {
           result => {
             status(result) shouldBe Status.ACCEPTED
             contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
@@ -69,7 +69,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
         when(service.complianceInvestigations(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)))))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(fullCaseJson))).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(fullCaseJson))).map {
           result => {
             status(result) shouldBe Status.ACCEPTED
             contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
@@ -83,7 +83,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
             Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
           ))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumRiskJson))).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(minimumRiskJson))).map {
           result => {
             status(result) shouldBe Status.ACCEPTED
             contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
@@ -95,19 +95,19 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
         when(service.complianceInvestigations(any())(any(), any()))
             .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)))))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(addressJson))).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(addressJson))).map {
           result => status(result) shouldBe Status.ACCEPTED
         }
       }
 
       "return BadRequest for invalid input (validation error in controller)" in {
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(incorrectJson))).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(incorrectJson))).map {
           result => status(result) shouldBe Status.BAD_REQUEST
         }
       }
 
       "return BadRequest for no json" in {
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url)).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)).map {
           result => status(result) shouldBe Status.BAD_REQUEST
         }
       }
@@ -116,7 +116,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
         when(service.complianceInvestigations(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, Some(Json.parse(exampleJsonErrorResponse)))))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.risking().url).withJsonBody(Json.parse(minimumRepaymentOrganisationJson))).map {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(minimumRepaymentOrganisationJson))).map {
           result => {
             status(result) shouldBe Status.BAD_REQUEST
             contentAsJson(result) shouldBe Json.parse(exampleJsonErrorResponse)

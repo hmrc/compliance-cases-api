@@ -1,0 +1,34 @@
+{
+  "sourceSystemId": "CNT",
+  "sourceSystemKey": "AZ1234567/7",
+  "case": {
+    "caseType": "Repayment",
+    "sourceSystemRef": "CFSRP",
+    "repaymentAmount": 1234567.99,
+    "taxRegime": "VAT_Trader",
+    "taxPeriodStart": "2016-04-06",
+    "taxPeriodEnd": "2017-04-05",
+    "caseOwnerId": 666777,
+    "triggeredRiskRuleRef": "Abc$123",
+    "taxPayer": {
+      "taxPayerType": "Individual",
+      "segment": "Plan B",
+      "referenceNumber": {
+        "referenceType": "ValueAddedTax",
+        "referenceValue": "VAT-666"
+      },
+      "nameDetails": {
+        "title": "MR",
+        "firstName": "FirstName",
+        "lastName": "LastName"
+      },
+      "addresses": [
+        {
+          "correspondenceAddress": true,
+          "addressType": "Holiday house",
+          "addressLine1": "1 A Fake Road"
+        }
+      ]
+    }
+  }
+}

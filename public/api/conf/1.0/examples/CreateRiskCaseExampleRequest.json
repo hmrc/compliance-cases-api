@@ -1,0 +1,8 @@
+{
+  "sourceSystemId": "CNT",
+  "sourceSystemKey": "AZ1234567/7",
+  "case": {
+    "caseType": "Risk",
+    "sourceSystemRef": "CFSRK"
+  }
+}

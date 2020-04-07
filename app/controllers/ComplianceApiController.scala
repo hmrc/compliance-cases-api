@@ -39,7 +39,7 @@ class ComplianceApiController @Inject()(
 
   private val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
 
-  def risking(): Action[AnyContent] = Action.async { implicit request =>
+  def createCase(): Action[AnyContent] = Action.async { implicit request =>
     val input = request.body.asJson.getOrElse(JsNull)
 
     validator.validate[ComplianceInvestigations](schema, input) match {

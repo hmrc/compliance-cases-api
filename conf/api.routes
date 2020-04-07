@@ -1,0 +1,2 @@
+GET /definition           controllers.definition.ApiDocumentationController.definition()
+GET /conf/:version/*file  controllers.definition.ApiDocumentationController.conf(version, file)

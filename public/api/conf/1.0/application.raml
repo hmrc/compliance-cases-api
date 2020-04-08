@@ -1,0 +1,73 @@
+#%RAML 1.0
+---
+
+title: Compliance Cases
+version: 1.0
+protocols: [ HTTPS ]
+baseUri: https://api.service.hmrc.gov.uk/
+mediaType: [ application/json ]
+
+documentation:
+ - title: Overview
+   content: !include docs/overview.md
+ - title: Versioning
+   content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
+ - title: Errors
+   content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/errors.md
+ - title: Testing
+   content: !include docs/testing.md
+
+uses:
+  sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
+  headers: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml
+  annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
+  types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+  correlationIDHeader: headers/CorrelationIDHeader.raml
+
+/misc/compliance-cases:
+  /case:
+    post:
+      displayName: create-case-api
+
+      description: Passing Create Case data to integration framework
+
+      is: [headers.acceptHeader, headers.contentHeader, correlationIDHeader.correlationID]
+
+      (annotations.scope): "write:compliance-cases-api"
+      securedBy: [ sec.x-application: { scopes: [ "write:compliance-cases-api" ] } ]
+
+      body:
+        application/json:
+          type: !include schemas/CreateCaseSchema.json
+          examples:
+            example-1:
+              description: example create repayment case body
+              value: !include examples/CreateRepaymentCaseExampleRequest.json
+            example-2:
+              description: example create risk case body
+              value: !include examples/CreateRiskCaseExampleRequest.json
+      responses:
+        400:
+          body:
+            application/json:
+              type: types.errorResponse
+              example:
+                description: The JSON provided was invalid.
+                value:
+                  code: JSON_VALIDATION_ERROR
+        401:
+          body:
+            application/json:
+              type: types.errorResponse
+              example:
+                description: The credentials used are invalid.
+                value:
+                  code: UNAUTHORIZED
+        500:
+          body:
+            application/json:
+              type: types.errorResponse
+              example:
+                description: There was a problem with the server during the request.
+                value:
+                  code: INTERNAL_SERVER_ERROR

@@ -18,6 +18,7 @@ package connectors
 
 import caseData.ComplianceCasesExamples._
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.http.Fault
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -35,18 +36,22 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
 
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("microservice.services.compliance-cases.port" -> server.port)
+    .configure("integration-framework.base-url" -> s"http://localhost:${server.port}")
     .build()
 
   private implicit lazy val hc: HeaderCarrier = HeaderCarrier()
-  private lazy val connector = app.injector.instanceOf[ComplianceCasesConnector]
+  private def connector = app.injector.instanceOf[ComplianceCasesConnector]
+
+  val correlationId: String = "some-correlation-id"
 
   "Compliance Cases Connector" should {
 
     "return a HttpResponse when valid body is provided" in {
-
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
+        .withHeader("CorrelationId", equalTo(correlationId))
+        .withHeader("Authorization", equalTo("Bearer some-token"))
+        .withHeader("Environment", equalTo("local"))
         .willReturn(
           aResponse()
             .withStatus(ACCEPTED)
@@ -55,28 +60,33 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
         )
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
-      response.status mustBe ACCEPTED
-      response.json mustBe Json.parse(exampleJsonSuccessResponse)
+      whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) { response =>
+        response.right.get.status mustBe ACCEPTED
+        response.right.get.json mustBe Json.parse(exampleJsonSuccessResponse)
+      }
     }
 
     "return an 500 when call fails" in {
-
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
+        .withHeader("CorrelationId", equalTo(correlationId))
+        .withHeader("Authorization", equalTo("Bearer some-token"))
+        .withHeader("Environment", equalTo("local"))
         .willReturn(serverError)
       )
 
-
-      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
-
-      response.status mustBe INTERNAL_SERVER_ERROR
+      whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
+        _.right.get.status mustBe INTERNAL_SERVER_ERROR
+      }
     }
 
     "return an 400 when call fails" in {
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
+        .withHeader("CorrelationId", equalTo(correlationId))
+        .withHeader("Authorization", equalTo("Bearer some-token"))
+        .withHeader("Environment", equalTo("local"))
         .willReturn(
           aResponse()
             .withStatus(BAD_REQUEST)
@@ -85,48 +95,56 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
         )
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
-      response.status mustBe BAD_REQUEST
+      whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
+        _.right.get.status mustBe BAD_REQUEST
+      }
     }
 
     "return an 404 when call fails" in {
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
+        .withHeader("CorrelationId", equalTo(correlationId))
+        .withHeader("Authorization", equalTo("Bearer some-token"))
+        .withHeader("Environment", equalTo("local"))
         .willReturn(notFound())
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
-
-      response.status mustBe NOT_FOUND
+      whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
+        _.right.get.status mustBe NOT_FOUND
+      }
     }
 
     "return an 401 when call fails" in {
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
+        .withHeader("CorrelationId", equalTo(correlationId))
+        .withHeader("Authorization", equalTo("Bearer some-token"))
+        .withHeader("Environment", equalTo("local"))
         .willReturn(unauthorized())
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
-
-      response.status mustBe UNAUTHORIZED
+      whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
+        _.right.get.status mustBe UNAUTHORIZED
+      }
     }
 
-    "return an exception when call fails" in {
+    "return an Left when call fails" in {
 
-      val code = 600
-
-      def exception = aResponse.withStatus(code)
+      def exception = aResponse.withFault(Fault.CONNECTION_RESET_BY_PEER)
 
       server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
+        .withHeader("CorrelationId", equalTo(correlationId))
+        .withHeader("Authorization", equalTo("Bearer some-token"))
+        .withHeader("Environment", equalTo("local"))
         .willReturn(exception)
       )
 
-      val response = whenReady(connector.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
-
-      response.status mustBe INTERNAL_SERVER_ERROR
+      whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
+        _.isLeft mustBe true
+      }
     }
   }
 }

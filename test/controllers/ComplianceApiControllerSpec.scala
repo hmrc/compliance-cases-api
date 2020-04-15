@@ -16,9 +16,11 @@
 
 package controllers
 
+import java.util.UUID
+
 import akka.stream.Materializer
 import caseData.ComplianceCasesExamples._
-import org.mockito.Matchers.any
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
@@ -49,79 +51,147 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
 
   implicit lazy val materializer: Materializer = app.materializer
 
+  val correlationId: String = UUID.randomUUID().toString
+
+
   "The Compliance Api Controller" when {
     "serving Investigations api" should {
       "return Accepted for valid input" in {
-        when(service.complianceInvestigations(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
+        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+          .thenReturn(Future.successful(Right(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
             Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
-          ))
+          )))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(minimumRepaymentOrganisationJson))).map {
-          result => {
-            status(result) shouldBe Status.ACCEPTED
-            contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> correlationId)
+          .withJsonBody(Json.parse(minimumRepaymentOrganisationJson)))
+          .map {
+            result => {
+              status(result) shouldBe Status.ACCEPTED
+              contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+            }
           }
-        }
       }
 
       "return Accepted for valid full individual repayment input" in {
-        when(service.complianceInvestigations(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)))))
+        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+          .thenReturn(Future.successful(Right(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse))))))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(fullCaseJson))).map {
-          result => {
-            status(result) shouldBe Status.ACCEPTED
-            contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> correlationId)
+          .withJsonBody(Json.parse(fullCaseJson)))
+          .map {
+            result => {
+              status(result) shouldBe Status.ACCEPTED
+              contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+            }
           }
-        }
       }
 
       "return Accepted for valid risk input" in {
-        when(service.complianceInvestigations(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
+        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+          .thenReturn(Future.successful(Right(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
             Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
-          ))
+          )))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(minimumRiskJson))).map {
-          result => {
-            status(result) shouldBe Status.ACCEPTED
-            contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> correlationId)
+          .withJsonBody(Json.parse(minimumRiskJson)))
+          .map {
+            result => {
+              status(result) shouldBe Status.ACCEPTED
+              contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+            }
           }
-        }
       }
 
       "return Accepted for valid input with address" in {
-        when(service.complianceInvestigations(any())(any(), any()))
-            .thenReturn(Future.successful(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)))))
+        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+          .thenReturn(Future.successful(Right(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse))))))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(addressJson))).map {
-          result => status(result) shouldBe Status.ACCEPTED
-        }
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> correlationId)
+          .withJsonBody(Json.parse(addressJson)))
+          .map {
+            result => status(result) shouldBe Status.ACCEPTED
+          }
+      }
+
+      "return InternalServerError if a left is returned from the service" in {
+        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+          .thenReturn(Future.successful(Left(())))
+
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> correlationId)
+          .withJsonBody(Json.parse(addressJson)))
+          .map {
+            result =>
+              status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+              contentAsJson(result) shouldBe Json.obj(
+                "code" -> "INTERNAL_SERVER_ERROR",
+              "message" ->  "Internal server error")
+          }
       }
 
       "return BadRequest for invalid input (validation error in controller)" in {
-        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(incorrectJson))).map {
-          result => status(result) shouldBe Status.BAD_REQUEST
-        }
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> correlationId)
+          .withJsonBody(Json.parse(incorrectJson)))
+          .map {
+            result => status(result) shouldBe Status.BAD_REQUEST
+          }
       }
 
       "return BadRequest for no json" in {
-        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)).map {
-          result => status(result) shouldBe Status.BAD_REQUEST
-        }
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> correlationId))
+          .map {
+            result => status(result) shouldBe Status.BAD_REQUEST
+          }
       }
 
       "return BadRequest for valid input (error passed back from connector)" in {
-        when(service.complianceInvestigations(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, Some(Json.parse(exampleJsonErrorResponse)))))
+        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+          .thenReturn(Future.successful(
+            Right(HttpResponse(BAD_REQUEST, Some(Json.parse(exampleJsonErrorResponse))))
+          ))
 
-        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url).withJsonBody(Json.parse(minimumRepaymentOrganisationJson))).map {
-          result => {
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) shouldBe Json.parse(exampleJsonErrorResponse)
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> correlationId)
+          .withJsonBody(Json.parse(minimumRepaymentOrganisationJson)))
+          .map {
+            result => {
+              status(result) shouldBe Status.BAD_REQUEST
+              contentAsJson(result) shouldBe Json.parse(exampleJsonErrorResponse)
+            }
           }
-        }
+      }
+      "return BadRequest if no correlationId is present" in {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withJsonBody(Json.parse(minimumRepaymentOrganisationJson)))
+          .map {
+            result => {
+              status(result) shouldBe Status.BAD_REQUEST
+              contentAsJson(result) shouldBe Json.obj(
+                "code" -> "MISSING_CORRELATION_ID",
+                "message" -> "The correlation id is missing"
+              )
+            }
+          }
+      }
+      "return BadRequest if no correlationId is invalid" in {
+        route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
+          .withHeaders("CorrelationId" -> "some-correlation-id")
+          .withJsonBody(Json.parse(minimumRepaymentOrganisationJson)))
+          .map {
+            result => {
+              status(result) shouldBe Status.BAD_REQUEST
+              contentAsJson(result) shouldBe Json.obj(
+                "code" -> "INVALID_CORRELATION_ID",
+                "message" -> "The correlation id provided is invalid"
+              )
+            }
+          }
       }
     }
   }

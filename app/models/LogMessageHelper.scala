@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package services
+package models
 
-import connectors.ComplianceCasesConnector
-import javax.inject.Inject
-import play.api.libs.json.JsValue
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+case class LogMessageHelper(className: String, methodName: String, message: String, correlationId: String){
+  override def toString: String = s"[$className][$methodName][correlationId = $correlationId] $message"
+}
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class ComplianceCasesService @Inject()(connector: ComplianceCasesConnector) {
-
-  def createCase(request: JsValue, correlationId: String)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[Unit, HttpResponse]] = {
-    connector.createCase(request, correlationId)
-  }
+object LogMessageHelper {
+  def apply(className: String, methodName: String, message: String): LogMessageHelper =
+    LogMessageHelper(className, methodName, message, "NotProvided")
 }

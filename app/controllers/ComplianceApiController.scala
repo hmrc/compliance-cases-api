@@ -17,12 +17,15 @@
 package controllers
 
 import config.AppConfig
+import controllers.actions.ValidateCorrelationIdHeaderAction
 import javax.inject.{Inject, Singleton}
-import models.ComplianceInvestigations
+import models.{ComplianceInvestigations, LogMessageHelper}
+import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.libs.json.{JsNull, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import services.{ComplianceCasesService, ResourceService, ValidationService}
+import uk.gov.hmrc.api.controllers.ErrorInternalServerError
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
@@ -34,17 +37,26 @@ class ComplianceApiController @Inject()(
                                          resources: ResourceService,
                                          complianceCasesService: ComplianceCasesService,
                                          appConfig: AppConfig,
+                                         getCorrelationId: ValidateCorrelationIdHeaderAction,
                                          cc: ControllerComponents
                                        )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   private val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
 
-  def createCase(): Action[AnyContent] = Action.async { implicit request =>
+  def createCase(): Action[AnyContent] = getCorrelationId.async { implicit request =>
     val input = request.body.asJson.getOrElse(JsNull)
 
+    def logMessage(message: String): String = LogMessageHelper("ComplianceApiController", "createCase", message, request.correlationId).toString
+
     validator.validate[ComplianceInvestigations](schema, input) match {
-      case Right(_) => complianceCasesService.complianceInvestigations(Json.toJson(input)).map(mappingConnectorResponse)
-      case Left(errors) => Future.successful(BadRequest(errors))
+      case Right(_) =>
+        Logger.info(logMessage("request received passing on to integration framework"))
+        complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
+          response => response.fold[Result](_ => InternalServerError(Json.toJson(ErrorInternalServerError)), mappingConnectorResponse)
+        )
+      case Left(errors) =>
+        Logger.warn(logMessage(s"request body didn't match json with errors: ${Json.prettyPrint(errors)}"))
+        Future.successful(BadRequest(errors))
     }
   }
 

@@ -16,26 +16,50 @@
 
 package connectors
 
-import config.AppConfig
+import connectors.httpParsers.ComplianceCaseConnectorParser
 import javax.inject.{Inject, Singleton}
+import models.LogMessageHelper
 import play.api.http.{ContentTypes, HeaderNames}
 import play.api.libs.json.JsValue
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import play.api.{Configuration, Logger}
+import uk.gov.hmrc.http.logging.Authorization
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: AppConfig) extends RecoveryUtil {
+class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: Configuration) extends ComplianceCaseConnectorParser {
 
-  private val headers = Seq(HeaderNames.CONTENT_TYPE -> ContentTypes.JSON)
+  override val className: String = this.getClass.getSimpleName
 
-  implicit val api: String = "complianceInvestigations"
+  lazy val bearerToken: String = config.get[String]("integration-framework.auth-token")
+  lazy val iFEnvironment: String = config.get[String]("integration-framework.environment")
+  lazy val ifBaseUrl: String = config.get[String]("integration-framework.base-url")
+  lazy val createCaseUri: String = config.get[String]("integration-framework.endpoints.create-case")
 
-  def complianceInvestigations(request: JsValue)
-                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  private def headers(correlationId: String) = Seq(
+    HeaderNames.CONTENT_TYPE -> ContentTypes.JSON,
+    "CorrelationId" -> correlationId,
+    "Environment" -> iFEnvironment
+  )
 
-    val endpoint = config.complianceInvestigationsUrl
-    httpClient.POST[JsValue, HttpResponse](endpoint, request, headers).recover(recovery)
+  def createCase(request: JsValue, correlationId: String)
+                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[Unit, HttpResponse]] = {
+
+    def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
+
+    httpClient.POST[JsValue, HttpResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
+      implicitly, httpReads(correlationId), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec
+    ).map(Right.apply)
+      .recover {
+        case e: Exception =>
+          Logger.error(
+            logMessage(
+              s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} (IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION)"
+            ), e
+          )
+          Left(())
+      }
   }
 }

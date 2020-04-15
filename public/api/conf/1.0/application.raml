@@ -51,10 +51,19 @@ uses:
           body:
             application/json:
               type: types.errorResponse
-              example:
-                description: The JSON provided was invalid.
-                value:
-                  code: JSON_VALIDATION_ERROR
+              examples:
+                example-1:
+                  description: The JSON provided was invalid.
+                  value:
+                    code: JSON_VALIDATION_ERROR
+                example-2:
+                  description: The correlation id is missing
+                  value:
+                    code: MISSING_CORRELATION_ID
+                example-3:
+                  description: The correlation id provided is invalid.
+                  value:
+                    code: INVALID_CORRELATION_ID
         401:
           body:
             application/json:
@@ -68,6 +77,6 @@ uses:
             application/json:
               type: types.errorResponse
               example:
-                description: There was a problem with the server during the request.
+                description: Internal server error.
                 value:
                   code: INTERNAL_SERVER_ERROR

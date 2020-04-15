@@ -42,13 +42,10 @@ class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with GuiceOn
   "Service" should {
 
     "return 204" in {
+      when(complianceCasesConnector.createCase(Matchers.any(), Matchers.eq("some-correlation-id"))(Matchers.any(),Matchers.any()))
+        .thenReturn(Future.successful(Right(HttpResponse(NO_CONTENT))))
 
-      when(complianceCasesConnector.complianceInvestigations(Matchers.any())(Matchers.any(),Matchers.any()))
-        .thenReturn(Future.successful(HttpResponse(NO_CONTENT)))
-
-      val response = whenReady(service.complianceInvestigations(Json.parse(fullCaseJson))) { response => response }
-
-      response.status mustBe NO_CONTENT
+      whenReady(service.createCase(Json.parse(fullCaseJson), "some-correlation-id")){ _.right.get.status mustBe NO_CONTENT }
     }
   }
 }

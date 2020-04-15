@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package services
+package models.responses
 
-import connectors.ComplianceCasesConnector
-import javax.inject.Inject
-import play.api.libs.json.JsValue
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import play.api.libs.json.{JsObject, Json}
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class ComplianceCasesService @Inject()(connector: ComplianceCasesConnector) {
-
-  def createCase(request: JsValue, correlationId: String)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[Unit, HttpResponse]] = {
-    connector.createCase(request, correlationId)
-  }
+object CorrelationIdMessages {
+  val invalid: JsObject = Json.obj("code" -> "INVALID_CORRELATION_ID", "message" -> "The correlation id provided is invalid")
+  val missing: JsObject = Json.obj("code" -> "MISSING_CORRELATION_ID", "message" -> "The correlation id is missing")
 }

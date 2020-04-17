@@ -21,7 +21,15 @@ trait WireMockStubHelpers {
         aResponse()
           .withStatus(status)))
 
-  def stubPostWithResponseBody(url: String, status: Int, correlationId: String, response: String): StubMapping =
+  def stubPostWithResponseBody(url: String, status: Int, response: String): StubMapping =
+    stubFor(post(urlMatching(url))
+      .willReturn(
+        aResponse()
+          .withStatus(status)
+          .withBody(response)
+          .withHeader("Content-Type", "application/json; charset=utf-8")))
+
+  def stubPostWithResponseBodyAndHeaders(url: String, status: Int, correlationId: String, response: String): StubMapping =
     stubFor(post(urlMatching(url))
       .withHeader("CorrelationId", equalTo(correlationId))
       .withHeader("Authorization", equalTo("Bearer some-token"))

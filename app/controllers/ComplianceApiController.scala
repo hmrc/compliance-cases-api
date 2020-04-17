@@ -17,7 +17,7 @@
 package controllers
 
 import config.AppConfig
-import controllers.actions.ValidateCorrelationIdHeaderAction
+import controllers.actions.{AuthenticateApplicationAction, ValidateCorrelationIdHeaderAction}
 import javax.inject.{Inject, Singleton}
 import models.{ComplianceInvestigations, LogMessageHelper}
 import play.api.Logger
@@ -38,12 +38,13 @@ class ComplianceApiController @Inject()(
                                          complianceCasesService: ComplianceCasesService,
                                          appConfig: AppConfig,
                                          getCorrelationId: ValidateCorrelationIdHeaderAction,
+                                         authenticateApplication: AuthenticateApplicationAction,
                                          cc: ControllerComponents
                                        )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   private val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
 
-  def createCase(): Action[AnyContent] = getCorrelationId.async { implicit request =>
+  def createCase(): Action[AnyContent] = (authenticateApplication andThen getCorrelationId).async { implicit request =>
     val input = request.body.asJson.getOrElse(JsNull)
 
     def logMessage(message: String): String = LogMessageHelper("ComplianceApiController", "createCase", message, request.correlationId).toString

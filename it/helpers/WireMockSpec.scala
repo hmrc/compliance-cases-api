@@ -29,7 +29,8 @@ trait WireMockSpec extends BeforeAndAfterEach with BeforeAndAfterAll with GuiceO
   override implicit lazy val app = GuiceApplicationBuilder()
     .configure(
       "auditing.consumer.baseUri.port" -> wireMockPort,
-      "integration-framework.base-url" -> s"http://localhost:$wireMockPort"
+      "integration-framework.base-url" -> s"http://localhost:$wireMockPort",
+      "microservice.services.auth.port" -> s"$wireMockPort"
     )
     .build()
 

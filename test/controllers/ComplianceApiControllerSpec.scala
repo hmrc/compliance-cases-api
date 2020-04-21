@@ -20,8 +20,10 @@ import java.util.UUID
 
 import akka.stream.Materializer
 import caseData.ComplianceCasesExamples._
+import controllers.actions.{AuthenticateApplicationAction, ValidateCorrelationIdHeaderAction}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
+import org.mockito.invocation.InvocationOnMock
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -29,8 +31,9 @@ import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
+import play.api.mvc.Request
 import play.api.test.Helpers._
+import play.api.test.FakeRequest
 import services.ComplianceCasesService
 import uk.gov.hmrc.http.HttpResponse
 
@@ -39,13 +42,20 @@ import scala.concurrent.Future
 
 class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSugar with GuiceOneAppPerSuite {
 
+  val mockAuthApp: AuthenticateApplicationAction = mock[AuthenticateApplicationAction]
+
+  when(mockAuthApp.andThen[Request](any())).thenAnswer(
+    (invocation: InvocationOnMock) => invocation.getArguments()(0).asInstanceOf[ValidateCorrelationIdHeaderAction]
+  )
+
   private val service: ComplianceCasesService = mock[ComplianceCasesService]
   override lazy val app: Application = {
     import play.api.inject._
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[ComplianceCasesService].toInstance(service)
+        bind[ComplianceCasesService].toInstance(service),
+        bind[AuthenticateApplicationAction].toInstance(mockAuthApp)
       ).build()
   }
 

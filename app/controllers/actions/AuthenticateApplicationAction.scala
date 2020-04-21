@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthenticateApplicationAction @Inject()(
                                                val authConnector: DefaultAuthConnector,
                                                config: Configuration,
-                                               val parser: BodyParsers.Default,
+                                               val parser: BodyParsers.Default
                                              )(implicit val executionContext: ExecutionContext) extends
   AuthorisedFunctions with ActionBuilder[Request, AnyContent] {
 

@@ -23,7 +23,7 @@ import play.api.http.{ContentTypes, HeaderNames}
 import play.api.libs.json.JsValue
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,7 +56,7 @@ class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: Configu
         case e: Exception =>
           Logger.error(
             logMessage(
-              s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} (IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION)"
+              s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
             ), e
           )
           Left(())

@@ -18,8 +18,8 @@ package services
 
 import akka.stream.Materializer
 import caseData.ComplianceCasesExamples._
-import models.ComplianceInvestigations
-import org.mockito.Matchers.{any, eq => eqTo}
+import controllers.actions.RequestWithCorrelationId
+import org.mockito.Matchers.{eq => eqTo}
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -27,6 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar
@@ -40,7 +41,8 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
 
   implicit lazy val materializer: Materializer = app.materializer
   val bodyParser = new BodyParsers.Default
-  val mockResource = mock[ResourceService]
+  val mockResource: ResourceService = mock[ResourceService]
+  implicit val request: RequestWithCorrelationId[AnyContentAsEmpty.type] =  RequestWithCorrelationId(FakeRequest(), "Some-Correlation-Id")
 
   def validationService = new ValidationService(bodyParser, mockResource)
 
@@ -50,24 +52,9 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
   }
 
   "validationService" should {
-    "return json errors when schema validation passes but model does not map" in {
-      when(mockResource.getFile(any())).thenReturn("{}")
-      validationService.validate[ComplianceInvestigations]("{}", Json.parse(requestJsonWithoutSourceSystemId)).left.get mustBe Json.parse(
-        """
-          |{
-          |"code": "JSON_VALIDATION_ERROR",
-          |"message": "The provided JSON was unable to be validated",
-          |"errors":
-          |[
-          |  {"code":"BAD_REQUEST","message":"an invalid value provided","path":"/sourceSystemId"}
-          |]
-          |}
-          |""".stripMargin)
-    }
-
     "return json schema errors" in {
-      validationService.validate[ComplianceInvestigations](caseflowCreateCaseSchema,
-        Json.parse("""{"sourceSystemId": "CNT", "sourceSystemKey": [], "case": []}""")).left.get mustBe Json.parse(
+      validationService.validate(caseflowCreateCaseSchema,
+        Json.parse("""{"sourceSystemId": "CNT", "sourceSystemKey": [], "sourceSystemURL": "http://me.com", "case": []}""")).left.get mustBe Json.parse(
         """
           |{
           |"code": "JSON_VALIDATION_ERROR",
@@ -83,7 +70,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
 
     "return invalid fields in risk" in {
       when(mockResource.getFile(eqTo("/schemas/caseflowCreateRiskCaseSchema.json"))).thenReturn(caseflowCreateRiskCaseSchema)
-      validationService.validate[ComplianceInvestigations](caseflowCreateCaseSchema,
+      validationService.validate(caseflowCreateCaseSchema,
         Json.parse(invalidRiskCaseJson)).left.get mustBe Json.parse(
         """
           |{
@@ -100,7 +87,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
 
     "return missing and invalid fields in repayments" in {
       when(mockResource.getFile(eqTo("/schemas/caseflowCreateRepaymentCaseSchema.json"))).thenReturn(caseflowCreateRepaymentCaseSchema)
-      validationService.validate[ComplianceInvestigations](caseflowCreateCaseSchema,
+      validationService.validate(caseflowCreateCaseSchema,
         Json.parse(invalidRepaymentCaseJson)).left.get mustBe Json.parse(
         """
           |{
@@ -109,7 +96,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
           |"errors":
           |[
           |{"code":"MISSING_FIELD","message":"field not present","path":"/case/taxPeriodStart"},
-          |{"code":"MISSING_FIELD","message":"field not present","path":"/case/taxPayer/referenceNumber/referenceType"},
+          |{"code":"MISSING_FIELD","message":"field not present","path":"/case/taxPayer/referenceNumbers/0/referenceType"},
           |{"code":"BAD_REQUEST","message":"an invalid value provided","path":"/case/taxRegime"}
           |]
           |}
@@ -118,7 +105,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
     }
 
     "return invalid caseType using incorrect datatype" in {
-      validationService.validate[ComplianceInvestigations](caseflowCreateCaseSchema,
+      validationService.validate(caseflowCreateCaseSchema,
         Json.parse(invalidCaseTypeUsingIncorrectDatatypeJson)).left.get mustBe Json.parse(
         """
           |{
@@ -134,7 +121,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
     }
 
     "return invalid caseType" in {
-      validationService.validate[ComplianceInvestigations](caseflowCreateCaseSchema,
+      validationService.validate(caseflowCreateCaseSchema,
         Json.parse(invalidCaseType)).left.get mustBe Json.parse(
         """
           |{

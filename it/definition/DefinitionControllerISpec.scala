@@ -30,7 +30,7 @@ class DefinitionControllerISpec extends PlaySpec with GuiceOneServerPerSuite wit
            |    "name": "Compliance Cases",
            |    "description": "Api to manage compliance cases in CaseFlow",
            |    "context": "misc/compliance-cases",
-           |    "categories": ["OTHER"],
+           |    "categories": ["PRIVATE_GOVERNMENT"],
            |    "versions": [
            |      {
            |        "version": "1.0",

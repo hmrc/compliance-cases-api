@@ -31,7 +31,7 @@ case class ApiDefinition(whiteListedApplicationIds: Seq[String], endpointsEnable
     "name" -> "Compliance Cases",
     "description" -> "Api to manage compliance cases in CaseFlow",
     "context" -> "misc/compliance-cases",
-    "categories" -> Json.arr("OTHER"),
+    "categories" -> Json.arr("PRIVATE_GOVERNMENT"),
     "versions" -> Json.arr(
       Json.obj(
         "version" -> "1.0",

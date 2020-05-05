@@ -1,27 +1,34 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "API#1561 -  Create Case Request Schema v0.1.0",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
+  "type" : "object",
+  "additionalProperties" : false,
+  "required" : [
     "sourceSystemId",
     "sourceSystemKey",
+    "sourceSystemURL",
     "case"
   ],
-  "properties": {
-    "sourceSystemId": {
-      "description": "To identify the source system. Currently only 'CNT' (Connect) supported",
-      "type": "string",
-      "enum": [
+  "properties" : {
+    "sourceSystemId" : {
+      "description" : "Mandatory. To identify the source system. Currently only 'CNT' (Connect) supported",
+      "type" : "string",
+      "enum" : [
         "CNT"
       ]
     },
-    "sourceSystemKey": {
-      "description": "Primary key on the source system",
-      "type": "string",
-      "pattern": "^[A-Za-z0-9\/\\$\\.\\-]{1,64}$"
+    "sourceSystemKey" : {
+      "description" : "Mandatory. Primary key of a record on the source system",
+      "type" : "string",
+      "pattern" : "^[A-Za-z0-9/\\$\\.\\-]{1,50}$",
+      "example" : "VI00004-1"
     },
-    "case": {
+    "sourceSystemURL" : {
+      "description" : "Mandatory. Full URL of a record on the source system",
+      "type" : "string",
+      "format" : "uri"
+    },
+    "case" : {
       "type": "object"
     }
   },

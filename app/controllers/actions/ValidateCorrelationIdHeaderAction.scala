@@ -32,7 +32,7 @@ class ValidateCorrelationIdHeaderAction @Inject()(val parser: BodyParsers.Defaul
                                                  (implicit val executionContext: ExecutionContext)
   extends ActionBuilder[RequestWithCorrelationId, AnyContent] {
 
-  val correlationIdRegex: Regex = """(^[A-Za-z0-9\-]{36}$)""".r
+  val correlationIdRegex: Regex = """(^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$)""".r
 
   override def invokeBlock[A](request: Request[A], block: RequestWithCorrelationId[A] => Future[Result]): Future[Result] = {
     request.headers.get("CorrelationId").map {
@@ -41,9 +41,9 @@ class ValidateCorrelationIdHeaderAction @Inject()(val parser: BodyParsers.Defaul
           LogMessageHelper("ValidateCorrelationIdHeaderAction", "invokeBlock", "successfully found CorrelationId in request", correlationId).toString
         )
         block(RequestWithCorrelationId(request, correlationId))
-      case x =>
+      case invalidCorrelationId =>
         Logger.warn(
-          LogMessageHelper("ValidateCorrelationIdHeaderAction", "invokeBlock", s"invalid CorrelationId found in request $x").toString
+          LogMessageHelper("ValidateCorrelationIdHeaderAction", "invokeBlock", s"invalid CorrelationId found in request $invalidCorrelationId").toString
         )
         Future.successful(BadRequest(CorrelationIdMessages.invalid))
     }.getOrElse {

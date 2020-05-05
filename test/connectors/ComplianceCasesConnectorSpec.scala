@@ -47,7 +47,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
   "Compliance Cases Connector" should {
 
     "return a HttpResponse when valid body is provided" in {
-      server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
+      server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
         .withHeader("CorrelationId", equalTo(correlationId))
         .withHeader("Authorization", equalTo("Bearer some-token"))
@@ -67,7 +67,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
     }
 
     "return an 500 when call fails" in {
-      server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
+      server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
         .withHeader("CorrelationId", equalTo(correlationId))
         .withHeader("Authorization", equalTo("Bearer some-token"))
@@ -82,7 +82,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
 
     "return an 400 when call fails" in {
 
-      server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
+      server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
         .withHeader("CorrelationId", equalTo(correlationId))
         .withHeader("Authorization", equalTo("Bearer some-token"))
@@ -102,7 +102,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
 
     "return an 404 when call fails" in {
 
-      server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
+      server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
         .withHeader("CorrelationId", equalTo(correlationId))
         .withHeader("Authorization", equalTo("Bearer some-token"))
@@ -117,7 +117,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
 
     "return an 401 when call fails" in {
 
-      server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
+      server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
         .withHeader("CorrelationId", equalTo(correlationId))
         .withHeader("Authorization", equalTo("Bearer some-token"))
@@ -134,7 +134,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
 
       def exception = aResponse.withFault(Fault.CONNECTION_RESET_BY_PEER)
 
-      server.stubFor(post(urlEqualTo("/compliance-cases/risking"))
+      server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
         .withHeader("CorrelationId", equalTo(correlationId))
         .withHeader("Authorization", equalTo("Bearer some-token"))

@@ -34,7 +34,7 @@ trait ComplianceCaseConnectorParser {
         logMessage(s"received a bad request status when calling $url ( IF_CREATE_CASE_ENDPOINT_BAD_REQUEST_RESPONSE )")
       )
       case status if status != ACCEPTED => Logger.warn(
-        logMessage(s"received status $status when calling $url")
+        logMessage(s"received status $status when calling $url ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_RESPONSE )")
       )
       case _ => Logger.info(logMessage(s"received an accepted when calling $url"))
     }

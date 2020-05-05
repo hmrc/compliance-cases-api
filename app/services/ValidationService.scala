@@ -21,10 +21,13 @@ import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonschema.core.report.{ListReportProvider, LogLevel, ProcessingMessage, ProcessingReport}
 import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.google.inject.Inject
-import models.responses.{BadRequestErrorResponse, InvalidField, MissingField}
+import controllers.actions.RequestWithCorrelationId
+import models.LogMessageHelper
+import models.responses.{BadRequestErrorResponse, FieldError, InvalidField, MissingField}
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
@@ -40,13 +43,18 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
     .newBuilder()
     .setReportProvider(new ListReportProvider(LogLevel.ERROR, LogLevel.FATAL))
     .freeze()
-  private val logger = Logger(this.getClass)
 
-  def validateAgainstSchema(json: JsonNode, schema: JsonSchema): ProcessingReport = {
+  private val logger = Logger(this.getClass.getSimpleName)
+
+  def logMessage(methodName: String, message: String)(implicit request: RequestWithCorrelationId[_], hc: HeaderCarrier): String = {
+    LogMessageHelper(this.getClass.getSimpleName, methodName, message, request.correlationId).toString
+  }
+
+  private def validateAgainstSchema(json: JsonNode, schema: JsonSchema): ProcessingReport = {
     schema.validate(json, true)
   }
 
-  def getFieldName(processingMessage: ProcessingMessage, prefix: String = "") = {
+  private def getFieldName(processingMessage: ProcessingMessage, prefix: String = ""): String = {
     processingMessage.asJson().get("instance").asScala.map(instanceName => prefix + instanceName.asText).headOption.getOrElse("Field cannot be found")
   }
 
@@ -56,57 +64,58 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
     ).toList).getOrElse(List())
   }
 
-  def validateCaseType(caseJson: JsValue): Either[BadRequestErrorResponse, Unit] = {
+  def validateCaseType(caseJson: JsValue)(implicit request: RequestWithCorrelationId[_], hc: HeaderCarrier): Either[BadRequestErrorResponse, Unit] = {
+    val methodName: String = "validateCaseType"
+
     def getResult(schema: String, caseType: String): Either[BadRequestErrorResponse, Unit] = {
       val result = validateInternallyAgainstSchema(schema, caseJson)
       if (result.isSuccess) Right(()) else {
-        val errors = getJsonObjs(result, "/case")
-        errors.foreach(g => logger.error(g.toString()))
         Left(
-          BadRequestErrorResponse(errors, caseType)
+          BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result, "/case"), caseType)
         )
       }
     }
 
     (caseJson \ "caseType").validate[String] match {
-      case JsSuccess("Repayment", _) => getResult(repaymentCaseSchema, "Repayment")
-      case JsSuccess("Risk", _) => getResult(riskCaseSchema, "Risk")
-      case JsSuccess(_, _) => Left(mappingErrorResponse(JsError(__ \ "case" \ "caseType", "invalid case type provided").errors))
-      case JsError(errors) => Left(mappingErrorResponse(errors.map{
-        case (_, errors) => (__ \ "case" \ "caseType", errors)
-      }))
+      case JsSuccess("Repayment", _) =>
+        logger.info(logMessage(methodName, "Found REPAYMENT caseType attempting to validate against repayments schema"))
+        getResult(repaymentCaseSchema, "Repayment")
+      case JsSuccess("YieldBearing", _) =>
+        logger.info(logMessage(methodName, "Found RISK caseType attempting to validate against risk schema"))
+        getResult(riskCaseSchema, "Risk")
+      case JsSuccess(_, _) =>
+        logger.warn(logMessage(methodName, "Found INVALID caseType in request"))
+        Left(mapErrorsToBadRequestErrorResponse(JsError(__ \ "case" \ "caseType", "invalid case type provided").errors))
+      case JsError(errors) =>
+        logger.warn(logMessage(methodName, "caseType missing or not a string"))
+        Left(mapErrorsToBadRequestErrorResponse(errors.map{
+          case (_, errors) => (__ \ "case" \ "caseType", errors)
+        }))
     }
   }
 
-  private def validateInternallyAgainstSchema(schemaString: String, input: JsValue) = {
+  private def validateInternallyAgainstSchema(schemaString: String, input: JsValue): ProcessingReport = {
     val schemaJson = JsonLoader.fromString(schemaString)
     val json = JsonLoader.fromString(Json.stringify(input))
     val schema = factory.getJsonSchema(schemaJson)
     validateAgainstSchema(json, schema)
   }
 
-  def validate[A](schemaString: String, input: JsValue)(implicit rds: Reads[A]): Either[JsValue, Unit] = {
+  def validate(schemaString: String, input: JsValue)(
+    implicit request: RequestWithCorrelationId[_], hc: HeaderCarrier
+  ): Either[JsValue, Unit] = {
     val result = validateInternallyAgainstSchema(schemaString, input)
     if (result.isSuccess) {
-      validateCaseType((input \ "case").as[JsValue]).flatMap(_ =>
-        Json.fromJson[A](input) match {
-          case JsSuccess(value, path) => Right(())
-          case JsError(errors) => Left(mappingErrorResponse(errors))
-        }
-      ).fold(invalid => Left(Json.toJson(invalid)), valid => Right(valid))
+      validateCaseType((input \ "case").as[JsValue])
+        .fold(invalid => Left(Json.toJson(invalid)), valid => Right(valid))
     } else {
-
-      //Uncomment if want to log request json
-      //logger.debug(Json.prettyPrint(input))
-      val errors = getJsonObjs(result)
-      errors.foreach(g => logger.error(g.toString()))
       Left(
-        Json.toJson(BadRequestErrorResponse(errors))
+        Json.toJson(BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result)))
       )
     }
   }
 
-  def getJsonObjs(result: ProcessingReport, prefix: String = "") = {
+  private def getSequenceOfFieldErrorsFromReport(result: ProcessingReport, prefix: String = ""): Seq[FieldError] = {
     result.iterator.asScala.toList
       .flatMap {
         error =>
@@ -121,7 +130,7 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
       }
   }
 
-  private def mappingErrorResponse(mappingErrors: Seq[(JsPath, Seq[JsonValidationError])]): BadRequestErrorResponse = {
+  private def mapErrorsToBadRequestErrorResponse(mappingErrors: Seq[(JsPath, Seq[JsonValidationError])]): BadRequestErrorResponse = {
     val errors = mappingErrors.map {
       x => InvalidField(path = x._1.toString())
     }

@@ -16,12 +16,10 @@
 
 package controllers
 
-import config.AppConfig
 import controllers.actions.{AuthenticateApplicationAction, ValidateCorrelationIdHeaderAction}
 import javax.inject.{Inject, Singleton}
-import models.{ComplianceInvestigations, LogMessageHelper}
+import models.LogMessageHelper
 import play.api.Logger
-import play.api.http.ContentTypes
 import play.api.libs.json.{JsNull, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import services.{ComplianceCasesService, ResourceService, ValidationService}
@@ -36,7 +34,6 @@ class ComplianceApiController @Inject()(
                                          validator: ValidationService,
                                          resources: ResourceService,
                                          complianceCasesService: ComplianceCasesService,
-                                         appConfig: AppConfig,
                                          getCorrelationId: ValidateCorrelationIdHeaderAction,
                                          authenticateApplication: AuthenticateApplicationAction,
                                          cc: ControllerComponents
@@ -49,7 +46,7 @@ class ComplianceApiController @Inject()(
 
     def logMessage(message: String): String = LogMessageHelper("ComplianceApiController", "createCase", message, request.correlationId).toString
 
-    validator.validate[ComplianceInvestigations](schema, input) match {
+    validator.validate(schema, input) match {
       case Right(_) =>
         Logger.info(logMessage("request received passing on to integration framework"))
         complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
@@ -62,17 +59,7 @@ class ComplianceApiController @Inject()(
   }
 
   private def mappingConnectorResponse(response: HttpResponse): Result = {
-    val excludedHeaders = List(CONTENT_TYPE, CONTENT_LENGTH)
-
-    val headers = for {
-      (key, values) <- response.allHeaders
-      if !excludedHeaders.contains(key)
-    } yield key -> values.mkString(", ")
-
-    Status(response.status)
-      .apply(response.body)
-      .withHeaders(headers.toList: _*)
-      .as(ContentTypes.JSON)
+    Status(response.status)(response.body)
   }
 
 }

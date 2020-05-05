@@ -8,8 +8,8 @@ import play.api.test.Helpers._
 class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
 
   "POST /case" should {
-    s"return an $ACCEPTED if $ACCEPTED received from IF" in {
-      stubPostWithoutResponseBody("/compliance-cases/risking", ACCEPTED, correlationId)
+    s"return an $ACCEPTED if $ACCEPTED received from IF for repayments" in {
+      stubPostWithoutResponseBody("/organisations/case", ACCEPTED, correlationId)
       stubPostWithResponseBody("/auth/authorise", ACCEPTED, Json.obj(
         "applicationId" -> "ID-1"
       ).toString)
@@ -24,8 +24,24 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       response.body mustBe ""
     }
 
+    s"return an $ACCEPTED if $ACCEPTED received from IF for risk" in {
+      stubPostWithoutResponseBody("/organisations/case", ACCEPTED, correlationId)
+      stubPostWithResponseBody("/auth/authorise", ACCEPTED, Json.obj(
+        "applicationId" -> "ID-1"
+      ).toString)
+      stubPostWithoutRequestAndResponseBody("/write/audit", NO_CONTENT)
+      stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
+
+      val response = await(buildClient("/case")
+        .withHttpHeaders("CorrelationId" -> correlationId)
+        .post(createCaseRiskJson))
+
+      response.status mustBe ACCEPTED
+      response.body mustBe ""
+    }
+
     s"return a $BAD_REQUEST if $BAD_REQUEST received from IF" in {
-      stubPostWithResponseBodyAndHeaders("/compliance-cases/risking", BAD_REQUEST, correlationId, Json.obj(
+      stubPostWithResponseBodyAndHeaders("/organisations/case", BAD_REQUEST, correlationId, Json.obj(
         "code" -> "BAD_REQUEST", "message" -> "oops something in there is bad"
       ).toString)
       stubPostWithResponseBody("/auth/authorise", ACCEPTED, Json.obj(
@@ -70,7 +86,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
     }
 
     s"return a $INTERNAL_SERVER_ERROR if an exception occurs received from IF" in {
-      stubPostWithFault("/compliance-cases/risking", correlationId)
+      stubPostWithFault("/organisations/case", correlationId)
       stubPostWithoutRequestAndResponseBody("/write/audit", NO_CONTENT)
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
       stubPostWithResponseBody("/auth/authorise", ACCEPTED, Json.obj(

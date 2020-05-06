@@ -47,6 +47,7 @@ uses:
               description: example create risk case body
               value: !include examples/CreateRiskCaseExampleRequest.json
       responses:
+        202:
         400:
           body:
             application/json:
@@ -57,13 +58,21 @@ uses:
                   value:
                     code: JSON_VALIDATION_ERROR
                 example-2:
-                  description: The correlation id is missing
+                  description: The correlation id is missing.
                   value:
                     code: MISSING_CORRELATION_ID
                 example-3:
                   description: The correlation id provided is invalid.
                   value:
                     code: INVALID_CORRELATION_ID
+                example-4:
+                  description: An invalid value provided.
+                  value:
+                    code: BAD_REQUEST
+                example-5:
+                  description: Field not present.
+                  value:
+                    code: MISSING_FIELD
         401:
           body:
             application/json:

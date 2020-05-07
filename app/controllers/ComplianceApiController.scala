@@ -29,7 +29,6 @@ import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton()
 class ComplianceApiController @Inject()(
                                          validator: ValidationService,
                                          resources: ResourceService,

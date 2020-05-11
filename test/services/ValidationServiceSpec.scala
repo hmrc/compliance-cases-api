@@ -19,7 +19,7 @@ package services
 import akka.stream.Materializer
 import caseData.ComplianceCasesExamples._
 import controllers.actions.RequestWithCorrelationId
-import org.mockito.Matchers.{eq => eqTo}
+import org.mockito.ArgumentMatchersSugar
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -31,7 +31,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar
-  with ScalaFutures with IntegrationPatience with BeforeAndAfterEach {
+  with ArgumentMatchersSugar with ScalaFutures with IntegrationPatience with BeforeAndAfterEach {
 
   import play.api.mvc._
 
@@ -42,7 +42,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
   implicit lazy val materializer: Materializer = app.materializer
   val bodyParser = new BodyParsers.Default
   val mockResource: ResourceService = mock[ResourceService]
-  implicit val request: RequestWithCorrelationId[AnyContentAsEmpty.type] =  RequestWithCorrelationId(FakeRequest(), "Some-Correlation-Id")
+  implicit val request: RequestWithCorrelationId[AnyContentAsEmpty.type] = RequestWithCorrelationId(FakeRequest(), "Some-Correlation-Id")
 
   def validationService = new ValidationService(bodyParser, mockResource)
 
@@ -137,5 +137,3 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
     }
   }
 }
-
-

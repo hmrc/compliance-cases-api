@@ -21,7 +21,7 @@ import java.util.UUID
 import akka.stream.Materializer
 import caseData.ComplianceCasesExamples._
 import controllers.actions.{AuthenticateApplicationAction, ValidateCorrelationIdHeaderAction}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchersSugar
 import org.mockito.Mockito.when
 import org.mockito.invocation.InvocationOnMock
 import org.scalatest.{Matchers, WordSpec}
@@ -32,19 +32,19 @@ import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.Request
-import play.api.test.Helpers._
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import services.ComplianceCasesService
 import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
 
 
-class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSugar with GuiceOneAppPerSuite {
+class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSugar with ArgumentMatchersSugar with GuiceOneAppPerSuite {
 
   val mockAuthApp: AuthenticateApplicationAction = mock[AuthenticateApplicationAction]
 
-  when(mockAuthApp.andThen[Request](any())).thenAnswer(
+  when(mockAuthApp.andThen[Request](any)).thenAnswer(
     (invocation: InvocationOnMock) => invocation.getArguments()(0).asInstanceOf[ValidateCorrelationIdHeaderAction]
   )
 
@@ -67,7 +67,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
   "The Compliance Api Controller" when {
     "serving Investigations api" should {
       "return Accepted for valid input" in {
-        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+        when(service.createCase(any, eqTo(correlationId))(any, any))
           .thenReturn(Future.successful(Right(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
             Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
           )))
@@ -84,7 +84,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
       }
 
       "return Accepted for valid full individual repayment input" in {
-        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+        when(service.createCase(any, eqTo(correlationId))(any, any))
           .thenReturn(Future.successful(Right(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse))))))
 
         route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
@@ -99,7 +99,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
       }
 
       "return Accepted for valid risk input" in {
-        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+        when(service.createCase(any, eqTo(correlationId))(any, any))
           .thenReturn(Future.successful(Right(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse)),
             Map("Content-Type" -> Seq("application/json"), "header" -> Seq("`123")))
           )))
@@ -116,7 +116,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
       }
 
       "return Accepted for valid input with address" in {
-        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+        when(service.createCase(any, eqTo(correlationId))(any, any))
           .thenReturn(Future.successful(Right(HttpResponse(ACCEPTED, Some(Json.parse(exampleJsonSuccessResponse))))))
 
         route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
@@ -128,7 +128,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
       }
 
       "return InternalServerError if a left is returned from the service" in {
-        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+        when(service.createCase(any, eqTo(correlationId))(any, any))
           .thenReturn(Future.successful(Left(())))
 
         route(app, FakeRequest(POST, routes.ComplianceApiController.createCase().url)
@@ -161,7 +161,7 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockitoSug
       }
 
       "return BadRequest for valid input (error passed back from connector)" in {
-        when(service.createCase(any(), eqTo(correlationId))(any(), any()))
+        when(service.createCase(any, eqTo(correlationId))(any, any))
           .thenReturn(Future.successful(
             Right(HttpResponse(BAD_REQUEST, Some(Json.parse(exampleJsonErrorResponse))))
           ))

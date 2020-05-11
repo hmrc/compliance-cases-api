@@ -23,7 +23,7 @@ libraryDependencies  ++= Seq(
   "com.typesafe.play"           %% "play-test"                % PlayVersion.current     % "test",
   "org.pegdown"                 %  "pegdown"                  % "1.6.0"                 % "test, it",
   "org.scalatestplus.play"      %% "scalatestplus-play"       % "3.1.3"                 % "test, it",
-  "org.mockito"                 % "mockito-all"               % "1.10.19"               % "test",
+  "org.mockito"                 %% "mockito-scala"            % "1.8.0"                 % "test",
   "com.github.tomakehurst"      % "wiremock-standalone"       % "2.26.3"                % "test, it"
 )
 

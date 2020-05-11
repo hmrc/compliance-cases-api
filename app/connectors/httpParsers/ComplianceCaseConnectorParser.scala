@@ -18,7 +18,7 @@ package connectors.httpParsers
 
 import models.LogMessageHelper
 import play.api.Logger
-import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, ACCEPTED}
+import play.api.http.Status.{ACCEPTED, BAD_REQUEST, NOT_FOUND}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 trait ComplianceCaseConnectorParser {

@@ -18,7 +18,7 @@ package services
 
 import caseData.ComplianceCasesExamples._
 import connectors.ComplianceCasesConnector
-import org.mockito.Matchers
+import org.mockito.ArgumentMatchersSugar
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{MustMatchers, WordSpec}
@@ -32,7 +32,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
-  with ScalaFutures with IntegrationPatience {
+  with ArgumentMatchersSugar with ScalaFutures with IntegrationPatience {
 
   private val complianceCasesConnector = mock[ComplianceCasesConnector]
   private val service: ComplianceCasesService = new ComplianceCasesService(complianceCasesConnector)
@@ -42,10 +42,12 @@ class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with GuiceOn
   "Service" should {
 
     "return 204" in {
-      when(complianceCasesConnector.createCase(Matchers.any(), Matchers.eq("some-correlation-id"))(Matchers.any(),Matchers.any()))
+      when(complianceCasesConnector.createCase(any, eqTo("some-correlation-id"))(any, any))
         .thenReturn(Future.successful(Right(HttpResponse(NO_CONTENT))))
 
-      whenReady(service.createCase(Json.parse(fullCaseJson), "some-correlation-id")){ _.right.get.status mustBe NO_CONTENT }
+      whenReady(service.createCase(Json.parse(fullCaseJson), "some-correlation-id")) {
+        _.right.get.status mustBe NO_CONTENT
+      }
     }
   }
 }

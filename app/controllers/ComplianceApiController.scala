@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.{AuthenticateApplicationAction, ValidateCorrelationIdHeaderAction}
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import models.LogMessageHelper
 import play.api.Logger
 import play.api.libs.json.{JsNull, Json}

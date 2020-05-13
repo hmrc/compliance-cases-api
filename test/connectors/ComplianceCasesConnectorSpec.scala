@@ -61,12 +61,12 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) { response =>
-        response.right.get.status mustBe ACCEPTED
-        response.right.get.json mustBe Json.parse(exampleJsonSuccessResponse)
+        response.get.status mustBe ACCEPTED
+        response.get.json mustBe Json.parse(exampleJsonSuccessResponse)
       }
     }
 
-    "return an 500 when call fails" in {
+    "return an empty option if the call fails with a 500" in {
       server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
         .withHeader("CorrelationId", equalTo(correlationId))
@@ -76,11 +76,11 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.right.get.status mustBe INTERNAL_SERVER_ERROR
+        _.isEmpty mustBe true
       }
     }
 
-    "return an 400 when call fails" in {
+    "return an empty option if the call fails with a 400" in {
 
       server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
@@ -96,11 +96,11 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.right.get.status mustBe BAD_REQUEST
+        _.isEmpty mustBe true
       }
     }
 
-    "return an 404 when call fails" in {
+    "return an empty option if the call fails with a 404" in {
 
       server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
@@ -111,11 +111,11 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.right.get.status mustBe NOT_FOUND
+        _.isEmpty mustBe true
       }
     }
 
-    "return an 401 when call fails" in {
+    "return an empty option if the call fails with a 401" in {
 
       server.stubFor(post(urlEqualTo("/organisations/case"))
         .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
@@ -126,11 +126,11 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.right.get.status mustBe UNAUTHORIZED
+        _.isEmpty mustBe true
       }
     }
 
-    "return an Left when call fails" in {
+    "return an empty option if the call fails with an exceptin" in {
 
       def exception = aResponse.withFault(Fault.CONNECTION_RESET_BY_PEER)
 
@@ -143,7 +143,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.isLeft mustBe true
+        _.isEmpty mustBe true
       }
     }
   }

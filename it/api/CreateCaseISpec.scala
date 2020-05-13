@@ -17,7 +17,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId)
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
         .post(createRepaymentCaseJson))
 
       response.status mustBe ACCEPTED
@@ -33,14 +33,14 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId)
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
         .post(createCaseRiskJson))
 
       response.status mustBe ACCEPTED
       response.body mustBe ""
     }
 
-    s"return a $BAD_REQUEST if $BAD_REQUEST received from IF" in {
+    s"return a $INTERNAL_SERVER_ERROR if $BAD_REQUEST received from IF" in {
       stubPostWithResponseBodyAndHeaders("/organisations/case", BAD_REQUEST, correlationId, Json.obj(
         "code" -> "BAD_REQUEST", "message" -> "oops something in there is bad"
       ).toString)
@@ -51,11 +51,11 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId)
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
         .post(createRepaymentCaseJson))
 
-      response.status mustBe BAD_REQUEST
-      response.body mustBe """{"code":"BAD_REQUEST","message":"oops something in there is bad"}"""
+      response.status mustBe INTERNAL_SERVER_ERROR
+      response.body mustBe """{"code":"INTERNAL_SERVER_ERROR","message":"Internal server error"}"""
     }
 
     s"return a $UNAUTHORIZED if application is not authorised" in {
@@ -64,7 +64,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId)
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
         .post(createRepaymentCaseJson))
 
       response.status mustBe UNAUTHORIZED
@@ -78,7 +78,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId)
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
         .post(createRepaymentCaseJson))
 
       response.status mustBe UNAUTHORIZED
@@ -94,7 +94,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       ).toString)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId)
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
         .post(createRepaymentCaseJson))
 
       response.status mustBe INTERNAL_SERVER_ERROR

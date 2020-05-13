@@ -14,6 +14,18 @@ PlayKeys.playDefaultPort := 7052
 lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
 
+// ***************
+// Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
+val silencerVersion = "1.7.0"
+libraryDependencies ++= Seq(
+  compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
+  "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+)
+// ***************
+scalacOptions ++= Seq(
+  "-P:silencer:pathFilters=views;routes"
+)
+
 libraryDependencies  ++= Seq(
   "uk.gov.hmrc"                 %% "bootstrap-play-26"        % "1.7.0",
   "com.github.java-json-tools"  % "json-schema-validator"     % "2.2.13",

@@ -1113,6 +1113,7 @@ object ComplianceCasesExamples {
        |    "taxRegime": "VAT_Trader@",
        |    "taxPeriodEnd": "2017-04-05",
        |    "claimDate": "2017-04-05",
+       |    "whoami": "unexpected",
        |    "repaymentAmount": 123456,
        |    "caseOwnerId": 666777,
        |    "triggeredRiskRuleRef": "R1234",

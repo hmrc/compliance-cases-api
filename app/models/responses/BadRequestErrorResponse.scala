@@ -24,12 +24,12 @@ object BadRequestErrorResponse {
   implicit def badRequestWrites: Writes[BadRequestErrorResponse] = Json.writes[BadRequestErrorResponse]
 
   def apply(errors: Seq[FieldError]): BadRequestErrorResponse = {
-    new BadRequestErrorResponse("JSON_VALIDATION_ERROR", "The provided JSON was unable to be validated", errors)
+    new BadRequestErrorResponse("INVALID_PAYLOAD", "Submission has not passed validation. Invalid payload.", errors)
   }
 
   def apply(errors: Seq[FieldError], caseType: String): BadRequestErrorResponse = {
-    new BadRequestErrorResponse("JSON_VALIDATION_ERROR",
-      s"The provided JSON was unable to be validated as the $caseType model.",
+    new BadRequestErrorResponse("INVALID_PAYLOAD",
+      s"Submission has not passed validation for the $caseType model. Invalid payload.",
       errors)
   }
 }

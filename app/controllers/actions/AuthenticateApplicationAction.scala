@@ -18,6 +18,7 @@ package controllers.actions
 
 import javax.inject.Inject
 import models.LogMessageHelper
+import org.slf4j.MDC
 import play.api.libs.json.Json
 import play.api.mvc.Results.{InternalServerError, Unauthorized}
 import play.api.mvc._
@@ -25,7 +26,7 @@ import play.api.{Configuration, Logger}
 import uk.gov.hmrc.api.controllers.{ErrorInternalServerError, ErrorUnauthorized}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthProvider, AuthProviders, AuthorisationException, AuthorisedFunctions}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 
@@ -43,9 +44,18 @@ class AuthenticateApplicationAction @Inject()(
     .getOrElse(Seq.empty[String])
     .toSet
 
+  private[actions] def updateContextWithRequestId(implicit hc: HeaderCarrier): Unit = {
+    if(Option(MDC.getCopyOfContextMap).isEmpty || MDC.getCopyOfContextMap.isEmpty) {
+      hc.requestId.foreach(id => MDC.put(HeaderNames.xRequestId, id.value))
+      hc.sessionId.foreach(id => MDC.put(HeaderNames.xSessionId, id.value))
+    }
+  }
+
   override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
     implicit val hc: HeaderCarrier =
       HeaderCarrierConverter.fromHeadersAndSessionAndRequest(request.headers, request = Some(request))
+
+    updateContextWithRequestId
 
     authorised(AuthProviders(AuthProvider.StandardApplication)).retrieve(Retrievals.applicationId) {
       case Some(applicationId) if applicationIdIsAllowed(applicationId) =>

@@ -23,11 +23,10 @@ import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.google.inject.Inject
 import controllers.actions.RequestWithCorrelationId
 import models.LogMessageHelper
-import models.responses.{BadRequestErrorResponse, FieldError, InvalidField, MissingField}
+import models.responses._
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
@@ -46,7 +45,7 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
 
   private val logger = Logger(this.getClass.getSimpleName)
 
-  def logMessage(methodName: String, message: String)(implicit request: RequestWithCorrelationId[_], hc: HeaderCarrier): String = {
+  private def logMessage(methodName: String, message: String)(implicit request: RequestWithCorrelationId[_]): String = {
     LogMessageHelper(this.getClass.getSimpleName, methodName, message, request.correlationId).toString
   }
 
@@ -54,7 +53,7 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
     schema.validate(json, true)
   }
 
-  private def getFieldName(processingMessage: ProcessingMessage, prefix: String = ""): String = {
+  private def getFieldName(processingMessage: ProcessingMessage, prefix: String): String = {
     processingMessage.asJson().get("instance").asScala.map(instanceName => prefix + instanceName.asText).headOption.getOrElse("Field cannot be found")
   }
 
@@ -64,7 +63,13 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
     ).toList).getOrElse(List())
   }
 
-  def validateCaseType(caseJson: JsValue)(implicit request: RequestWithCorrelationId[_], hc: HeaderCarrier): Either[BadRequestErrorResponse, Unit] = {
+  def getUnexpectedFields(processingMessage: ProcessingMessage, prefix: String = ""): List[UnexpectedField] = {
+    Option(processingMessage.asJson().get("unwanted")).map(_.asScala.map(
+      instanceName => UnexpectedField(path = s"${getFieldName(processingMessage, prefix)}/${instanceName.asText()}")
+    ).toList).getOrElse(List())
+  }
+
+  def validateCaseType(caseJson: JsValue)(implicit request: RequestWithCorrelationId[_]): Either[BadRequestErrorResponse, Unit] = {
     val methodName: String = "validateCaseType"
 
     def getResult(schema: String, caseType: String): Either[BadRequestErrorResponse, Unit] = {
@@ -102,7 +107,7 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
   }
 
   def validate(schemaString: String, input: JsValue)(
-    implicit request: RequestWithCorrelationId[_], hc: HeaderCarrier
+    implicit request: RequestWithCorrelationId[_]
   ): Either[JsValue, Unit] = {
     val result = validateInternallyAgainstSchema(schemaString, input)
     if (result.isSuccess) {
@@ -118,14 +123,15 @@ class ValidationService @Inject()(val bodyParser: BodyParsers.Default, resources
   private def getSequenceOfFieldErrorsFromReport(result: ProcessingReport, prefix: String = ""): Seq[FieldError] = {
     result.iterator.asScala.toList
       .flatMap {
-        error =>
-          val missingFields = getMissingFields(error, prefix)
-          if (missingFields.isEmpty) {
+        error: ProcessingMessage =>
+          val missingAndUnexpectedFields = getMissingFields(error, prefix) ++ getUnexpectedFields(error, prefix)
+
+          if (missingAndUnexpectedFields.isEmpty) {
             List(
               InvalidField(getFieldName(error, prefix))
             )
           } else {
-            missingFields
+            missingAndUnexpectedFields
           }
       }
   }

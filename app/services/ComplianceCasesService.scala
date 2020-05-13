@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ComplianceCasesService @Inject()(connector: ComplianceCasesConnector) {
 
   def createCase(request: JsValue, correlationId: String)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[Unit, HttpResponse]] = {
+                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[HttpResponse]] = {
     connector.createCase(request, correlationId)
   }
 }

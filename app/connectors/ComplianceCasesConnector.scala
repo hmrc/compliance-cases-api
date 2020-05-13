@@ -22,8 +22,8 @@ import models.LogMessageHelper
 import play.api.http.{ContentTypes, HeaderNames}
 import play.api.libs.json.JsValue
 import play.api.{Configuration, Logger}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,21 +45,20 @@ class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: Configu
   )
 
   def createCase(request: JsValue, correlationId: String)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[Unit, HttpResponse]] = {
+                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[IFResponse] = {
 
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
-    httpClient.POST[JsValue, HttpResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
+    httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
       implicitly, httpReads(correlationId), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec
-    ).map(Right.apply)
-      .recover {
-        case e: Exception =>
-          Logger.error(
-            logMessage(
-              s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
-            ), e
-          )
-          Left(())
-      }
+    ).recover {
+      case e: Exception =>
+        Logger.error(
+          logMessage(
+            s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
+          ), e
+        )
+        None
+    }
   }
 }

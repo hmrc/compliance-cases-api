@@ -21,13 +21,16 @@ import play.api.libs.json.{Json, Writes}
 class FieldError(val code: String, val message: String, val path: String)
 
 case class MissingField(override val path: String)
-  extends FieldError(code = "MISSING_FIELD", message = "field not present", path)
+  extends FieldError(code = "MISSING_FIELD", message = "Expected field not present", path)
 
 case class InvalidField(override val path: String)
-  extends FieldError(code = "BAD_REQUEST", message = "an invalid value provided", path)
+  extends FieldError(code = "INVALID_FIELD", message = "Invalid value in field", path)
+
+case class UnexpectedField(override val path: String)
+  extends FieldError(code = "UNEXPECTED_FIELD", message = "Unexpected field found", path)
 
 object FieldError{
-  implicit def invalidFieldWrites: Writes[FieldError] = (fieldError:FieldError) => {
+  implicit def invalidFieldWrites: Writes[FieldError] = fieldError => {
     Json.obj(
       "code" -> fieldError.code,
       "message" -> fieldError.message,

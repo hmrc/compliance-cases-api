@@ -21,10 +21,9 @@ import javax.inject.Inject
 import models.LogMessageHelper
 import play.api.Logger
 import play.api.libs.json.{JsNull, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.{ComplianceCasesService, ResourceService, ValidationService}
 import uk.gov.hmrc.api.controllers.ErrorInternalServerError
-import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,16 +48,16 @@ class ComplianceApiController @Inject()(
       case Right(_) =>
         Logger.info(logMessage("request received passing on to integration framework"))
         complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
-          response => response.fold[Result](_ => InternalServerError(Json.toJson(ErrorInternalServerError)), mappingConnectorResponse)
+          maybeResponse => maybeResponse.fold(
+            ifEmpty = InternalServerError(Json.toJson(ErrorInternalServerError))
+          )(
+            response => Status(response.status)(response.body)
+          )
         )
       case Left(errors) =>
         Logger.warn(logMessage(s"request body didn't match json with errors: ${Json.prettyPrint(errors)}"))
         Future.successful(BadRequest(errors))
     }
-  }
-
-  private def mappingConnectorResponse(response: HttpResponse): Result = {
-    Status(response.status)(response.body)
   }
 
 }

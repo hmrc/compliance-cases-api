@@ -54,16 +54,18 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
   "validationService" should {
     "return json schema errors" in {
       validationService.validate(caseflowCreateCaseSchema,
-        Json.parse("""{"sourceSystemId": "CNT", "sourceSystemKey": [], "sourceSystemURL": "http://me.com", "case": []}""")).left.get mustBe Json.parse(
+        Json.parse("""{"sourceSystemId": "CNT", "sourceSystemKey": [], "sourceSystemURL": "http://me.com", "case": [], "love": "yelp"}"""))
+        .left.get mustBe Json.parse(
         """
           |{
-          |"code": "JSON_VALIDATION_ERROR",
-          |"message": "The provided JSON was unable to be validated",
-          |"errors":
-          |[
-          | {"code":"BAD_REQUEST","message":"an invalid value provided","path":"/case"},
-          | {"code":"BAD_REQUEST","message":"an invalid value provided","path":"/sourceSystemKey"}
-          |]
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"UNEXPECTED_FIELD","message":"Unexpected field found","path":"/love"},
+          |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/case"},
+          |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/sourceSystemKey"}
+          | ]
           |}
           |""".stripMargin)
     }
@@ -74,12 +76,12 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
         Json.parse(invalidRiskCaseJson)).left.get mustBe Json.parse(
         """
           |{
-          |"code": "JSON_VALIDATION_ERROR",
-          |"message": "The provided JSON was unable to be validated as the Risk model.",
-          |"errors":
-          |[
-          |{"code":"BAD_REQUEST","message":"an invalid value provided","path":"/case/sourceSystemRef"}
-          |]
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation for the Risk model. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/case/sourceSystemRef"}
+          | ]
           |}
           |""".stripMargin
       )
@@ -91,14 +93,15 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
         Json.parse(invalidRepaymentCaseJson)).left.get mustBe Json.parse(
         """
           |{
-          |"code": "JSON_VALIDATION_ERROR",
-          |"message": "The provided JSON was unable to be validated as the Repayment model.",
-          |"errors":
-          |[
-          |{"code":"MISSING_FIELD","message":"field not present","path":"/case/taxPeriodStart"},
-          |{"code":"MISSING_FIELD","message":"field not present","path":"/case/taxPayer/referenceNumbers/0/referenceType"},
-          |{"code":"BAD_REQUEST","message":"an invalid value provided","path":"/case/taxRegime"}
-          |]
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation for the Repayment model. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"UNEXPECTED_FIELD","message":"Unexpected field found","path":"/case/whoami"},
+          |   {"code":"MISSING_FIELD","message":"Expected field not present","path":"/case/taxPeriodStart"},
+          |   {"code":"MISSING_FIELD","message":"Expected field not present","path":"/case/taxPayer/referenceNumbers/0/referenceType"},
+          |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/case/taxRegime"}
+          | ]
           |}
           |""".stripMargin
       )
@@ -109,12 +112,12 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
         Json.parse(invalidCaseTypeUsingIncorrectDatatypeJson)).left.get mustBe Json.parse(
         """
           |{
-          |"code": "JSON_VALIDATION_ERROR",
-          |"message": "The provided JSON was unable to be validated",
-          |"errors":
-          |[
-          |{"code":"BAD_REQUEST","message":"an invalid value provided","path":"/case/caseType"}
-          |]
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/case/caseType"}
+          | ]
           |}
           |""".stripMargin
       )
@@ -125,12 +128,12 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
         Json.parse(invalidCaseType)).left.get mustBe Json.parse(
         """
           |{
-          |"code": "JSON_VALIDATION_ERROR",
-          |"message": "The provided JSON was unable to be validated",
-          |"errors":
-          |[
-          |{"code":"BAD_REQUEST","message":"an invalid value provided","path":"/case/caseType"}
-          |]
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/case/caseType"}
+          | ]
           |}
           |""".stripMargin
       )

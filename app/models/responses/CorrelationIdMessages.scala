@@ -19,6 +19,6 @@ package models.responses
 import play.api.libs.json.{JsObject, Json}
 
 object CorrelationIdMessages {
-  val invalid: JsObject = Json.obj("code" -> "INVALID_CORRELATION_ID", "message" -> "The correlation id provided is invalid")
-  val missing: JsObject = Json.obj("code" -> "MISSING_CORRELATION_ID", "message" -> "The correlation id is missing")
+  val invalid: JsObject = Json.obj("code" -> "INVALID_CORRELATION_ID", "message" -> "Submission has not passed validation. Invalid header CorrelationId.")
+  val missing: JsObject = Json.obj("code" -> "MISSING_CORRELATION_ID", "message" -> "Submission has not passed validation. Missing header CorrelationId.")
 }

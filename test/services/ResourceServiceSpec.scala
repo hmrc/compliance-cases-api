@@ -17,39 +17,20 @@
 package services
 
 import caseData.ComplianceCasesExamples._
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Environment
-import play.api.libs.json.Json
-import uk.gov.hmrc.http.HeaderCarrier
 
-class ResourceServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
-  with ScalaFutures with IntegrationPatience {
+class ResourceServiceSpec extends WordSpec with MustMatchers with MockitoSugar {
 
   private val env = Environment.simple()
 
-  implicit lazy val hc: HeaderCarrier = HeaderCarrier(sessionId = None)
-
   val service = new ResourceService(env)
-
-
 
   "Service" should {
 
     "return exception" in {
-      try {
-        service.getJson("/schemas/1.json")
-      } catch {
-        case e: Exception =>
-          e mustBe an[Exception]
-          e.getLocalizedMessage mustBe "resource not found: /schemas/1.json"
-      }
-    }
-
-    "return json" in {
-      service.getJson("/schemas/caseflowCreateCaseSchema.json") mustBe Json.parse(caseflowCreateCaseSchema)
+      intercept[Exception](service.getFile("/schemas/1.json")).getLocalizedMessage mustBe "resource not found: /schemas/1.json"
     }
 
     "return create case schema" in {

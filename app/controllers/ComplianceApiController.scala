@@ -39,14 +39,16 @@ class ComplianceApiController @Inject()(
 
   private val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
 
+  private val logger = Logger(this.getClass.getSimpleName)
+
   def createCase(): Action[AnyContent] = (authenticateApplication andThen getCorrelationId).async { implicit request =>
     val input = request.body.asJson.getOrElse(JsNull)
 
     def logMessage(message: String): String = LogMessageHelper("ComplianceApiController", "createCase", message, request.correlationId).toString
 
-    validator.validate(schema, input) match {
-      case Right(_) =>
-        Logger.info(logMessage("request received passing on to integration framework"))
+    validator.validateAndRetrieveErrors(schema, input) match {
+      case None =>
+        logger.info(logMessage("request received passing on to integration framework"))
         complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
           maybeResponse => maybeResponse.fold(
             ifEmpty = InternalServerError(Json.toJson(ErrorInternalServerError))
@@ -54,8 +56,8 @@ class ComplianceApiController @Inject()(
             response => Status(response.status)(response.body)
           )
         )
-      case Left(errors) =>
-        Logger.warn(logMessage(s"request body didn't match json with errors: ${Json.prettyPrint(errors)}"))
+      case Some(errors) =>
+        logger.warn(logMessage(s"request body didn't match json with errors: ${Json.prettyPrint(errors)}"))
         Future.successful(BadRequest(errors))
     }
   }

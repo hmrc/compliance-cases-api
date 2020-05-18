@@ -26,7 +26,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -35,8 +35,6 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
 
   import play.api.mvc._
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   implicit lazy val hc: HeaderCarrier = HeaderCarrier(sessionId = None)
 
   implicit lazy val materializer: Materializer = app.materializer
@@ -44,7 +42,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
   val mockResource: ResourceService = mock[ResourceService]
   implicit val request: RequestWithCorrelationId[AnyContentAsEmpty.type] = RequestWithCorrelationId(FakeRequest(), "Some-Correlation-Id")
 
-  def validationService = new ValidationService(bodyParser, mockResource)
+  def validationService = new ValidationService(mockResource)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -52,10 +50,27 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
   }
 
   "validationService" should {
+
+    "return json schema errors for json that is not an object" in {
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
+        JsString(""))
+        .get mustBe Json.parse(
+        """
+          |{
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"INVALID_JSON_TYPE","message":"Invalid Json type as payload","path":""}
+          | ]
+          |}
+          |""".stripMargin)
+    }
+
     "return json schema errors" in {
-      validationService.validate(caseflowCreateCaseSchema,
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
         Json.parse("""{"sourceSystemId": "CNT", "sourceSystemKey": [], "sourceSystemURL": "http://me.com", "case": [], "love": "yelp"}"""))
-        .left.get mustBe Json.parse(
+        .get mustBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -72,8 +87,8 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
 
     "return invalid fields in risk" in {
       when(mockResource.getFile(eqTo("/schemas/caseflowCreateRiskCaseSchema.json"))).thenReturn(caseflowCreateRiskCaseSchema)
-      validationService.validate(caseflowCreateCaseSchema,
-        Json.parse(invalidRiskCaseJson)).left.get mustBe Json.parse(
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
+        Json.parse(invalidRiskCaseJson)).get mustBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -89,8 +104,8 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
 
     "return missing and invalid fields in repayments" in {
       when(mockResource.getFile(eqTo("/schemas/caseflowCreateRepaymentCaseSchema.json"))).thenReturn(caseflowCreateRepaymentCaseSchema)
-      validationService.validate(caseflowCreateCaseSchema,
-        Json.parse(invalidRepaymentCaseJson)).left.get mustBe Json.parse(
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
+        Json.parse(invalidRepaymentCaseJson)).get mustBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -108,8 +123,8 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
     }
 
     "return invalid caseType using incorrect datatype" in {
-      validationService.validate(caseflowCreateCaseSchema,
-        Json.parse(invalidCaseTypeUsingIncorrectDatatypeJson)).left.get mustBe Json.parse(
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
+        Json.parse(invalidCaseTypeUsingIncorrectDatatypeJson)).get mustBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -124,8 +139,8 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
     }
 
     "return invalid caseType" in {
-      validationService.validate(caseflowCreateCaseSchema,
-        Json.parse(invalidCaseType)).left.get mustBe Json.parse(
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
+        Json.parse(invalidCaseType)).get mustBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",

@@ -44,6 +44,8 @@ class AuthenticateApplicationAction @Inject()(
     .getOrElse(Seq.empty[String])
     .toSet
 
+  private val logger = Logger(this.getClass.getSimpleName)
+
   private[actions] def updateContextWithRequestId(implicit hc: HeaderCarrier): Unit = {
     if(Option(MDC.getCopyOfContextMap).isEmpty || MDC.getCopyOfContextMap.isEmpty) {
       hc.requestId.foreach(id => MDC.put(HeaderNames.xRequestId, id.value))
@@ -61,18 +63,18 @@ class AuthenticateApplicationAction @Inject()(
       case Some(applicationId) if applicationIdIsAllowed(applicationId) =>
         block(request)
       case _ =>
-        Logger.warn(
+        logger.warn(
           LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", "no application id or application id not in request").toString
         )
         Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
     } recover {
       case _: AuthorisationException =>
-        Logger.warn(
+        logger.warn(
           LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", "no application id or application id not in request").toString
         )
         Unauthorized(Json.toJson(ErrorUnauthorized))
       case e: Throwable =>
-        Logger.warn(
+        logger.warn(
           LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", "an unexpected exception occurred").toString, e
         )
         InternalServerError(Json.toJson(ErrorInternalServerError))

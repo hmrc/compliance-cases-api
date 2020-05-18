@@ -25,27 +25,29 @@ trait ComplianceCaseConnectorParser {
   val className: String
   type IFResponse = Option[HttpResponse]
 
+  val logger: Logger
+
   def httpReads(correlationId: String): HttpReads[IFResponse] = (_, url, response) => {
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
     response.status match {
       case NOT_FOUND =>
-        Logger.warn(
+        logger.warn(
           logMessage(s"received a not found status when calling $url ( IF_CREATE_CASE_ENDPOINT_NOT_FOUND_RESPONSE )")
         )
         None
       case BAD_REQUEST =>
-        Logger.warn(
+        logger.warn(
           logMessage(s"received a bad request status when calling $url with body: ${response.body} ( IF_CREATE_CASE_ENDPOINT_BAD_REQUEST_RESPONSE )")
         )
         None
       case status if status != ACCEPTED =>
-        Logger.warn(
+        logger.warn(
           logMessage(s"received status $status when calling $url ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_RESPONSE )")
         )
         None
       case _ =>
-        Logger.info(logMessage(s"received an accepted when calling $url"))
+        logger.info(logMessage(s"received an accepted when calling $url"))
         Some(response)
     }
   }

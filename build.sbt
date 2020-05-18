@@ -12,6 +12,7 @@ majorVersion := 0
 PlayKeys.playDefaultPort := 7052
 
 lazy val microservice = Project(appName, file("."))
+  .disablePlugins(JUnitXmlReportPlugin)
   .configs(IntegrationTest)
 
 // ***************

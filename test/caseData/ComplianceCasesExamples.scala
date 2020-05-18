@@ -370,7 +370,7 @@ object ComplianceCasesExamples {
        |    },
        |    "organisationNameType" : {
        |      "type" : "string",
-       |      "pattern" : "^[a-zA-Z0-9 &`\\-\\'\\.^]{1,70}$"
+       |      "pattern" : "^[\\u0020-\\u007E\\u00C0-\\u00FF\\u0100-\\u02AF]{1,255}$"
        |    },
        |    "addressLineType" : {
        |      "type" : "string",
@@ -772,7 +772,7 @@ object ComplianceCasesExamples {
        |    },
        |    "organisationNameType" : {
        |      "type" : "string",
-       |      "pattern" : "^[a-zA-Z0-9 &`\\-\\'\\.^]{1,70}$"
+       |      "pattern" : "^[\\u0020-\\u007E\\u00C0-\\u00FF\\u0100-\\u02AF]{1,255}$"
        |    },
        |    "addressLineType" : {
        |      "type" : "string",

@@ -29,6 +29,9 @@ case class InvalidField(override val path: String)
 case class UnexpectedField(override val path: String)
   extends FieldError(code = "UNEXPECTED_FIELD", message = "Unexpected field found", path)
 
+object InvalidJsonType
+  extends FieldError(code = "INVALID_JSON_TYPE", message = "Invalid Json type as payload", path = "")
+
 object FieldError{
   implicit def invalidFieldWrites: Writes[FieldError] = fieldError => {
     Json.obj(

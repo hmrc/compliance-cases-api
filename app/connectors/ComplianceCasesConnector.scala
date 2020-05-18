@@ -32,6 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: Configuration) extends ComplianceCaseConnectorParser {
 
   override val className: String = this.getClass.getSimpleName
+  override val logger: Logger = Logger(className)
 
   lazy val bearerToken: String = config.get[String]("integration-framework.auth-token")
   lazy val iFEnvironment: String = config.get[String]("integration-framework.environment")
@@ -53,7 +54,7 @@ class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: Configu
       implicitly, httpReads(correlationId), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec
     ).recover {
       case e: Exception =>
-        Logger.error(
+        logger.error(
           logMessage(
             s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
           ), e

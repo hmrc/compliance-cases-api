@@ -21,9 +21,9 @@ import play.api.libs.json.{JsArray, JsValue, Json, Writes}
 case class ApiDefinition(whiteListedApplicationIds: Seq[String], endpointsEnabled: Boolean, status: String){
   val scopes: JsArray = Json.arr(
     Json.obj(
-      "key" -> "write:compliance-cases-api",
-      "name" -> "Create Cases",
-      "description" -> "Scope to create cases in CaseFlow"
+      "key" -> "write:protect-connect",
+      "name" -> "Protect Connect",
+      "description" -> "Scope for accessing protect connect APIs"
     )
   )
 

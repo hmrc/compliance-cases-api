@@ -1,41 +1,53 @@
 {
-  "sourceSystemId": "CNT",
-  "sourceSystemKey": "AZ1234567/7",
+  "sourceSystemId" : "CNT",
+  "sourceSystemKey" : "VI00004-1",
   "sourceSystemURL" : "http://localhost:7052",
-  "case": {
-    "caseType": "Repayment",
-    "sourceSystemRef": "CFSRP",
-    "repaymentAmount": 1234567,
-    "taxRegime": "VAT_Trader",
-    "taxPeriodStart": "2016-04-06",
-    "taxPeriodEnd": "2017-04-05",
-    "claimDate": "2017-04-05",
-    "caseOwnerId": 666777,
-    "triggeredRiskRuleRef": "R123",
-    "taxPayer": {
-      "taxPayerType": "Individual",
-      "segment": "Plan B",
-      "referenceNumbers": [{
-        "referenceType": "ValueAddedTax",
-        "referenceValue": "VAT432"
-      }],
-      "nameDetails": {
-        "title": "Mr",
-        "firstName": "FirstName",
-        "lastName": "LastName"
+  "taxPayer" : {
+    "taxPayerType" : "Organisation",
+    "segment" : "Micro A",
+    "nameDetails" : {
+      "organisationName" : "Bodgit & Scarper"
+    },
+    "referenceNumbers" : [
+      {
+        "referenceType" : "VIRef",
+        "referenceValue" : "VI000002343B"
+      }
+    ],
+    "addresses" : [
+      {
+        "correspondenceAddress" : true,
+        "addressType" : "Registered Address",
+        "addressLine1" : "Megabucks House",
+        "addressLine2" : "Richville Place",
+        "city" : "Richville",
+        "county" : "Wadshire",
+        "postcode" : "ZZ11 2YY"
       },
-      "addresses": [
-        {
-          "correspondenceAddress": true,
-          "addressType": "Holiday house",
-          "addressLine1": "1 A Fake Road",
-          "addressLine2": "A Fake Place",
-          "city": "A Fake City",
-          "county": "A Fake County",
-          "country": "A Fake Country",
-          "postcode": "AB0 0CD"
-        }
-      ]
-    }
+      {
+        "correspondenceAddress" : false,
+        "addressType" : "Main Office",
+        "addressLine1" : "The Hovel",
+        "addressLine2" : "Downtrodden Way",
+        "city" : "Poorsville",
+        "county" : "Wadshire",
+        "country" : "UK",
+        "postcode" : "ZZ11 2YY"
+      }
+    ]
+  },
+  "case" : {
+    "caseType" : "Repayment",
+    "sourceSystemRef" : "CFSRP",
+    "campaignId" : "CID-00002344",
+    "projectId" : "PID-98765432",
+    "repaymentAmount" : 123456,
+    "taxRegime" : "VATC",
+    "taxPeriodStart" : "2019-04-06",
+    "taxPeriodEnd" : "2020-04-05",
+    "caseOwnerId" : 666,
+    "triggeredRiskRuleRef" : "R0123",
+    "oudn" : "Bolton-2437-C",
+    "claimDate" : "2020-04-17"
   }
 }

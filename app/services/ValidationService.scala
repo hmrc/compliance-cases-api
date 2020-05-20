@@ -48,12 +48,18 @@ class ValidationService @Inject()(resources: ResourceService) {
     input.asOpt[JsObject] match {
       case Some(jsObject) =>
         val result: ProcessingReport = validate(schemaString, jsObject)
-        if (result.isSuccess) {
-          validateCaseType((input \ "case").as[JsValue]) map (Json.toJson(_))
+        val (caseTypeName, caseFieldErrors): (Option[String], Seq[FieldError]) = (input \ "case").asOpt[JsObject].map(
+          validateCaseType(_)
+        ).getOrElse(None -> Seq.empty[FieldError])
+
+        if (result.isSuccess && caseFieldErrors.isEmpty) {
+          None
         } else {
-          Some(
-            Json.toJson(BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result)))
-          )
+          caseTypeName
+            .map(caseType =>
+              BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors, caseType = caseType)
+            ).orElse(Some(BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors)))
+            .map(Json.toJson(_))
         }
       case _ => Some(
         Json.toJson(BadRequestErrorResponse(Seq(InvalidJsonType)))
@@ -82,15 +88,13 @@ class ValidationService @Inject()(resources: ResourceService) {
   private def getUnexpectedFields(processingMessage: ProcessingMessage, prefix: String): List[UnexpectedField] =
     getUnwantedOrMissingFields("unwanted", processingMessage, prefix) map UnexpectedField.apply
 
-  private def validateCaseType(caseJson: JsValue)(implicit request: RequestWithCorrelationId[_]): Option[BadRequestErrorResponse] = {
+  private def validateCaseType(caseJson: JsValue)(implicit request: RequestWithCorrelationId[_]): (Option[String], Seq[FieldError]) = {
     val methodName: String = "validateCaseType"
 
-    def getResult(schema: String, caseType: String): Option[BadRequestErrorResponse] = {
+    def getResult(schema: String, caseType: String): (Option[String], Seq[FieldError]) = {
       val result = validate(schema, caseJson)
-      if (result.isSuccess) None else {
-        Some(
-          BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result, "/case"), caseType)
-        )
+      if (result.isSuccess) None -> Seq.empty else {
+        Some(caseType) -> getSequenceOfFieldErrorsFromReport(result, "/case")
       }
     }
 
@@ -98,17 +102,17 @@ class ValidationService @Inject()(resources: ResourceService) {
       case JsSuccess("Repayment", _) =>
         logger.info(logMessage(methodName, "Found REPAYMENT caseType attempting to validate against repayments schema"))
         getResult(repaymentCaseSchema, "Repayment")
-      case JsSuccess("YieldBearing", _) =>
+      case JsSuccess("Risk", _) =>
         logger.info(logMessage(methodName, "Found RISK caseType attempting to validate against risk schema"))
         getResult(riskCaseSchema, "Risk")
       case JsSuccess(_, _) =>
         logger.warn(logMessage(methodName, "Found INVALID caseType in request"))
-        Some(mapErrorsToBadRequestErrorResponse(JsError(__ \ "case" \ "caseType", "invalid case type provided").errors))
+        None -> toInvalidField(JsError(__ \ "case" \ "caseType", "invalid case type provided").errors)
       case JsError(errors) =>
         logger.warn(logMessage(methodName, "caseType missing or not a string"))
-        Some(mapErrorsToBadRequestErrorResponse(errors.map {
+        None -> toInvalidField(errors.map {
           case (_, errors) => (__ \ "case" \ "caseType", errors)
-        }))
+        })
     }
   }
 
@@ -126,19 +130,16 @@ class ValidationService @Inject()(resources: ResourceService) {
           val missingAndUnexpectedFields = getMissingFields(error, prefix) ++ getUnexpectedFields(error, prefix)
 
           if (missingAndUnexpectedFields.isEmpty) {
-            List(
-              InvalidField(getFieldName(error, prefix))
-            )
+            List(InvalidField(getFieldName(error, prefix)))
           } else {
             missingAndUnexpectedFields
           }
       }
   }
 
-  private def mapErrorsToBadRequestErrorResponse(mappingErrors: Seq[(JsPath, Seq[JsonValidationError])]): BadRequestErrorResponse = {
-    val errors = mappingErrors.map {
+  private def toInvalidField(mappingErrors: Seq[(JsPath, Seq[JsonValidationError])]): Seq[InvalidField] = {
+    mappingErrors.map {
       x => InvalidField(path = x._1.toString())
     }
-    BadRequestErrorResponse(errors)
   }
 }

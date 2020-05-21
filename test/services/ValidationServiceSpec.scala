@@ -78,6 +78,7 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
           | "errors":
           | [
           |   {"code":"UNEXPECTED_FIELD","message":"Unexpected field found","path":"/love"},
+          |   {"code":"MISSING_FIELD","message":"Expected field not present","path":"/taxPayer"},
           |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/case"},
           |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/sourceSystemKey"}
           | ]
@@ -112,9 +113,9 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
           | "message": "Submission has not passed validation for the Repayment model. Invalid payload.",
           | "errors":
           | [
+          |   {"code":"MISSING_FIELD","message":"Expected field not present","path":"/taxPayer/referenceNumbers/0/referenceType"},
           |   {"code":"UNEXPECTED_FIELD","message":"Unexpected field found","path":"/case/whoami"},
           |   {"code":"MISSING_FIELD","message":"Expected field not present","path":"/case/taxPeriodStart"},
-          |   {"code":"MISSING_FIELD","message":"Expected field not present","path":"/case/taxPayer/referenceNumbers/0/referenceType"},
           |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/case/taxRegime"}
           | ]
           |}

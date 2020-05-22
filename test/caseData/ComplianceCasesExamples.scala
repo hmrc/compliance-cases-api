@@ -274,7 +274,7 @@ object ComplianceCasesExamples {
        |    "organisationNameType": {
        |      "type": "string",
        |      "description": "Allow Unicode blocks Basic Latin (except DEL), Latin-1 Supplement from À to ÿ, and all of Latin Extended-A and Latin Extended-B",
-       |      "pattern": "^[ -~À-ÿĀ-ʯ]{1,255}$"
+       |      "pattern": "^[ -~¡-ÿĀ-ʯḀ-ỿ‐-―‘-‟₠-₿ÅK]{1,255}$"
        |    },
        |    "addressLineType": {
        |      "type": "string",

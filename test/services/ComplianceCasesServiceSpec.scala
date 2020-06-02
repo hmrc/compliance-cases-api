@@ -17,33 +17,30 @@
 package services
 
 import caseData.ComplianceCasesExamples._
-import connectors.ComplianceCasesConnector
-import org.mockito.ArgumentMatchersSugar
-import org.mockito.Mockito.when
+import helpers.MockHelpers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
 
-class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
-  with ArgumentMatchersSugar with ScalaFutures with IntegrationPatience {
+class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with ScalaFutures with IntegrationPatience with MockHelpers {
 
-  private val complianceCasesConnector = mock[ComplianceCasesConnector]
-  private val service: ComplianceCasesService = new ComplianceCasesService(complianceCasesConnector)
+  private val service: ComplianceCasesService = new ComplianceCasesService(mockComplianceCasesConnector)
 
   implicit lazy val hc: HeaderCarrier = HeaderCarrier()
 
   "Service" should {
 
-    "return 204" in {
-      when(complianceCasesConnector.createCase(any[JsValue], eqTo("some-correlation-id"))(any[HeaderCarrier], any[ExecutionContext]))
-        .thenReturn(Future.successful(Some(HttpResponse(NO_CONTENT))))
+    "return 204 on successful response from connector" in {
+      Given
+        .the.complianceCasesConnector.createsCase(
+        Json.parse(fullCaseJson),
+        "some-correlation-id",
+        Some(HttpResponse(NO_CONTENT))
+      ).build()
 
       whenReady(service.createCase(Json.parse(fullCaseJson), "some-correlation-id")) {
         _.get.status mustBe NO_CONTENT

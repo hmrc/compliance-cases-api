@@ -36,13 +36,13 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
 
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("integration-framework.base-url" -> s"http://localhost:${server.port}")
+    .configure("integration-framework.base-url" -> s"http://localhost:${server.port}", "auditing.enabled" -> false)
     .build()
 
   private implicit lazy val hc: HeaderCarrier = HeaderCarrier()
-  private def connector = app.injector.instanceOf[ComplianceCasesConnector]
-
   val correlationId: String = "some-correlation-id"
+
+  private def connector = app.injector.instanceOf[ComplianceCasesConnector]
 
   "Compliance Cases Connector" should {
 

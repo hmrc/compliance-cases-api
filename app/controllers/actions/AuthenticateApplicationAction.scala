@@ -25,16 +25,15 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.api.controllers.{ErrorInternalServerError, ErrorUnauthorized}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.{AuthProvider, AuthProviders, AuthorisationException, AuthorisedFunctions}
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
 class AuthenticateApplicationAction @Inject()(
-                                               val authConnector: DefaultAuthConnector,
+                                               val authConnector: AuthConnector,
                                                config: Configuration,
                                                val parser: BodyParsers.Default
                                              )(implicit val executionContext: ExecutionContext) extends

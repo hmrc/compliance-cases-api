@@ -18,14 +18,12 @@ package services
 
 import caseData.ComplianceCasesExamples._
 import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.Environment
 
-class ResourceServiceSpec extends WordSpec with MustMatchers with MockitoSugar {
+class ResourceServiceSpec extends WordSpec with MustMatchers {
 
   private val env = Environment.simple()
-
-  val service = new ResourceService(env)
+  private val service = new ResourceService(env)
 
   "Service" should {
 

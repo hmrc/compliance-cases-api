@@ -1,19 +1,22 @@
 package definition
 
+import helpers.WireMockSpec
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSClient
-import play.api.test.Helpers.OK
+import play.api.test.Helpers.{NO_CONTENT, OK}
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
-class DefinitionControllerISpec extends PlaySpec with GuiceOneServerPerSuite with FutureAwaits with DefaultAwaitTimeout {
+class DefinitionControllerISpec extends PlaySpec with GuiceOneServerPerSuite with FutureAwaits with DefaultAwaitTimeout with WireMockSpec {
 
   def wsClient: WSClient = app.injector.instanceOf[WSClient]
 
   "api/definition" should {
     "return the correct definition from config" in {
-      val response = await(wsClient.url(s"http://localhost:$port/api/definition").get())
+      stubPostWithoutRequestAndResponseBody("/write/audit", NO_CONTENT)
+
+      val response = await(buildClient(s"/api/definition").get())
 
       response.status mustBe OK
       response.body[JsValue] mustBe Json.parse(

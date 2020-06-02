@@ -29,14 +29,14 @@ scalacOptions ++= Seq(
 
 libraryDependencies  ++= Seq(
   "uk.gov.hmrc"                 %% "bootstrap-play-26"        % "1.8.0",
-  "com.github.java-json-tools"  % "json-schema-validator"     % "2.2.13",
+  "com.github.java-json-tools"  % "json-schema-validator"     % "2.2.14",
   "uk.gov.hmrc"                 %% "play-hmrc-api"            % "4.1.0-play-26",
   "uk.gov.hmrc"                 %% "auth-client"              % "3.0.0-play-26",
   "org.scalatest"               %% "scalatest"                % "3.0.8"                 % "test",
   "com.typesafe.play"           %% "play-test"                % PlayVersion.current     % "test",
   "org.pegdown"                 %  "pegdown"                  % "1.6.0"                 % "test, it",
   "org.scalatestplus.play"      %% "scalatestplus-play"       % "3.1.3"                 % "test, it",
-  "org.mockito"                 %% "mockito-scala"            % "1.8.0"                 % "test",
+  "org.scalamock"               %% "scalamock"                % "4.4.0"                 % "test",
   "com.github.tomakehurst"      % "wiremock-standalone"       % "2.26.3"                % "test, it"
 )
 

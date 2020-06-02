@@ -16,40 +16,43 @@
 
 package services
 
-import akka.stream.Materializer
 import caseData.ComplianceCasesExamples._
 import controllers.actions.RequestWithCorrelationId
-import org.mockito.ArgumentMatchersSugar
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.BeforeAndAfterEach
+import helpers.MockHelpers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.{JsNull, JsString, Json}
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar
-  with ArgumentMatchersSugar with ScalaFutures with IntegrationPatience with BeforeAndAfterEach {
-
-  import play.api.mvc._
+class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationPatience with MockHelpers {
 
   implicit lazy val hc: HeaderCarrier = HeaderCarrier(sessionId = None)
 
-  implicit lazy val materializer: Materializer = app.materializer
-  val bodyParser = new BodyParsers.Default
-  val mockResource: ResourceService = mock[ResourceService]
-  implicit val request: RequestWithCorrelationId[AnyContentAsEmpty.type] = RequestWithCorrelationId(FakeRequest(), "Some-Correlation-Id")
 
-  def validationService = new ValidationService(mockResource)
+  implicit val request: RequestWithCorrelationId[AnyContent] = RequestWithCorrelationId(FakeRequest(), "Some-Correlation-Id")
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockResource)
-  }
+  def validationService = new ValidationService(mockResourceService)
 
   "validationService" should {
+
+    "return None if json is a valid repayment type" in {
+      Given.the.resourceService.returnsResourceAt("/schemas/caseflowCreateRepaymentCaseSchema.json", caseflowCreateRepaymentCaseSchema).build()
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(minimumRepaymentOrganisationJson)) mustBe None
+    }
+    "return None if json is a valid full repayment type" in {
+      Given.the.resourceService.returnsResourceAt("/schemas/caseflowCreateRepaymentCaseSchema.json", caseflowCreateRepaymentCaseSchema).build()
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(fullCaseJson)) mustBe None
+    }
+    "return None if json is a valid repayment type with address" in {
+      Given.the.resourceService.returnsResourceAt("/schemas/caseflowCreateRepaymentCaseSchema.json", caseflowCreateRepaymentCaseSchema).build()
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(addressJson)) mustBe None
+    }
+    "return None if json is a valid risk type" in {
+      Given.the.resourceService.returnsResourceAt("/schemas/caseflowCreateRiskCaseSchema.json", caseflowCreateRiskCaseSchema).build()
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(minimumRiskJson)) mustBe None
+    }
 
     "return json schema errors for json that is not an object" in {
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
@@ -67,7 +70,22 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
           |""".stripMargin)
     }
 
-    "return json schema errors" in {
+    "return json schema errors if no Json (JsNull) is passed in" in {
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, JsNull)
+        .get mustBe Json.parse(
+        """
+          |{
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"INVALID_JSON_TYPE","message":"Invalid Json type as payload","path":""}
+          | ]
+          |}
+          |""".stripMargin)
+    }
+
+    "return json schema errors for multiple errors and no case" in {
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
         Json.parse("""{"sourceSystemId": "CNT", "sourceSystemKey": [], "sourceSystemURL": "http://me.com", "case": [], "love": "yelp"}"""))
         .get mustBe Json.parse(
@@ -86,8 +104,46 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
           |""".stripMargin)
     }
 
+    "return json schema errors for multiple errors and valid risk case field" in {
+      Given.the.resourceService.returnsResourceAt("/schemas/caseflowCreateRiskCaseSchema.json", caseflowCreateRiskCaseSchema).build()
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
+        Json.parse(multipleInvalidFieldsWithValidRiskCaseField))
+        .get mustBe Json.parse(
+        """
+          |{
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"UNEXPECTED_FIELD","message":"Unexpected field found","path":"/love"},
+          |   {"code":"MISSING_FIELD","message":"Expected field not present","path":"/taxPayer"},
+          |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/sourceSystemKey"}
+          | ]
+          |}
+          |""".stripMargin)
+    }
+
+    "return json schema errors for multiple errors and valid repayment case field" in {
+      Given.the.resourceService.returnsResourceAt("/schemas/caseflowCreateRepaymentCaseSchema.json", caseflowCreateRepaymentCaseSchema).build()
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
+        Json.parse(multipleInvalidFieldsWithValidRepaymentCaseField))
+        .get mustBe Json.parse(
+        """
+          |{
+          | "code": "INVALID_PAYLOAD",
+          | "message": "Submission has not passed validation. Invalid payload.",
+          | "errors":
+          | [
+          |   {"code":"UNEXPECTED_FIELD","message":"Unexpected field found","path":"/love"},
+          |   {"code":"MISSING_FIELD","message":"Expected field not present","path":"/taxPayer"},
+          |   {"code":"INVALID_FIELD","message":"Invalid value in field","path":"/sourceSystemKey"}
+          | ]
+          |}
+          |""".stripMargin)
+    }
+
     "return invalid fields in risk" in {
-      when(mockResource.getFile(eqTo("/schemas/caseflowCreateRiskCaseSchema.json"))).thenReturn(caseflowCreateRiskCaseSchema)
+      Given.the.resourceService.returnsResourceAt("/schemas/caseflowCreateRiskCaseSchema.json", caseflowCreateRiskCaseSchema).build()
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
         Json.parse(invalidRiskCaseJson)).get mustBe Json.parse(
         """
@@ -104,7 +160,8 @@ class ValidationServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mocki
     }
 
     "return missing and invalid fields in repayments" in {
-      when(mockResource.getFile(eqTo("/schemas/caseflowCreateRepaymentCaseSchema.json"))).thenReturn(caseflowCreateRepaymentCaseSchema)
+      Given.the.resourceService.returnsResourceAt("/schemas/caseflowCreateRepaymentCaseSchema.json", caseflowCreateRepaymentCaseSchema).build()
+
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
         Json.parse(invalidRepaymentCaseJson)).get mustBe Json.parse(
         """

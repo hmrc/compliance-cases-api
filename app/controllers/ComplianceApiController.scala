@@ -37,7 +37,7 @@ class ComplianceApiController @Inject()(
                                          cc: ControllerComponents
                                        )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
-  private val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
+  private lazy val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
 
   private val logger = Logger(this.getClass.getSimpleName)
 

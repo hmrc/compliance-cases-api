@@ -970,4 +970,66 @@ object ComplianceCasesExamples {
        |}
        |""".stripMargin
 
+  lazy val multipleInvalidFieldsWithValidRiskCaseField: String =
+    """
+      |{
+      | "sourceSystemId": "CNT",
+      | "sourceSystemKey": [],
+      | "sourceSystemURL": "http://me.com",
+      | "case": {
+      |    "caseType" : "Risk",
+      |    "sourceSystemRef" : "CFSB",
+      |    "campaignId" : "CID-12345678",
+      |    "projectId" : "PID-12345678",
+      |    "suggestedOfficerGrade" : "Major",
+      |    "interventionSubType" : "Customer lead",
+      |    "risks" : [
+      |      {
+      |        "taxRegime" : "ABSD",
+      |        "subRegime" : "Returns",
+      |        "firstComplianceCheck" : "Check_1",
+      |        "secondComplianceCheck" : "Check_2",
+      |        "inaccuracyCategory" : "Wildly",
+      |        "inaccuracyDescription" : "All_over_the_place",
+      |        "behaviours" : {
+      |          "potentialBehaviour" : "Concerning",
+      |          "emergingBehaviour" : "Devious"
+      |        },
+      |        "taxPeriodStart" : "2019-04-06",
+      |        "taxPeriodEnd" : "2020-04-05",
+      |        "riskStartDate" : "2020-04-20",
+      |        "amounts" : {
+      |          "potentialAmount" : 9876500,
+      |          "expectedAmount" : 10008545,
+      |          "emergingAmount" : 10011456
+      |        },
+      |        "riskScore" : 2.1
+      |      }
+      |    ]
+      |  },
+      | "love": "yelp"
+      | }
+      |""".stripMargin
+
+  lazy val multipleInvalidFieldsWithValidRepaymentCaseField: String =
+    """
+      |{
+      | "sourceSystemId": "CNT",
+      | "sourceSystemKey": [],
+      | "sourceSystemURL": "http://me.com",
+      | "case": {
+      |    "caseType": "Repayment",
+      |    "sourceSystemRef": "CFSRP",
+      |    "repaymentAmount": 1234567.99,
+      |    "taxRegime": "VAT",
+      |    "taxPeriodEnd": "2017-04-05",
+      |    "taxPeriodStart": "2017-04-05",
+      |    "claimDate": "2017-04-05",
+      |    "repaymentAmount": 123456,
+      |    "caseOwnerId": 666777,
+      |    "triggeredRiskRuleRef": "R1234"
+      |  },
+      | "love": "yelp"
+      | }
+      |""".stripMargin
 }

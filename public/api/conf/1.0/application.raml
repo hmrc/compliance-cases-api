@@ -37,7 +37,7 @@ uses:
       securedBy: [ sec.x-application: { scopes: [ "write:protect-connect" ] } ]
       body:
         application/json:
-          type: !include schemas/CreateCaseSchema.json
+          type: !include schemas/request.json
           examples:
             example-1:
               description: example create repayment case body

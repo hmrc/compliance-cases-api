@@ -1,0 +1,35 @@
+{
+  "oneOf": [
+    {
+      "additionalProperties": false, 
+      "required": [
+        "caseID"
+      ], 
+      "type": "object", 
+      "properties": {
+        "caseID": {
+          "pattern": "^(CFSRP-[0-9]{1,15})$", 
+          "type": "string", 
+          "description": "Mandatory. Case id which has got created in Caseflow system for a submitted 'Repayment case'."
+        }
+      }
+    }, 
+    {
+      "additionalProperties": false, 
+      "required": [
+        "caseID"
+      ], 
+      "type": "object", 
+      "properties": {
+        "caseID": {
+          "pattern": "^((CFSP|CFSB)-[0-9]{1,15})$", 
+          "type": "string", 
+          "description": "Mandatory. Case id which has got created in Caseflow system for a submitted 'Risk case'."
+        }
+      }
+    }
+  ], 
+  "type": "object", 
+  "description": "Create Case success response schema", 
+  "$schema": "http://json-schema.org/schema#"
+}

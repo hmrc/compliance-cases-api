@@ -1,0 +1,100 @@
+{
+  "description": "All the details of an identified risk", 
+  "required": [
+    "taxRegime", 
+    "subRegime", 
+    "firstComplianceCheck", 
+    "secondComplianceCheck", 
+    "inaccuracyCategory", 
+    "inaccuracyDescription", 
+    "riskStartDate", 
+    "riskScore"
+  ], 
+  "additionalProperties": false, 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "object", 
+  "properties": {
+    "riskDescription": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,100}$", 
+      "type": "string", 
+      "description": "Optional. A free text description of the risk"
+    }, 
+    "subRegime": {
+      "pattern": "^[A-Za-z0-9_]{2,35}$", 
+      "type": "string", 
+      "description": "Mandatory. A sub categorisation of the main tax regime"
+    }, 
+    "inaccuracyCategory": {
+      "pattern": "^[A-Za-z0-9_]{3,100}$", 
+      "type": "string", 
+      "description": "Mandatory. Alphanumeric string with underscore separator"
+    }, 
+    "inaccuracyDescription": {
+      "pattern": "^[A-Za-z0-9_]{3,100}$", 
+      "type": "string", 
+      "description": "Mandatory. Alphanumeric string with underscore separator"
+    }, 
+    "taxPeriodStart": {
+      "$ref": "dateType.json"
+    }, 
+    "taxRegime": {
+      "$ref": "taxRegimeType.json"
+    }, 
+    "amounts": {
+      "additionalProperties": false, 
+      "type": "object", 
+      "description": "Optional. Contains the potential, expected, and emerging amounts (all optional)", 
+      "properties": {
+        "emergingAmount": {
+          "$ref": "amountPosNegType.json"
+        }, 
+        "potentialAmount": {
+          "$ref": "amountPosNegType.json"
+        }, 
+        "expectedAmount": {
+          "$ref": "amountPosNegType.json"
+        }
+      }
+    }, 
+    "riskStartDate": {
+      "$ref": "dateType.json"
+    }, 
+    "firstComplianceCheck": {
+      "pattern": "^[A-Za-z0-9_]{3,100}$", 
+      "type": "string", 
+      "description": "Mandatory. Alphanumeric string with underscore separator"
+    }, 
+    "secondComplianceCheck": {
+      "pattern": "^[A-Za-z0-9_]{3,100}$", 
+      "type": "string", 
+      "description": "Mandatory. Alphanumeric string with underscore separator"
+    }, 
+    "taxPeriodEnd": {
+      "$ref": "dateType.json"
+    }, 
+    "riskScore": {
+      "minimum": 0, 
+      "type": "number", 
+      "multipleOf": 0.1, 
+      "maximum": 99.9, 
+      "description": "Mandatory. The risk's score between 0.0 and 99.9"
+    }, 
+    "behaviours": {
+      "additionalProperties": false, 
+      "type": "object", 
+      "description": "Optional. Contains the potential and emerging behaviours (both optional)", 
+      "properties": {
+        "potentialBehaviour": {
+          "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,100}$", 
+          "type": "string", 
+          "description": "Optional."
+        }, 
+        "emergingBehaviour": {
+          "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,100}$", 
+          "type": "string", 
+          "description": "Optional."
+        }
+      }
+    }
+  }
+}

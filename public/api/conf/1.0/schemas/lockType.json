@@ -1,0 +1,6 @@
+{
+  "pattern": "^([a-zA-Z0-9]{1,6})$", 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "string", 
+  "description": "Optional. The Lock for each repayment line up to 6 in length"
+}

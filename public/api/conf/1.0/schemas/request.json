@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false, 
+  "$schema": "http://json-schema.org/schema#", 
+  "required": [
+    "sourceSystemId", 
+    "sourceSystemKey", 
+    "sourceSystemURL", 
+    "taxPayer", 
+    "case"
+  ], 
+  "type": "object", 
+  "properties": {
+    "sourceSystemURL": {
+      "minLength": 1, 
+      "maxLength": 255, 
+      "type": "string", 
+      "description": "Mandatory. Full URL of a record on the source system", 
+      "format": "uri"
+    }, 
+    "case": {
+      "oneOf": [
+        {
+          "$ref": "riskCaseType.json"
+        }, 
+        {
+          "$ref": "repaymentCaseType.json"
+        }
+      ]
+    }, 
+    "taxPayer": {
+      "$ref": "taxPayerType.json"
+    }, 
+    "sourceSystemId": {
+      "enum": [
+        "CNT"
+      ], 
+      "type": "string", 
+      "description": "Mandatory. To identify the source system. Currently only 'CNT' (Connect) supported"
+    }, 
+    "sourceSystemKey": {
+      "pattern": "^[A-Za-z0-9/\\$\\.\\-]{1,50}$", 
+      "type": "string", 
+      "description": "Mandatory. Primary key of a record on the source system"
+    }
+  }
+}

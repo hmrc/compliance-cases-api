@@ -1,0 +1,85 @@
+{
+  "description": "Repayment Case", 
+  "required": [
+    "caseType", 
+    "sourceSystemRef", 
+    "campaignId", 
+    "projectId", 
+    "repaymentAmount", 
+    "taxRegime", 
+    "taxPeriodStart", 
+    "taxPeriodEnd", 
+    "claimDate"
+  ], 
+  "additionalProperties": false, 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "object", 
+  "properties": {
+    "secondLock": {
+      "$ref": "lockType.json"
+    }, 
+    "triggeredRiskRuleRef": {
+      "pattern": "^R[0-9]{1,10}$", 
+      "type": "string", 
+      "description": "Optional. A reference for the triggered risk rule on the source system"
+    }, 
+    "caseType": {
+      "enum": [
+        "Repayment"
+      ], 
+      "type": "string", 
+      "description": "Mandatory. Must be 'Repayment' for a repayment case"
+    }, 
+    "inYearPeriod": {
+      "pattern": "^[1-12]{1,2}$", 
+      "type": "string", 
+      "description": "Optional. In Year Period, expected for VAT returns Only and upto 2 digits."
+    }, 
+    "campaignId": {
+      "$ref": "campaignIdType.json"
+    }, 
+    "projectId": {
+      "$ref": "projectIdType.json"
+    }, 
+    "firstLock": {
+      "$ref": "lockType.json"
+    }, 
+    "thirdLock": {
+      "$ref": "lockType.json"
+    }, 
+    "oudn": {
+      "pattern": "^[A-Za-z0-9\\&\\-\\'\\_]{8,100}$", 
+      "type": "string", 
+      "description": "Optional. OUDN of the owner"
+    }, 
+    "taxRegime": {
+      "$ref": "taxRegimeType.json"
+    }, 
+    "claimDate": {
+      "$ref": "dateType.json"
+    }, 
+    "repaymentAmount": {
+      "$ref": "amountPosType.json"
+    }, 
+    "taxPeriodStart": {
+      "$ref": "dateType.json"
+    }, 
+    "taxPeriodEnd": {
+      "$ref": "dateType.json"
+    }, 
+    "sourceSystemRef": {
+      "enum": [
+        "CFSRP"
+      ], 
+      "type": "string", 
+      "description": "Mandatory. An identify reference; 'CFSRP' for a 'Repayment'"
+    }, 
+    "caseOwnerId": {
+      "minimum": 1, 
+      "type": "number", 
+      "multipleOf": 1, 
+      "maximum": 9999999, 
+      "description": "Optional. The numeric id of the owner of the case."
+    }
+  }
+}

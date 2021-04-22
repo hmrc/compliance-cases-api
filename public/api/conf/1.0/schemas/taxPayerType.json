@@ -1,0 +1,109 @@
+{
+  "description": "Mandatory. All the details of the tax payer.", 
+  "required": [
+    "taxPayerType", 
+    "referenceNumbers", 
+    "addresses"
+  ], 
+  "additionalProperties": false, 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "object", 
+  "properties": {
+    "taxPayerType": {
+      "pattern": "^[A-Za-z0-9\\/\\-\\. ]{1,40}$", 
+      "type": "string", 
+      "description": "Mandatory. A categorisation of the tax payer e.g. Individual, Partnership, Organisation"
+    }, 
+    "referenceNumbers": {
+      "description": "Mandatory. An array of key/value pairs representing a reference for the customer.", 
+      "minItems": 1, 
+      "items": {
+        "additionalProperties": false, 
+        "required": [
+          "referenceType", 
+          "referenceValue"
+        ], 
+        "type": "object", 
+        "properties": {
+          "referenceValue": {
+            "pattern": "^[A-Z0-9\\/]{5,25}$", 
+            "type": "string", 
+            "description": "Mandatory. The value of the reference."
+          }, 
+          "referenceType": {
+            "pattern": "^[A-Za-z\\/\\-\\. ]{1,100}$", 
+            "type": "string", 
+            "description": "Mandatory. The type of the reference."
+          }
+        }
+      }, 
+      "maxItems": 50, 
+      "uniqueItems": true, 
+      "type": "array"
+    }, 
+    "segment": {
+      "pattern": "^[A-Za-z0-9\\/\\- ]{1,60}$", 
+      "type": "string", 
+      "description": "Optional. The segment of the tax payer e.g. Micro A; needed\n    for an organisation type tax payer"
+    }, 
+    "nameDetails": {
+      "oneOf": [
+        {
+          "additionalProperties": false, 
+          "required": [
+            "firstName", 
+            "lastName"
+          ], 
+          "type": "object", 
+          "properties": {
+            "lastName": {
+              "$ref": "nameType.json"
+            }, 
+            "firstName": {
+              "$ref": "nameType.json"
+            }, 
+            "title": {
+              "enum": [
+                "Unknown", 
+                "Mr", 
+                "Mrs", 
+                "Miss", 
+                "Ms", 
+                "Dr", 
+                "Sir", 
+                "Rev", 
+                "Professor", 
+                "Lord"
+              ], 
+              "type": "string", 
+              "description": "Optional. The person's title."
+            }
+          }
+        }, 
+        {
+          "additionalProperties": false, 
+          "required": [
+            "organisationName"
+          ], 
+          "type": "object", 
+          "properties": {
+            "organisationName": {
+              "$ref": "organisationNameType.json"
+            }
+          }
+        }
+      ], 
+      "description": "Optional. The name of the individual or organisation tax payer "
+    }, 
+    "addresses": {
+      "description": "Mandatory. A list of addresses of the tax payer", 
+      "minItems": 1, 
+      "items": {
+        "$ref": "addressEntry.json"
+      }, 
+      "maxItems": 50, 
+      "uniqueItems": true, 
+      "type": "array"
+    }
+  }
+}

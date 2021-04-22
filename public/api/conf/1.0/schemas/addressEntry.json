@@ -1,0 +1,47 @@
+{
+  "additionalProperties": false, 
+  "$schema": "http://json-schema.org/schema#", 
+  "required": [
+    "addressLine1", 
+    "correspondenceAddress", 
+    "addressType"
+  ], 
+  "type": "object", 
+  "properties": {
+    "city": {
+      "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "addressType": {
+      "pattern": "^[A-Za-z ]{4,20}$", 
+      "type": "string", 
+      "description": "Mandatory. The type of the address."
+    }, 
+    "country": {
+      "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{1,35}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "county": {
+      "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "correspondenceAddress": {
+      "type": "boolean", 
+      "description": "Mandatory. Whether this address is a correspondence one (true) or not (false)."
+    }, 
+    "addressLine2": {
+      "$ref": "addressLineType.json"
+    }, 
+    "postcode": {
+      "pattern": "^[A-Z]{1,2}[0-9][0-9A-Z]?\\s?[0-9][A-Z]{2}$", 
+      "type": "string", 
+      "description": "Optional. Standard UK postcode with optional space between the outcode and incode parts"
+    }, 
+    "addressLine1": {
+      "$ref": "addressLineType.json"
+    }
+  }
+}

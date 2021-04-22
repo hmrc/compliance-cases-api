@@ -1,0 +1,6 @@
+{
+  "pattern": "^[a-zA-Z_]{2,15}$", 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "string", 
+  "description": "Mandatory. The tax regime of the Repayment case or of a risk for a Risk case"
+}

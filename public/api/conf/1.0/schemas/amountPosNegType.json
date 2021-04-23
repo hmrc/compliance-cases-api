@@ -1,0 +1,8 @@
+{
+  "description": "A number representing a positive or negative amount in pounds from -999999999999 to 999999999999", 
+  "maximum": 999999999999, 
+  "multipleOf": 1, 
+  "minimum": -999999999999, 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "number"
+}

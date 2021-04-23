@@ -19,16 +19,7 @@ Example error response: Repayment
       "code": "001",
       "message": "Repayment amount must greater than 0",
       "path": "case/repaymentAmount"
-    },
-    {
-      "code": "012",
-      "message": "..."
-    },
-    {
-      "code": "006",
-      "message": "...",
-      "path": "case/campaignId"
-    },
+    }
   ]
 }</pre>
 

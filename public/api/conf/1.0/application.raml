@@ -94,13 +94,221 @@ uses:
               type: types.errorResponse
               examples:
                 example-1:
-                  description: "Risk Case: Has to match with an existing Campaign ID in Caseflow"
+                  description: "Repayment Case: repaymentAmount must be greater than 0"
                   value:
-                    code: "101"
+                    code: "001"
                 example-2:
-                  description: "Repayment Case: Repayment amount must be greater than 0"
+                  description: "Repayment Case: taxRegime must be defined Caseflow value. IT, CT etc"
+                  value:
+                    code: "002"
+                example-3:
+                  description: "Repayment Case: taxPeriodFrom must not be in the future and must not be greater or equal to taxPeriodEnd"
+                  value:
+                    code: "003"
+                example-4:
+                  description: "Repayment Case: taxPeriodEnd can not be in future"
+                  value:
+                    code: "004"
+                example-5:
+                  description: "Repayment Case: repaymentClaimDate can not be in future"
+                  value:
+                    code: "005"
+                example-6:
+                  description: "campaignId must match Caseflow equivalent"
+                  value:
+                    code: "006"
+                example-7:
+                  description: "Repayment Case: projectId must match Caseflow equivalent"
+                  value:
+                    code: "007"
+                example-8:
+                  description: "Repayment Case: caseOwnerId must match with a valid caseowner in Caseflow"
+                  value:
+                    code: "008"
+                example-9:
+                  description: "Repayment Case: oudn must match Caseflow equivalent"
+                  value:
+                    code: "009"
+                example-10:
+                  description: "Repayment Case: repaymentAmount must be less than 100 billion"
+                  value:
+                    code: "010"
+                example-11:
+                  description: "Repayment Case: caseOwnerId must match a user in an INT business area role in Caseflow"
+                  value:
+                    code: "011"
+                example-12:
+                  description: "Repayment Case: Either caseOwnerId or oudn must be present, but not both"
+                  value:
+                    code: "012"
+                example-13:
+                  description: "Repayment Case: As in Caseflow, taxPayerType must be 'Individual', 'Partnership' etc"
+                  value:
+                    code: "201"
+                example-14:
+                  description: "Repayment Case: segment must be any of the pre-defined values in Caseflow like 'small', 'large'. This is applicable for some specific taxPayerTypes"
+                  value:
+                    code: "202"
+                example-15:
+                  description: "Repayment Case: caseOwnerId must match with a valid caseowner in Caseflow"
+                  value:
+                    code: "203"
+                example-16:
+                  description: "Repayment Case: Depending on taxPayerType either firstName and lastName, or companyName is mandatory"
+                  value:
+                    code: "204"
+                example-17:
+                  description: "Repayment Case: referenceType has to be a pre-defined value in caseflow, like 'NINO', 'ATED' etc"
+                  value:
+                    code: "301"
+                example-18:
+                  description: "Repayment Case: referenceValue is a specific format, like NINO, e.g 'AA123456A'"
+                  value:
+                    code: "302"
+                example-19:
+                  description: "Repayment Case: Must be only one correspondenceAddress"
+                  value:
+                    code: "310"
+                example-20:
+                  description: "Repayment Case: addressType must be 'home', 'office', etc"
+                  value:
+                    code: "311"
+                example-21:
+                  description: "Repayment Case: An error has occurred in case creation due to pega internal process failure"
+                  value:
+                    code: "999"
+                example-22:
+                  description: "Risk Case: campaignID must match Caseflow equivalent"
+                  value:
+                    code: "001"
+                example-23:
+                  description: "Risk Case: projectID must match Caseflow equivalent"
+                  value:
+                    code: "002"
+                example-24:
+                  description: "Risk Case: targetRIS must match any of the pre-defined values in Caseflow"
+                  value:
+                    code: "004"
+                example-25:
+                  description: "Risk Case: complianceStream must match any of the pre-defined values in Caseflow"
+                  value:
+                    code: "005"
+                example-26:
+                  description: "Risk Case: enquiryType must match any of the pre-defined values in Caseflow"
+                  value:
+                    code: "006"
+                example-27:
+                  description: "Risk Case: vatOfficeCode be an existing VAT code"
+                  value:
+                    code: "008"
+                example-28:
+                  description: "Risk Case: lastDateForEnquiry must not be in the future"
+                  value:
+                    code: "009"
+                example-29:
+                  description: "Risk Case: authorisationType must match any of the pre-defined values in Caseflow e.g. 'Mandatory'"
+                  value:
+                    code: "010"
+                example-30:
+                  description: "Risk Case: suggestedOfficerGrade must match any of the pre-defined values in Caseflow e.g. 'AA', 'O'"
+                  value:
+                    code: "011"
+                example-31:
+                  description: "Risk Case: interventionSubType must match any of the pre-defined values in Caseflow e.g. 'Customer Lead'"
+                  value:
+                    code: "012"
+                example-32:
+                  description: "Risk Case: taxRegime must match any of the pre-defined values in Caseflow e.g. 'AMLS', 'CT'"
                   value:
                     code: "101"
+                example-33:
+                  description: "Risk Case: subRegime must match any of the pre-defined values in Caseflow related to regime"
+                  value:
+                    code: "102"
+                example-34:
+                  description: "Risk Case: firstComplianceCheck must match any of the pre-defined values in Caseflow related to subRegime"
+                  value:
+                    code: "103"
+                example-35:
+                  description: "Risk Case: secondComplianceCheck must match any of the pre-defined values in Caseflow related to firstComplianceCheck"
+                  value:
+                    code: "104"
+                example-36:
+                  description: "Risk Case: inaccuracyCategory must match any of the pre-defined values in Caseflow related to subRegime"
+                  value:
+                    code: "105"
+                example-37:
+                  description: "Risk Case: inaccuracyDescription must match any of the pre-defined values in Caseflow related to category"
+                  value:
+                    code: "106"
+                example-38:
+                  description: "Risk Case: taxPeriodStart must not be in future and must not be greater than or equal to taxPeriodEnd"
+                  value:
+                    code: "107"
+                example-39:
+                  description: "Risk Case: taxPeriodEnd must not be in the future"
+                  value:
+                    code: "108"
+                example-40:
+                  description: "Risk Case: riskStartDate must not be in the future"
+                  value:
+                    code: "109"
+                example-41:
+                  description: "Risk Case: potentialBehaviour must match any of the pre-defined values in Caseflow e.g. 'Compliant', 'Deliberate'"
+                  value:
+                    code: "110"
+                example-42:
+                  description: "Risk Case: emergingBehaviour must match any of the pre-defined values in Caseflow e.g. 'Compliant', 'Deliberate'"
+                  value:
+                    code: "111"
+                example-43:
+                  description: "Risk Case: potentialAmount must be from -100bn, up to +100bn"
+                  value:
+                    code: "112"
+                example-44:
+                  description: "Risk Case: emergingAmount must be from -100bn, up to +100bn"
+                  value:
+                    code: "113"
+                example-45:
+                  description: "Risk Case: expectedAmount must be from -100bn, up to +100bn"
+                  value:
+                    code: "114"
+                example-46:
+                  description: "Risk Case: taxPayerType must be Individual, Partnership etc"
+                  value:
+                    code: "201"
+                example-47:
+                  description: "Risk Case: segment must be any of the pre-defined values in Caseflow like 'small', 'large'. This is applicable for some specific taxPayerTypes"
+                  value:
+                    code: "202"
+                example-48:
+                  description: "Risk Case: title must be Dr, Mr, Mrs, etc"
+                  value:
+                    code: "203"
+                example-49:
+                  description: "Risk Case: Depending on taxPayerType either firstName and lastName, or companyName is mandatory"
+                  value:
+                    code: "204"
+                example-50:
+                  description: "Risk Case: referenceType must be pre-defined value like 'NINO', 'ATED' etc"
+                  value:
+                    code: "301"
+                example-51:
+                  description: "Risk Case: referenceValue is a specific format, like a NINO - AA123456A"
+                  value:
+                    code: "302"
+                example-52:
+                  description: "Risk Case: There must be only one correspondenceAddress"
+                  value:
+                    code: "310"
+                example-53:
+                  description: "Risk Case: addressType must specify 'home', 'office' etc"
+                  value:
+                    code: "311"
+                example-54:
+                  description: "Risk Case: An error has occurred in case creation due to pega internal process failure"
+                  value:
+                    code: "999"
         500:
           body:
             application/json:

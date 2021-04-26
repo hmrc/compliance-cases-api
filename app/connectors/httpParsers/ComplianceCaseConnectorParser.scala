@@ -18,7 +18,7 @@ package connectors.httpParsers
 
 import models.LogMessageHelper
 import play.api.Logger
-import play.api.http.Status.{ACCEPTED, BAD_REQUEST, NOT_FOUND}
+import play.api.http.Status._
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 trait ComplianceCaseConnectorParser {
@@ -41,6 +41,11 @@ trait ComplianceCaseConnectorParser {
           logMessage(s"received a bad request status when calling $url with body: ${response.body} ( IF_CREATE_CASE_ENDPOINT_BAD_REQUEST_RESPONSE )")
         )
         None
+      case UNPROCESSABLE_ENTITY =>
+        logger.warn(
+          logMessage(s"received an unprocessable entity status when calling $url with body: ${response.body}")
+        )
+        Some(response)
       case status if status != ACCEPTED =>
         logger.warn(
           logMessage(s"received status $status when calling $url ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_RESPONSE )")

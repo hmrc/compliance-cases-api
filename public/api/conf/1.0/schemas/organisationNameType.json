@@ -1,0 +1,6 @@
+{
+  "pattern": "^[ -~\u00a1-\u00ff\u0100-\u02af\u1e00-\u1eff\u2010-\u2015\u2018-\u201f\u20a0-\u20bf\u212b\u212a]{1,255}$", 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "string", 
+  "description": "Allow Unicode blocks Basic Latin (Space to Tilde), printable Latin-1 Supplement (\u00a1 to \u00ff), and all of Latin Extended-A and Latin Extended-B and IP Extensions (\u0100 to \u02af), all the Latin Extended Additional characters (\u1e00 to \u1eff), General Punctuation characters Hyphen to Horizontal Bar (\u2010 to \u2015), General Punctuation characters (\u2018 to \u201f), Currency Symbol characters (\u20a0 to \u20bf), Letterlike Symbols \u212b and \u212a"
+}

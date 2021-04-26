@@ -1,0 +1,6 @@
+{
+  "pattern": "^PID-[0-9]{1,15}$", 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "string", 
+  "description": "The project id relating to this case"
+}

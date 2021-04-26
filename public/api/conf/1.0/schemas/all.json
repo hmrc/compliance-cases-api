@@ -1,0 +1,58 @@
+{
+  "oneOf": [
+    {
+      "$ref": "nameType.json"
+    }, 
+    {
+      "$ref": "taxPayerType.json"
+    }, 
+    {
+      "$ref": "addressLineType.json"
+    }, 
+    {
+      "$ref": "amountPosNegType.json"
+    }, 
+    {
+      "$ref": "repaymentCaseType.json"
+    }, 
+    {
+      "$ref": "taxRegimeType.json"
+    }, 
+    {
+      "$ref": "lockType.json"
+    }, 
+    {
+      "$ref": "successResponse.json"
+    }, 
+    {
+      "$ref": "addressEntry.json"
+    }, 
+    {
+      "$ref": "riskCaseType.json"
+    }, 
+    {
+      "$ref": "campaignIdType.json"
+    }, 
+    {
+      "$ref": "riskEntry.json"
+    }, 
+    {
+      "$ref": "request.json"
+    }, 
+    {
+      "$ref": "amountPosType.json"
+    }, 
+    {
+      "$ref": "projectIdType.json"
+    }, 
+    {
+      "$ref": "organisationNameType.json"
+    }, 
+    {
+      "$ref": "dateType.json"
+    }, 
+    {
+      "$ref": "errorResponse.json"
+    }
+  ]
+}

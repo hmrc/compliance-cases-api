@@ -1,0 +1,100 @@
+{
+  "description": "Risk Case", 
+  "required": [
+    "caseType", 
+    "sourceSystemRef", 
+    "campaignId", 
+    "projectId", 
+    "suggestedOfficerGrade", 
+    "interventionSubType"
+  ], 
+  "additionalProperties": false, 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "object", 
+  "properties": {
+    "caseType": {
+      "enum": [
+        "Risk"
+      ], 
+      "type": "string", 
+      "description": "Mandatory. Has to be 'Risk' for a Risk case"
+    }, 
+    "campaignId": {
+      "$ref": "campaignIdType.json"
+    }, 
+    "complianceStream": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{2,30}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "interactionTitle": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,100}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "authorisationType": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,30}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "archiveApproach": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,100}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "confidenceScore": {
+      "minimum": 0, 
+      "type": "number", 
+      "multipleOf": 0.1, 
+      "maximum": 99.9, 
+      "description": "Optional."
+    }, 
+    "targetRIS": {
+      "pattern": "^[A-Za-z_]{2,50}$", 
+      "type": "string", 
+      "description": "Optional. The target RIS of the case"
+    }, 
+    "suggestedOfficerGrade": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,20}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "risks": {
+      "minItems": 1, 
+      "uniqueItems": true, 
+      "type": "array", 
+      "description": "Optional. A collection of risks associated with the Risk case", 
+      "items": {
+        "$ref": "riskEntry.json"
+      }
+    }, 
+    "lastDateForEnquiry": {
+      "$ref": "dateType.json"
+    }, 
+    "projectId": {
+      "$ref": "projectIdType.json"
+    }, 
+    "interventionSubType": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,100}$", 
+      "type": "string"
+    }, 
+    "sourceSystemRef": {
+      "enum": [
+        "CFSP", 
+        "CFSB"
+      ], 
+      "type": "string", 
+      "description": "Mandatory. An identify reference; 'CFSP' or 'CFSB' for a 'Risk'"
+    }, 
+    "vatOfficeCode": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{1,20}$", 
+      "type": "string", 
+      "description": "Optional."
+    }, 
+    "enquiryType": {
+      "pattern": "^[A-Za-z0-9 \\.\\/\\&_-]{2,30}$", 
+      "type": "string", 
+      "description": "Optional."
+    }
+  }
+}

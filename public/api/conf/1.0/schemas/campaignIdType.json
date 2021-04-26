@@ -1,0 +1,6 @@
+{
+  "pattern": "^CID-[0-9]{1,15}$", 
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "string", 
+  "description": "The campaign id relating to this case"
+}

@@ -1,0 +1,36 @@
+{
+  "additionalProperties": false, 
+  "$schema": "http://json-schema.org/schema#", 
+  "required": [
+    "failures"
+  ], 
+  "type": "object", 
+  "properties": {
+    "failures": {
+      "minItems": 1, 
+      "uniqueItems": true, 
+      "type": "array", 
+      "items": {
+        "additionalProperties": false, 
+        "required": [
+          "code", 
+          "reason"
+        ], 
+        "type": "object", 
+        "properties": {
+          "reason": {
+            "minLength": 1, 
+            "type": "string", 
+            "description": "A simple description for the failure", 
+            "maxLength": 160
+          }, 
+          "code": {
+            "pattern": "^[A-Z0-9_-]{1,160}$", 
+            "type": "string", 
+            "description": "Keys for all the errors returned"
+          }
+        }
+      }
+    }
+  }
+}

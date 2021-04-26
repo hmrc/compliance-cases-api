@@ -1,0 +1,12 @@
+{
+  "code": "UNPROCESSABLE_ENTITY",
+  "message": "Unprocessable Entity",
+  "caseType": "Risk",
+  "errors": [
+    {
+      "code": "001",
+      "message": "...",
+      "path": "case/campaignId"
+    }
+  ]
+}

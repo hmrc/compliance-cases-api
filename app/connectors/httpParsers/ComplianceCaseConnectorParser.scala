@@ -16,8 +16,6 @@
 
 package connectors.httpParsers
 
-import config.AppConfig
-import javax.inject.Inject
 import models.{Error, ErrorResponse, LogMessageHelper}
 import play.api.Configuration
 import play.api.Logger
@@ -31,6 +29,7 @@ trait ComplianceCaseConnectorParser {
   type IFResponse = Option[HttpResponse]
 
   val config: Configuration
+  lazy val errorResponseMap: Map[String, String] = config.get[Map[String, String]]("errorMessages")
 
   val logger: Logger = Logger(getClass)
 
@@ -68,25 +67,25 @@ trait ComplianceCaseConnectorParser {
     case HttpResponse(UNPROCESSABLE_ENTITY, _, headers) =>
       HttpResponse(
         UNPROCESSABLE_ENTITY,
-        None,
+        Json.toJson(errorResponse(response, caseType)).toString,
         headers,
-        Some(Json.toJson(errorResponse(response, caseType)).toString)
       )
     case r:HttpResponse => r
   }
 
-  def errorResponse(response: HttpResponse, caseType: String) =
-    ErrorResponse(caseType, failures(response))
+  def errorResponse(response: HttpResponse, caseType: String): ErrorResponse =
+    ErrorResponse(caseType, failures(response, caseType))
 
-  def failures(response: HttpResponse): List[Error] =
+  def failures(response: HttpResponse, caseType: String): List[Error] =
     (response.json \ "failures").as[JsArray].value.map{ failure =>
-      error((failure \ "code").as[String])
-//      Error(
-//        (failure \ "code").as[String],
-//        (failure \ "reason").as[String]
-//      )
+      error((failure \ "code").as[String], caseType)
     }.toList
 
-  def error(code: String): Error = ???
+  def error(code: String, caseType: String): Error = {
+    Error(
+      code,
+      errorResponseMap.get(s"$caseType:$code").fold(throw new RuntimeException("missing configuration message"))(identity)
+    )
+  }
 
 }

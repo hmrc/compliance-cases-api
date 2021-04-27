@@ -29,7 +29,10 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: Configuration) extends ComplianceCaseConnectorParser {
+class ComplianceCasesConnector @Inject()(
+  httpClient: HttpClient,
+  val config: Configuration
+) extends ComplianceCaseConnectorParser {
 
   override val className: String = this.getClass.getSimpleName
   override val logger: Logger = Logger(className)
@@ -50,8 +53,12 @@ class ComplianceCasesConnector @Inject()(httpClient: HttpClient, config: Configu
 
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
+
+    // TODO - replace JsValue with CaseFlowCreateRequest case class
+    val caseType = (request \ "case" \ "caseType").as[String]
+
     httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
-      implicitly, httpReads(correlationId), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec
+      implicitly, httpReads(correlationId, caseType), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec
     ).recover {
       case e: Exception =>
         logger.error(

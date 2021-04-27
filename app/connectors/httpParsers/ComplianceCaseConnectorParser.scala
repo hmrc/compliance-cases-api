@@ -16,18 +16,25 @@
 
 package connectors.httpParsers
 
-import models.LogMessageHelper
+import config.AppConfig
+import javax.inject.Inject
+import models.{Error, ErrorResponse, LogMessageHelper}
+import play.api.Configuration
 import play.api.Logger
 import play.api.http.Status._
+import play.api.libs.json._
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 trait ComplianceCaseConnectorParser {
+
   val className: String
   type IFResponse = Option[HttpResponse]
 
-  val logger: Logger
+  val config: Configuration
 
-  def httpReads(correlationId: String): HttpReads[IFResponse] = (_, url, response) => {
+  val logger: Logger = Logger(getClass)
+
+  def httpReads(correlationId: String, caseType: String): HttpReads[IFResponse] = (_, url, response) => {
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
     response.status match {
@@ -45,8 +52,7 @@ trait ComplianceCaseConnectorParser {
         logger.warn(
           logMessage(s"received an unprocessable entity status when calling $url with body: ${response.body}")
         )
-        val foo = HttpResponse.apply(response.status, body = "foobar", response.headers)
-        Some(foo)
+        Some(httpErrorResponse(response, caseType))
       case status if status != ACCEPTED =>
         logger.warn(
           logMessage(s"received status $status when calling $url ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_RESPONSE )")
@@ -57,4 +63,30 @@ trait ComplianceCaseConnectorParser {
         Some(response)
     }
   }
+
+  def httpErrorResponse(response: HttpResponse, caseType: String): HttpResponse = response match {
+    case HttpResponse(UNPROCESSABLE_ENTITY, _, headers) =>
+      HttpResponse(
+        UNPROCESSABLE_ENTITY,
+        None,
+        headers,
+        Some(Json.toJson(errorResponse(response, caseType)).toString)
+      )
+    case r:HttpResponse => r
+  }
+
+  def errorResponse(response: HttpResponse, caseType: String) =
+    ErrorResponse(caseType, failures(response))
+
+  def failures(response: HttpResponse): List[Error] =
+    (response.json \ "failures").as[JsArray].value.map{ failure =>
+      error((failure \ "code").as[String])
+//      Error(
+//        (failure \ "code").as[String],
+//        (failure \ "reason").as[String]
+//      )
+    }.toList
+
+  def error(code: String): Error = ???
+
 }

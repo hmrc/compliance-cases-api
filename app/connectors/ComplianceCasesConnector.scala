@@ -22,8 +22,8 @@ import models.LogMessageHelper
 import play.api.http.{ContentTypes, HeaderNames}
 import play.api.libs.json.JsValue
 import play.api.{Configuration, Logger}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.Authorization
+import uk.gov.hmrc.http.{HeaderCarrier, Authorization}
+
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}

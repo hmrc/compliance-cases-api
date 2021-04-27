@@ -45,7 +45,8 @@ trait ComplianceCaseConnectorParser {
         logger.warn(
           logMessage(s"received an unprocessable entity status when calling $url with body: ${response.body}")
         )
-        Some(response)
+        val foo = HttpResponse.apply(response.status, body = "foobar", response.headers)
+        Some(foo)
       case status if status != ACCEPTED =>
         logger.warn(
           logMessage(s"received status $status when calling $url ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_RESPONSE )")

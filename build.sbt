@@ -28,7 +28,7 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies  ++= Seq(
-  "uk.gov.hmrc"                 %% "bootstrap-play-26"        % "1.8.0",
+  "uk.gov.hmrc"                 %% "bootstrap-play-26"        % "3.2.0",
   "com.github.java-json-tools"  % "json-schema-validator"     % "2.2.14",
   "uk.gov.hmrc"                 %% "play-hmrc-api"            % "4.1.0-play-26",
   "uk.gov.hmrc"                 %% "auth-client"              % "3.0.0-play-26",

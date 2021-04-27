@@ -29,13 +29,15 @@ import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 
 class ComplianceApiController @Inject()(
-                                         validator: ValidationService,
-                                         resources: ResourceService,
-                                         complianceCasesService: ComplianceCasesService,
-                                         getCorrelationId: ValidateCorrelationIdHeaderAction,
-                                         authenticateApplication: AuthenticateApplicationAction,
-                                         cc: ControllerComponents
-                                       )(implicit ec: ExecutionContext) extends BackendController(cc) {
+  validator: ValidationService,
+  resources: ResourceService,
+  complianceCasesService: ComplianceCasesService,
+  getCorrelationId: ValidateCorrelationIdHeaderAction,
+  authenticateApplication: AuthenticateApplicationAction,
+  cc: ControllerComponents
+)(
+  implicit ec: ExecutionContext
+) extends BackendController(cc) {
 
   private lazy val schema = resources.getFile("/schemas/caseflowCreateCaseSchema.json")
 
@@ -44,22 +46,17 @@ class ComplianceApiController @Inject()(
   def createCase(): Action[AnyContent] = (authenticateApplication andThen getCorrelationId).async { implicit request =>
     val input = request.body.asJson.getOrElse(JsNull)
 
-    def logMessage(message: String): String = LogMessageHelper("ComplianceApiController", "createCase", message, request.correlationId).toString
+    def logMessage(message: String): String =
+      LogMessageHelper("ComplianceApiController", "createCase", message, request.correlationId).toString
 
-    validator.validateAndRetrieveErrors(schema, input) match {
-      case None =>
-        logger.info(logMessage("request received passing on to integration framework"))
-        complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
-          maybeResponse => maybeResponse.fold(
-            ifEmpty = InternalServerError(Json.toJson(ErrorInternalServerError))
-          )(
-            response => Status(response.status)(response.body)
-          )
-        )
-      case Some(errors) =>
-        logger.warn(logMessage(s"request body didn't match json with errors: ${Json.prettyPrint(errors)}"))
-        Future.successful(BadRequest(errors))
-    }
+    logger.info(logMessage("request received passing on to integration framework"))
+    complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
+      maybeResponse => maybeResponse.fold(
+        ifEmpty = InternalServerError(Json.toJson(ErrorInternalServerError))
+      )(
+        response => Status(response.status)(response.body)
+      )
+    )
   }
 
 }

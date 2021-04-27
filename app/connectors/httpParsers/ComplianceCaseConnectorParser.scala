@@ -52,7 +52,6 @@ trait ComplianceCaseConnectorParser {
           logMessage(s"received an unprocessable entity status when calling $url with body: ${response.body}")
         )
         Some(httpErrorResponse(response, caseType))
-
       case status if status != ACCEPTED =>
         logger.warn(
           logMessage(s"received status $status when calling $url ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_RESPONSE )")
@@ -64,14 +63,12 @@ trait ComplianceCaseConnectorParser {
     }
   }
 
-  def httpErrorResponse(response: HttpResponse, caseType: String): HttpResponse = response match {
-    case HttpResponse(UNPROCESSABLE_ENTITY, _, headers) =>
-      HttpResponse(
-        UNPROCESSABLE_ENTITY,
-        Json.toJson(errorResponse(response, caseType)).toString,
-        headers,
-      )
-    case r:HttpResponse => r
+  def httpErrorResponse(response: HttpResponse, caseType: String): HttpResponse = {
+    HttpResponse(
+      UNPROCESSABLE_ENTITY,
+      Json.toJson(errorResponse(response, caseType)).toString,
+      response.allHeaders
+    )
   }
 
   def errorResponse(response: HttpResponse, caseType: String): ErrorResponse =

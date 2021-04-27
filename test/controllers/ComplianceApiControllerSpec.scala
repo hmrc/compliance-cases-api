@@ -58,80 +58,80 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockFactor
   }
 
   "The Compliance Api Controller" when {
-    "serving Investigations api" should {
-//      "return Accepted for valid input" in new Setup {
-//
-//        Given
-//          .the.complianceCasesService.createsCase(
-//            Json.parse(minimumRepaymentOrganisationJson),
-//            correlationId, Some(HttpResponse(ACCEPTED,
-//            Some(Json.parse(exampleJsonSuccessResponse))))
-//          )
-//          .the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","mySchema")
-//          .and.the.validationService.validate("mySchema", Json.parse(minimumRepaymentOrganisationJson), None)
-//          .build()
-//
-//        val requestWithBody: FakeRequest[AnyContentAsJson] =
-//          FakeRequest("POST", "/case").withJsonBody(Json.parse(minimumRepaymentOrganisationJson))
-//
-//        val result: Future[Result] = controller.createCase()(requestWithBody)
-//
-//        status(result) shouldBe Status.ACCEPTED
-//        contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
-//      }
-//
-//      "return InternalServerError if an None is returned from the service" in new Setup {
-//
-//        Given
-//          .the.complianceCasesService.createsCase(
-//            Json.parse(addressJson),
-//            correlationId,
-//            None
-//          )
-//          .and.the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","oops None from service")
-//          .and.the.validationService.validate("oops None from service", Json.parse(addressJson), None)
-//          .build()
-//
-//        val requestWithBody: FakeRequest[AnyContentAsJson] =
-//          FakeRequest("POST", "/case").withJsonBody(Json.parse(addressJson))
-//
-//        val result: Future[Result] = controller.createCase()(requestWithBody)
-//
-//        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-//        contentAsJson(result) shouldBe Json.obj(
-//          "code" -> "INTERNAL_SERVER_ERROR",
-//          "message" -> "Internal server error")
-//      }
-//
-//      "return BadRequest for invalid input (validation error in controller)" in new Setup {
-//        Given
-//          .the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","errorValidation")
-//          .and.the.validationService.validate("errorValidation", Json.parse(addressJson), Some(Json.obj("this is an error" -> "my bad")))
-//          .build()
-//
-//        val requestWithBody: FakeRequest[AnyContentAsJson] =
-//          FakeRequest("POST", "/case").withJsonBody(Json.parse(addressJson))
-//
-//        val result: Future[Result] = controller.createCase()(requestWithBody)
-//
-//        status(result) shouldBe Status.BAD_REQUEST
-//        contentAsJson(result) shouldBe Json.obj("this is an error" -> "my bad")
-//      }
-//
-//      "return BadRequest for invalid input (validation error in controller) and convert an Empty body to JsNull" in new Setup {
-//        Given
-//          .the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","errorValidation")
-//          .and.the.validationService.validate("errorValidation", JsNull, Some(Json.obj("this is an error" -> "my bad")))
-//          .build()
-//
-//        val requestWithBody: FakeRequest[AnyContent] =
-//          FakeRequest("POST", "/case")
-//
-//        val result: Future[Result] = controller.createCase()(requestWithBody)
-//
-//        status(result) shouldBe Status.BAD_REQUEST
-//        contentAsJson(result) shouldBe Json.obj("this is an error" -> "my bad")
-//      }
+    "serving Investigations api" ignore {
+      "return Accepted for valid input" in new Setup {
+
+        Given
+          .the.complianceCasesService.createsCase(
+            Json.parse(minimumRepaymentOrganisationJson),
+            correlationId, Some(HttpResponse(ACCEPTED,
+            Some(Json.parse(exampleJsonSuccessResponse))))
+          )
+          .the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","mySchema")
+          .and.the.validationService.validate("mySchema", Json.parse(minimumRepaymentOrganisationJson), None)
+          .build()
+
+        val requestWithBody: FakeRequest[AnyContentAsJson] =
+          FakeRequest("POST", "/case").withJsonBody(Json.parse(minimumRepaymentOrganisationJson))
+
+        val result: Future[Result] = controller.createCase()(requestWithBody)
+
+        status(result) shouldBe Status.ACCEPTED
+        contentAsJson(result) shouldBe Json.parse(exampleJsonSuccessResponse)
+      }
+
+      "return InternalServerError if an None is returned from the service" in new Setup {
+
+        Given
+          .the.complianceCasesService.createsCase(
+            Json.parse(addressJson),
+            correlationId,
+            None
+          )
+          .and.the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","oops None from service")
+          .and.the.validationService.validate("oops None from service", Json.parse(addressJson), None)
+          .build()
+
+        val requestWithBody: FakeRequest[AnyContentAsJson] =
+          FakeRequest("POST", "/case").withJsonBody(Json.parse(addressJson))
+
+        val result: Future[Result] = controller.createCase()(requestWithBody)
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.obj(
+          "code" -> "INTERNAL_SERVER_ERROR",
+          "message" -> "Internal server error")
+      }
+
+      "return BadRequest for invalid input (validation error in controller)" in new Setup {
+        Given
+          .the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","errorValidation")
+          .and.the.validationService.validate("errorValidation", Json.parse(addressJson), Some(Json.obj("this is an error" -> "my bad")))
+          .build()
+
+        val requestWithBody: FakeRequest[AnyContentAsJson] =
+          FakeRequest("POST", "/case").withJsonBody(Json.parse(addressJson))
+
+        val result: Future[Result] = controller.createCase()(requestWithBody)
+
+        status(result) shouldBe Status.BAD_REQUEST
+        contentAsJson(result) shouldBe Json.obj("this is an error" -> "my bad")
+      }
+
+      "return BadRequest for invalid input (validation error in controller) and convert an Empty body to JsNull" in new Setup {
+        Given
+          .the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","errorValidation")
+          .and.the.validationService.validate("errorValidation", JsNull, Some(Json.obj("this is an error" -> "my bad")))
+          .build()
+
+        val requestWithBody: FakeRequest[AnyContent] =
+          FakeRequest("POST", "/case")
+
+        val result: Future[Result] = controller.createCase()(requestWithBody)
+
+        status(result) shouldBe Status.BAD_REQUEST
+        contentAsJson(result) shouldBe Json.obj("this is an error" -> "my bad")
+      }
     }
   }
 }

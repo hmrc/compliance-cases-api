@@ -27,8 +27,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthProvider.StandardApplication
 import uk.gov.hmrc.auth.core.{AuthProviders, BearerTokenExpired}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.http.logging.{RequestId, SessionId}
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, RequestId, SessionId}
 
 import scala.concurrent.{ExecutionContext, Future}
 

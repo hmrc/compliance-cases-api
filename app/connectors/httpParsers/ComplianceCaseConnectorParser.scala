@@ -16,18 +16,24 @@
 
 package connectors.httpParsers
 
-import models.LogMessageHelper
+import models.{Error, ErrorResponse, LogMessageHelper}
+import play.api.Configuration
 import play.api.Logger
-import play.api.http.Status.{ACCEPTED, BAD_REQUEST, NOT_FOUND}
+import play.api.http.Status._
+import play.api.libs.json._
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 trait ComplianceCaseConnectorParser {
+
   val className: String
   type IFResponse = Option[HttpResponse]
 
-  val logger: Logger
+  val config: Configuration
+  lazy val errorResponseMap: Map[String, String] = config.get[Map[String, String]]("errorMessages")
 
-  def httpReads(correlationId: String): HttpReads[IFResponse] = (_, url, response) => {
+  val logger: Logger = Logger(getClass)
+
+  def httpReads(correlationId: String, caseType: String): HttpReads[IFResponse] = (_, url, response) => {
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
     response.status match {
@@ -41,6 +47,11 @@ trait ComplianceCaseConnectorParser {
           logMessage(s"received a bad request status when calling $url with body: ${response.body} ( IF_CREATE_CASE_ENDPOINT_BAD_REQUEST_RESPONSE )")
         )
         None
+      case UNPROCESSABLE_ENTITY =>
+        logger.warn(
+          logMessage(s"received an unprocessable entity status when calling $url with body: ${response.body}")
+        )
+        Some(httpErrorResponse(response, caseType))
       case status if status != ACCEPTED =>
         logger.warn(
           logMessage(s"received status $status when calling $url ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_RESPONSE )")
@@ -51,4 +62,28 @@ trait ComplianceCaseConnectorParser {
         Some(response)
     }
   }
+
+  def httpErrorResponse(response: HttpResponse, caseType: String): HttpResponse = {
+    HttpResponse(
+      UNPROCESSABLE_ENTITY,
+      Json.toJson(errorResponse(response, caseType)).toString,
+      response.allHeaders
+    )
+  }
+
+  def errorResponse(response: HttpResponse, caseType: String): ErrorResponse =
+    ErrorResponse(caseType, failures(response, caseType))
+
+  def failures(response: HttpResponse, caseType: String): List[Error] =
+    (response.json \ "failures").as[JsArray].value.map{ failure =>
+      error((failure \ "code").as[String], caseType)
+    }.toList
+
+  def error(code: String, caseType: String): Error = {
+    Error(
+      code,
+      errorResponseMap.get(s"$caseType:$code").fold(throw new RuntimeException("missing configuration message"))(identity)
+    )
+  }
+
 }

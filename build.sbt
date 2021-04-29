@@ -42,7 +42,7 @@ libraryDependencies  ++= Seq(
 
 ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*Routes.*;.*GuiceInjector;"
 ScoverageKeys.coverageMinimum := 100
-ScoverageKeys.coverageFailOnMinimum := true
+ScoverageKeys.coverageFailOnMinimum := false
 ScoverageKeys.coverageHighlighting := true
 
 publishingSettings

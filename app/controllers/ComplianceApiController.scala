@@ -23,7 +23,6 @@ import play.api.Logger
 import play.api.libs.json.{JsNull, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.{ComplianceCasesService, ResourceService, ValidationService}
-import uk.gov.hmrc.api.controllers.ErrorInternalServerError
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}

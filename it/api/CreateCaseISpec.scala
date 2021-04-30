@@ -70,7 +70,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       response.status mustBe UNAUTHORIZED
       response.body mustBe """{"code":"UNAUTHORIZED","message":"Bearer token is missing or not authorized"}"""
     }
-    s"return a $UNAUTHORIZED if application is whitelistd" in {
+    s"return a $UNAUTHORIZED if application is allowListed" in {
       stubPostWithResponseBody("/auth/authorise", ACCEPTED, Json.obj(
         "applicationId" -> "ID-7"
       ).toString)

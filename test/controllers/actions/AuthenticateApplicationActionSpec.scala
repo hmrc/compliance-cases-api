@@ -75,10 +75,10 @@ class AuthenticateApplicationActionSpec extends WordSpec with Matchers with Mock
   }
 
   "action.async" should {
-    s"return a $OK if application id matches a whitelisted application id" in new Setup {
+    s"return a $OK if application id matches a allowListed application id" in new Setup {
       Given
         .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), Retrievals.applicationId, Future.successful(Some("ID-3")))
-        .and.the.configuration.getsConfigAt("apiDefinition.whitelistedApplicationIds", Some(Seq("ID-3", "ID-2"))).build()
+        .and.the.configuration.getsConfigAt("apiDefinition.allowListedApplicationIds", Some(Seq("ID-3", "ID-2"))).build()
 
       val result: Future[Result] = action.async(mockBody)(FakeRequest())
 
@@ -105,10 +105,10 @@ class AuthenticateApplicationActionSpec extends WordSpec with Matchers with Mock
       status(result) shouldBe UNAUTHORIZED
       contentAsJson(result) shouldBe Json.obj("code" -> "UNAUTHORIZED", "message" -> "Bearer token is missing or not authorized")
     }
-    s"return a $UNAUTHORIZED if application id doesn't match a whitelisted application id" in new Setup {
+    s"return a $UNAUTHORIZED if application id doesn't match a allowListed application id" in new Setup {
       Given
         .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), Retrievals.applicationId, Future.successful(Some("ID-3")))
-        .and.the.configuration.getsConfigAt("apiDefinition.whitelistedApplicationIds", Some(Seq("ID-1", "ID-2"))).build()
+        .and.the.configuration.getsConfigAt("apiDefinition.allowListedApplicationIds", Some(Seq("ID-1", "ID-2"))).build()
 
       val result: Future[Result] = action.async(mockBody)(FakeRequest())
 

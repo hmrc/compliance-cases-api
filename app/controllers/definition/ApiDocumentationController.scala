@@ -16,28 +16,44 @@
 
 package controllers.definition
 
-import controllers.Assets
+import controllers.{AssetsBuilder, AssetsMetadata}
+
 import javax.inject.Inject
 import models.definition.ApiDefinition
 import play.api.Configuration
 import play.api.http.HttpErrorHandler
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.api.controllers.DocumentationController
+import play.api.mvc.{Action, AnyContent, DefaultActionBuilder}
+
+import scala.concurrent.Future
 
 class ApiDocumentationController @Inject()(
-                                            cc: ControllerComponents,
-                                            assets: Assets,
-                                            errorHandler: HttpErrorHandler,
-                                            config: Configuration) extends DocumentationController(cc, assets, errorHandler){
+  defaultActionBuilder: DefaultActionBuilder,
+  httpErrorHandler: HttpErrorHandler,
+  meta: AssetsMetadata,
+  config: Configuration
+) extends AssetsBuilder(httpErrorHandler, meta){
 
-  lazy val whitelistedApplicationIds: Seq[String] = config.getOptional[Seq[String]]("apiDefinition.whitelistedApplicationIds").getOrElse(Seq.empty)
+  lazy val allowListedApplicationIds: Seq[String] = config.getOptional[Seq[String]]("apiDefinition.allowListedApplicationIds").getOrElse(Seq.empty)
 
   lazy val status: String = config.get[String]("apiDefinition.status")
 
   lazy val endpointsEnabled: Boolean = config.get[Boolean]("apiDefinition.endpointsEnabled")
 
-  override def definition(): Action[AnyContent] = cc.actionBuilder {
-    Ok(Json.toJson(ApiDefinition(whitelistedApplicationIds, endpointsEnabled, status)))
+  def definition(): Action[AnyContent] = defaultActionBuilder.async {
+    Future.successful(
+      Ok(
+        Json.toJson(
+          ApiDefinition(
+            allowListedApplicationIds,
+            endpointsEnabled,
+            status
+          )
+        )
+      )
+    )
   }
+
+  def conf(version: String, file: String): Action[AnyContent] =
+    super.at(s"/public/api/conf/$version", file)
 }

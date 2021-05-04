@@ -16,6 +16,8 @@
 
 package controllers.actions
 
+import controllers.{ErrorInternalServerError, ErrorUnauthorized}
+
 import javax.inject.Inject
 import models.LogMessageHelper
 import org.slf4j.MDC
@@ -23,7 +25,6 @@ import play.api.libs.json.Json
 import play.api.mvc.Results.{InternalServerError, Unauthorized}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import uk.gov.hmrc.api.controllers.{ErrorInternalServerError, ErrorUnauthorized}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
@@ -39,7 +40,7 @@ class AuthenticateApplicationAction @Inject()(
                                              )(implicit val executionContext: ExecutionContext) extends
   AuthorisedFunctions with ActionBuilder[Request, AnyContent] {
 
-  lazy val applicationIdIsAllowed: Set[String] = config.get[Option[Seq[String]]]("apiDefinition.whitelistedApplicationIds")
+  lazy val applicationIdIsAllowed: Set[String] = config.get[Option[Seq[String]]]("apiDefinition.allowListedApplicationIds")
     .getOrElse(Seq.empty[String])
     .toSet
 

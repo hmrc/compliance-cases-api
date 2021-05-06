@@ -6,7 +6,7 @@
     {
       "code": "001",
       "message": "...",
-      "path": "case/campaignId"
+      "path": "/case/campaignId"
     }
   ]
 }

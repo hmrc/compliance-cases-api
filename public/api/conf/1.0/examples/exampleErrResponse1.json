@@ -6,7 +6,7 @@
     {
       "code": "001",
       "message": "Repayment amount must greater than 0",
-      "path": "case/repaymentAmount"
+      "path": "/case/repaymentAmount"
     },
     {
       "code": "012",
@@ -15,7 +15,7 @@
     {
       "code": "006",
       "message": "...",
-      "path": "case/campaignId"
+      "path": "/case/campaignId"
     }
   ]
 }

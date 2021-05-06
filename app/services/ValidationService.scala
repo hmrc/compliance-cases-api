@@ -31,9 +31,9 @@ import scala.collection.JavaConverters._
 
 class ValidationService @Inject()(resources: ResourceService) {
 
-  private lazy val repaymentCaseSchema = resources.getFile("/schemas/caseflowCreateRepaymentCaseSchema.json")
+  private lazy val repaymentCaseSchema = resources.getFile("/schemas/repaymentCaseType.schema.json")
 
-  private lazy val riskCaseSchema = resources.getFile("/schemas/caseflowCreateRiskCaseSchema.json")
+  private lazy val riskCaseSchema = resources.getFile("/schemas/riskCaseType.schema.json")
 
   private val factory = JsonSchemaFactory
     .newBuilder()
@@ -58,7 +58,9 @@ class ValidationService @Inject()(resources: ResourceService) {
           caseTypeName
             .map(caseType =>
               BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors, caseType = caseType)
-            ).orElse(Some(BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors)))
+            )
+            // TODO make caseType optional
+            .orElse(Some(BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors)))
             .map(Json.toJson(_))
         }
       case _ => Some(

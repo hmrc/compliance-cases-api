@@ -32,7 +32,6 @@ class ResourceServiceSpec extends WordSpec with MustMatchers {
     }
 
     "return create case schema" in {
-      println(service.getFile("/schemas/request.schema.json"))
       service.getFile("/schemas/request.schema.json") mustBe caseflowCreateCaseSchema
     }
 

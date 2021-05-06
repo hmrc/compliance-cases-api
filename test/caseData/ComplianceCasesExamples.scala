@@ -234,7 +234,6 @@ object ComplianceCasesExamples {
   val caseflowCreateCaseSchema: String =
     """{
       |  "$schema": "http://json-schema.org/draft-04/schema#",
-      |  "title": "API#1561 -  Create Case Request Schema v0.1.0",
       |  "type": "object",
       |  "additionalProperties": false,
       |  "required": [

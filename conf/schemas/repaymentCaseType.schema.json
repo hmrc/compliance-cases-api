@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Repayment Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "caseType",
+    "sourceSystemRef",
+    "campaignId",
+    "projectId",
+    "repaymentAmount",
+    "taxRegime",
+    "taxPeriodStart",
+    "taxPeriodEnd",
+    "claimDate"
+  ],
+  "properties": {
+    "caseType": {
+      "description": "Mandatory. Must be 'Repayment' for a repayment case",
+      "type": "string",
+      "enum": [
+        "Repayment"
+      ]
+    },
+    "sourceSystemRef": {
+      "description": "Mandatory. An identify reference; 'CFSRP' for a 'Repayment'",
+      "type": "string",
+      "enum": [
+        "CFSRP"
+      ]
+    },
+    "campaignId": {
+      "$ref": "#/definitions/campaignIdType"
+    },
+    "projectId": {
+      "$ref": "#/definitions/projectIdType"
+    },
+    "repaymentAmount": {
+      "$ref": "#/definitions/amountPosType"
+    },
+    "taxRegime": {
+      "$ref": "#/definitions/taxRegimeType"
+    },
+    "taxPeriodStart": {
+      "$ref": "#/definitions/dateType"
+    },
+    "taxPeriodEnd": {
+      "$ref": "#/definitions/dateType"
+    },
+    "caseOwnerId": {
+      "description": "Optional. The numeric id of the owner of the case.",
+      "type": "number",
+      "multipleOf": 1,
+      "minimum": 1,
+      "maximum": 9999999
+    },
+    "triggeredRiskRuleRef": {
+      "description": "Optional. A reference for the triggered risk rule on the source system",
+      "type": "string",
+      "pattern": "^R[0-9]{1,10}$"
+    },
+    "oudn": {
+      "description": "Optional. OUDN of the owner",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9\\&\\-\\'\\_]{8,100}$"
+    },
+    "claimDate": {
+      "$ref": "#/definitions/dateType"
+    },
+    "inYearPeriod": {
+      "description": "Optional. In Year Period, expected for VAT returns Only and upto 2 digits.",
+      "type": "string",
+      "pattern": "^[1-12]{1,2}$"
+    },
+    "firstLock": {
+      "$ref": "#/definitions/lockType"
+    },
+    "secondLock": {
+      "$ref": "#/definitions/lockType"
+    },
+    "thirdLock": {
+      "$ref": "#/definitions/lockType"
+    }
+  },
+  "definitions": {
+    "campaignIdType": {
+      "description": "The campaign id relating to this case",
+      "type": "string",
+      "pattern": "^CID-[0-9]{1,15}$"
+    },
+    "projectIdType": {
+      "description": "The project id relating to this case",
+      "type": "string",
+      "pattern": "^PID-[0-9]{1,15}$"
+    },
+    "amountPosType": {
+      "description": "A number representing a positive amount in pounds from 0 to 999999999999",
+      "type": "number",
+      "multipleOf": 1,
+      "minimum": 0,
+      "maximum": 999999999999
+    },
+    "taxRegimeType": {
+      "type": "string",
+      "description": "Mandatory. The tax regime of the Repayment case or of a risk for a Risk case",
+      "pattern": "^[a-zA-Z_]{2,15}$"
+    },
+    "dateType": {
+      "description": "A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.",
+      "type": "string",
+      "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\\-]02[\\-]29|((19|20)[0-9]{2}[\\-](0[469]|11)[\\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\\-](0[13578]|1[02])[\\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\\-]02[\\-](0[1-9]|1[0-9]|2[0-8])))$"
+    },
+    "lockType": {
+      "type": "string",
+      "description": "Optional. The Lock for each repayment line up to 6 in length",
+      "pattern": "^([a-zA-Z0-9]{1,6})$"
+    }
+  }
+}

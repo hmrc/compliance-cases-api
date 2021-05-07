@@ -1,33 +1,54 @@
 {
-  "additionalProperties": false, 
-  "$schema": "http://json-schema.org/schema#", 
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/schema#",
   "required": [
-    "failures"
-  ], 
-  "type": "object", 
+    "errors",
+    "code",
+    "message"
+  ],
+  "type": "object",
   "properties": {
-    "failures": {
-      "minItems": 1, 
-      "uniqueItems": true, 
-      "type": "array", 
+    "code": {
+      "type":"string",
+      "description":"unique machine readable error code",
+      "minLength":1,
+      "maxLength":160
+    },
+    "message": {
+      "type":"string",
+      "description":"human readable error message",
+      "minLength":1,
+      "maxLength":160
+    },
+    "caseType": {
+      "type":"string",
+      "enum": ["Risk", "Repayment"]
+    },
+    "errors": {
+      "minItems": 1,
+      "uniqueItems": true,
+      "type": "array",
       "items": {
-        "additionalProperties": false, 
+        "additionalProperties": false,
         "required": [
-          "code", 
-          "reason"
-        ], 
-        "type": "object", 
+          "code",
+          "message"
+        ],
+        "type": "object",
         "properties": {
-          "reason": {
-            "minLength": 1, 
-            "type": "string", 
-            "description": "A simple description for the failure", 
+          "message": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A simple description for the error",
             "maxLength": 160
-          }, 
+          },
           "code": {
-            "pattern": "^[A-Z0-9_-]{1,160}$", 
-            "type": "string", 
+            "pattern": "^[0-9]{3}$",
+            "type": "string",
             "description": "Keys for all the errors returned"
+          },
+          "path": {
+            "type": "string"
           }
         }
       }

@@ -1,8 +1,8 @@
 {
-  "description": "Risk Case", 
+  "description": "Risk Case",
   "required": [
     "caseType", 
-    "sourceSystemRef", 
+    "sourceSystemRef",
     "campaignId", 
     "projectId", 
     "suggestedOfficerGrade", 

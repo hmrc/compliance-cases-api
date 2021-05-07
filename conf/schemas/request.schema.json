@@ -1,0 +1,208 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sourceSystemId",
+    "sourceSystemKey",
+    "sourceSystemURL",
+    "taxPayer",
+    "case"
+  ],
+  "properties": {
+    "sourceSystemId": {
+      "description": "Mandatory. To identify the source system. Currently only 'CNT' (Connect) supported",
+      "type": "string",
+      "enum": [
+        "CNT"
+      ]
+    },
+    "sourceSystemKey": {
+      "description": "Mandatory. Primary key of a record on the source system",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9/\\$\\.\\-]{1,50}$"
+    },
+    "sourceSystemURL": {
+      "description": "Mandatory. Full URL of a record on the source system",
+      "type": "string",
+      "format": "uri",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "taxPayer": {
+      "$ref": "#/definitions/taxPayerType"
+    },
+    "case": {
+      "type": "object"
+    }
+  },
+  "definitions": {
+    "nameType": {
+      "type": "string",
+      "pattern": "^[a-zA-Z &`\\-\\'\\.^]{1,70}$"
+    },
+    "organisationNameType": {
+      "type": "string",
+      "description": "Allow Unicode blocks Basic Latin (Space to Tilde), printable Latin-1 Supplement (¡ to ÿ), and all of Latin Extended-A and Latin Extended-B and IP Extensions (Ā to ʯ), all the Latin Extended Additional characters (Ḁ to ỿ), General Punctuation characters Hyphen to Horizontal Bar (‐ to ―), General Punctuation characters (‘ to ‟), Currency Symbol characters (₠ to ₿), Letterlike Symbols Å and K",
+      "pattern": "^[ -~¡-ÿĀ-ʯḀ-ỿ‐-―‘-‟₠-₿ÅK]{1,255}$"
+    },
+    "addressLineType": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9 \\-,\\.&\\'\\/]{1,35}$"
+    },
+    "addressEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "addressLine1",
+        "correspondenceAddress",
+        "addressType"
+      ],
+      "properties": {
+        "correspondenceAddress": {
+          "description": "Mandatory. Whether this address is a correspondence one (true) or not (false).",
+          "type": "boolean"
+        },
+        "addressType": {
+          "description": "Mandatory. The type of the address.",
+          "type": "string",
+          "pattern": "^[A-Za-z ]{4,20}$"
+        },
+        "addressLine1": {
+          "$ref": "#/definitions/addressLineType"
+        },
+        "addressLine2": {
+          "$ref": "#/definitions/addressLineType"
+        },
+        "city": {
+          "description": "Optional.",
+          "type": "string",
+          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$"
+        },
+        "county": {
+          "description": "Optional.",
+          "type": "string",
+          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$"
+        },
+        "country": {
+          "description": "Optional.",
+          "type": "string",
+          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{1,35}$"
+        },
+        "postcode": {
+          "description": "Optional. Standard UK postcode with optional space between the outcode and incode parts",
+          "type": "string",
+          "pattern": "^[A-Z]{1,2}[0-9][0-9A-Z]?\\s?[0-9][A-Z]{2}$"
+        }
+      }
+    },
+    "taxPayerType": {
+      "description": "Mandatory. All the details of the tax payer.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taxPayerType",
+        "referenceNumbers",
+        "addresses"
+      ],
+      "properties": {
+        "taxPayerType": {
+          "description": "Mandatory. A categorisation of the tax payer e.g. Individual, Partnership, Organisation",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9\\/\\-\\. ]{1,40}$"
+        },
+        "segment": {
+          "description": "Optional. The segment of the tax payer e.g. Micro A; needed\n    for an organisation type tax payer",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9\\/\\- ]{1,60}$"
+        },
+        "nameDetails": {
+          "description": "Optional. The name of the individual or organisation tax payer ",
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "firstName",
+                "lastName"
+              ],
+              "properties": {
+                "title": {
+                  "description": "Optional. The person's title.",
+                  "type": "string",
+                  "enum": [
+                    "Unknown",
+                    "Mr",
+                    "Mrs",
+                    "Miss",
+                    "Ms",
+                    "Dr",
+                    "Sir",
+                    "Rev",
+                    "Professor",
+                    "Lord"
+                  ]
+                },
+                "firstName": {
+                  "$ref": "#/definitions/nameType"
+                },
+                "lastName": {
+                  "$ref": "#/definitions/nameType"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "organisationName"
+              ],
+              "properties": {
+                "organisationName": {
+                  "$ref": "#/definitions/organisationNameType"
+                }
+              }
+            }
+          ]
+        },
+        "referenceNumbers": {
+          "description": "Mandatory. An array of key/value pairs representing a reference for the customer.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "referenceType",
+              "referenceValue"
+            ],
+            "properties": {
+              "referenceType": {
+                "description": "Mandatory. The type of the reference.",
+                "type": "string",
+                "pattern": "^[A-Za-z\\/\\-\\. ]{1,100}$"
+              },
+              "referenceValue": {
+                "description": "Mandatory. The value of the reference.",
+                "type": "string",
+                "pattern": "^[A-Z0-9\\/]{5,25}$"
+              }
+            }
+          }
+        },
+        "addresses": {
+          "description": "Mandatory. A list of addresses of the tax payer",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/addressEntry"
+          }
+        }
+      }
+    }
+  }
+}

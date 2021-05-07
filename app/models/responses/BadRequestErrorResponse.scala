@@ -18,18 +18,20 @@ package models.responses
 
 import play.api.libs.json.{Json, Writes}
 
-case class BadRequestErrorResponse(code: String, message: String, errors: Seq[FieldError])
+case class BadRequestErrorResponse(code: String, message: String, caseType: Option[String], errors: Seq[FieldError])
 
 object BadRequestErrorResponse {
   implicit def badRequestWrites: Writes[BadRequestErrorResponse] = Json.writes[BadRequestErrorResponse]
 
   def apply(errors: Seq[FieldError]): BadRequestErrorResponse = {
-    new BadRequestErrorResponse("INVALID_PAYLOAD", "Submission has not passed validation. Invalid payload.", errors)
+    new BadRequestErrorResponse("INVALID_PAYLOAD", "Submission has not passed validation. Invalid payload.", None, errors)
   }
 
   def apply(errors: Seq[FieldError], caseType: String): BadRequestErrorResponse = {
     new BadRequestErrorResponse("INVALID_PAYLOAD",
       s"Submission has not passed validation for the $caseType model. Invalid payload.",
-      errors)
+      Some(caseType),
+      errors
+    )
   }
 }

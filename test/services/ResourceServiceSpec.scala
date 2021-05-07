@@ -32,15 +32,15 @@ class ResourceServiceSpec extends WordSpec with MustMatchers {
     }
 
     "return create case schema" in {
-      service.getFile("/schemas/caseflowCreateCaseSchema.json") mustBe caseflowCreateCaseSchema
+      service.getFile("/schemas/request.schema.json") mustBe caseflowCreateCaseSchema
     }
 
     "return create repayment case schema" in {
-      service.getFile("/schemas/caseflowCreateRepaymentCaseSchema.json") mustBe caseflowCreateRepaymentCaseSchema
+      service.getFile("/schemas/repaymentCaseType.schema.json") mustBe caseflowCreateRepaymentCaseSchema
     }
 
     "return create risk case schema" in {
-      service.getFile("/schemas/caseflowCreateRiskCaseSchema.json") mustBe caseflowCreateRiskCaseSchema
+      service.getFile("/schemas/riskCaseType.schema.json") mustBe caseflowCreateRiskCaseSchema
     }
   }
 }

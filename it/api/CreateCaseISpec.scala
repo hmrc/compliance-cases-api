@@ -70,20 +70,6 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       response.status mustBe UNAUTHORIZED
       response.body mustBe """{"code":"UNAUTHORIZED","message":"Bearer token is missing or not authorized"}"""
     }
-    s"return a $UNAUTHORIZED if application is allowListed" in {
-      stubPostWithResponseBody("/auth/authorise", ACCEPTED, Json.obj(
-        "applicationId" -> "ID-7"
-      ).toString)
-      stubPostWithoutRequestAndResponseBody("/write/audit", NO_CONTENT)
-      stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
-
-      val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
-        .post(createRepaymentCaseJson))
-
-      response.status mustBe UNAUTHORIZED
-      response.body mustBe """{"code":"UNAUTHORIZED","message":"Bearer token is missing or not authorized"}"""
-    }
 
     s"return a $INTERNAL_SERVER_ERROR if an exception occurs received from IF" in {
       stubPostWithFault("/organisations/case", correlationId)

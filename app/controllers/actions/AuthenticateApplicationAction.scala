@@ -40,7 +40,7 @@ class AuthenticateApplicationAction @Inject()(
                                              )(implicit val executionContext: ExecutionContext) extends
   AuthorisedFunctions with ActionBuilder[Request, AnyContent] {
 
-  lazy val applicationIdIsAllowed: Set[String] = config.get[Option[Seq[String]]]("apiDefinition.allowListedApplicationIds")
+  lazy val applicationIdIsAllowed: Set[String] = config.get[Option[Seq[String]]]("apiDefinition.whitelistedApplicationIds")
     .getOrElse(Seq.empty[String])
     .toSet
 

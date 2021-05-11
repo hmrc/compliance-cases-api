@@ -18,7 +18,7 @@ package models.definition
 
 import play.api.libs.json.{JsArray, JsValue, Json, Writes}
 
-case class ApiDefinition(allowListedApplicationIds: Seq[String], endpointsEnabled: Boolean, status: String){
+case class ApiDefinition(whitelistedApplicationIds: Seq[String], endpointsEnabled: Boolean, status: String){
   val scopes: JsArray = Json.arr(
     Json.obj(
       "key" -> "write:protect-connect",
@@ -39,7 +39,7 @@ case class ApiDefinition(allowListedApplicationIds: Seq[String], endpointsEnable
         "endpointsEnabled" -> endpointsEnabled,
         "access" -> Json.obj(
           "type" -> "PRIVATE",
-          "allowListedApplicationIds" -> allowListedApplicationIds
+          "whitelistedApplicationIds" -> whitelistedApplicationIds
         )
       )
     )

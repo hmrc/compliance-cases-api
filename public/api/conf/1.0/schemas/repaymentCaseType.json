@@ -66,17 +66,17 @@
     }, 
     "taxPeriodEnd": {
       "$ref": "dateType.json"
-    }, 
+    },
     "sourceSystemRef": {
       "enum": [
         "CFSRP"
       ], 
       "type": "string", 
       "description": "Mandatory. An identify reference; 'CFSRP' for a 'Repayment'"
-    }, 
+    },
     "caseOwnerId": {
       "minimum": 1, 
-      "type": "number", 
+      "type": "number",
       "multipleOf": 1, 
       "maximum": 9999999, 
       "description": "Optional. The numeric id of the owner of the case."

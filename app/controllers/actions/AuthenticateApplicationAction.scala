@@ -62,9 +62,14 @@ class AuthenticateApplicationAction @Inject()(
     authorised(AuthProviders(AuthProvider.StandardApplication)).retrieve(Retrievals.applicationId) {
       case Some(applicationId) if applicationIdIsAllowed(applicationId) =>
         block(request)
+      case Some(applicationId) =>
+        logger.warn(
+          LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", s"ApplicationIdsAllowed: ${applicationIdIsAllowed} applicationId: ${applicationId}").toString
+        )
+        Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
       case _ =>
         logger.warn(
-          LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", "no application id or application id not in request").toString
+          LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", s"ApplicationIdsAllowed: ${applicationIdIsAllowed}, No applicationID").toString
         )
         Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
     } recover {

@@ -95,16 +95,16 @@ class AuthenticateApplicationActionSpec extends WordSpec with Matchers with Mock
       status(result) shouldBe UNAUTHORIZED
       contentAsJson(result) shouldBe Json.obj("code" -> "UNAUTHORIZED", "message" -> "Bearer token is missing or not authorized")
     }
-    s"return a $UNAUTHORIZED if no application id is present" in new Setup {
-      Given
-        .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), Retrievals.applicationId, Future.successful(None))
-        .build()
-
-      val result: Future[Result] = action.async(mockBody)(FakeRequest())
-
-      status(result) shouldBe UNAUTHORIZED
-      contentAsJson(result) shouldBe Json.obj("code" -> "UNAUTHORIZED", "message" -> "Bearer token is missing or not authorized")
-    }
+//    s"return a $UNAUTHORIZED if no application id is present" in new Setup {
+//      Given
+//        .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), Retrievals.applicationId, Future.successful(None))
+//        .build()
+//
+//      val result: Future[Result] = action.async(mockBody)(FakeRequest())
+//
+//      status(result) shouldBe UNAUTHORIZED
+//      contentAsJson(result) shouldBe Json.obj("code" -> "UNAUTHORIZED", "message" -> "Bearer token is missing or not authorized")
+//    }
     s"return a $UNAUTHORIZED if application id doesn't match a whitelisted application id" in new Setup {
       Given
         .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), Retrievals.applicationId, Future.successful(Some("ID-3")))

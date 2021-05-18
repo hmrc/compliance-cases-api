@@ -62,7 +62,7 @@ class ComplianceCasesConnector @Inject()(
       case e: Exception =>
         logger.error(
           logMessage(
-            s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
+            s"Exception from when trying to talk to $ifBaseUrl$createCaseUri with bearerToken: $bearerToken headers: ${headers(correlationId)} - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
           ), e
         )
         None

@@ -56,13 +56,16 @@ class ComplianceCasesConnector @Inject()(
     // TODO - replace JsValue with CaseFlowCreateRequest case class
     val caseType = (request \ "case" \ "caseType").as[String]
 
+    logMessage(s"Attempting to connect to IF on $ifBaseUrl$createCaseUri with bearerToken: $bearerToken headers: ${headers(correlationId)}")
+
+
     httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
       implicitly, httpReads(correlationId, caseType), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec
     ).recover {
       case e: Exception =>
         logger.error(
           logMessage(
-            s"Exception from when trying to talk to $ifBaseUrl$createCaseUri with bearerToken: $bearerToken headers: ${headers(correlationId)} - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
+            s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
           ), e
         )
         None

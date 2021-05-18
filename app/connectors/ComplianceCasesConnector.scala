@@ -44,7 +44,8 @@ class ComplianceCasesConnector @Inject()(
   private def headers(correlationId: String) = Seq(
     HeaderNames.CONTENT_TYPE -> ContentTypes.JSON,
     "CorrelationId" -> correlationId,
-    "Environment" -> iFEnvironment
+    "Environment" -> iFEnvironment,
+    "Authorization" -> s"Bearer $bearerToken"
   )
 
   def createCase(request: JsValue, correlationId: String)

@@ -49,3 +49,4 @@ publishingSettings
 resolvers += Resolver.jcenterRepo
 
 enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+disablePlugins(JUnitXmlReportPlugin)

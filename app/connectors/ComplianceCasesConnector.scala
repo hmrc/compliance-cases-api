@@ -56,7 +56,7 @@ class ComplianceCasesConnector @Inject()(
     // TODO - replace JsValue with CaseFlowCreateRequest case class
     val caseType = (request \ "case" \ "caseType").as[String]
 
-    logMessage(s"Attempting to connect to IF on $ifBaseUrl$createCaseUri with bearerToken: $bearerToken headers: ${headers(correlationId)}")
+    logger.info(logMessage(s"Attempting to connect to IF on $ifBaseUrl$createCaseUri with bearerToken: $bearerToken headers: ${headers(correlationId)}"))
 
 
     httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(

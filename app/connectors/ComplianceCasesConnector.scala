@@ -53,12 +53,8 @@ class ComplianceCasesConnector @Inject()(
 
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
-
     // TODO - replace JsValue with CaseFlowCreateRequest case class
     val caseType = (request \ "case" \ "caseType").as[String]
-
-    logger.info(logMessage(s"Attempting to connect to IF on $ifBaseUrl$createCaseUri with bearerToken: $bearerToken headers: ${headers(correlationId)}"))
-
 
     httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
       implicitly, httpReads(correlationId, caseType), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec

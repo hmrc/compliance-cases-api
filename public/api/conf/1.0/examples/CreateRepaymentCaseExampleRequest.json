@@ -48,6 +48,10 @@
     "caseOwnerId": 666,
     "triggeredRiskRuleRef": "R0123",
     "oudn": "Bolton-2437-C",
-    "claimDate": "2020-04-17"
+    "claimDate": "2020-04-17",
+    "inYearPeriod": "12",
+    "firstLock": "A",
+    "secondLock": "1a",
+    "thirdLock": "A1234"
   }
 }

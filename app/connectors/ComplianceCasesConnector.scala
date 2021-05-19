@@ -44,14 +44,14 @@ class ComplianceCasesConnector @Inject()(
   private def headers(correlationId: String) = Seq(
     HeaderNames.CONTENT_TYPE -> ContentTypes.JSON,
     "CorrelationId" -> correlationId,
-    "Environment" -> iFEnvironment
+    "Environment" -> iFEnvironment,
+    "Authorization" -> s"Bearer $bearerToken"
   )
 
   def createCase(request: JsValue, correlationId: String)
                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[IFResponse] = {
 
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
-
 
     // TODO - replace JsValue with CaseFlowCreateRequest case class
     val caseType = (request \ "case" \ "caseType").as[String]

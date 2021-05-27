@@ -57,7 +57,7 @@ class ComplianceCasesConnector @Inject()(
     val caseType = (request \ "case" \ "caseType").as[String]
 
     httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
-      implicitly, httpReads(correlationId, caseType), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec
+      implicitly, httpReads(correlationId, caseType), hc.copy(authorization = None), ec
     ).recover {
       case e: Exception =>
         logger.error(

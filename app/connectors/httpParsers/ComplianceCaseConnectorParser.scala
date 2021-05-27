@@ -67,7 +67,7 @@ trait ComplianceCaseConnectorParser {
     HttpResponse(
       UNPROCESSABLE_ENTITY,
       Json.toJson(errorResponse(response, caseType)).toString,
-      response.allHeaders
+      response.headers
     )
   }
 

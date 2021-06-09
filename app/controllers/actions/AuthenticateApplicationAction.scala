@@ -24,7 +24,7 @@ import org.slf4j.MDC
 import play.api.libs.json.Json
 import play.api.mvc.Results.{InternalServerError, Unauthorized}
 import play.api.mvc._
-import play.api.{Configuration, Logger}
+import play.api.Logger
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
@@ -34,15 +34,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 class AuthenticateApplicationAction @Inject()(
-                                               val authConnector: AuthConnector,
-                                               config: Configuration,
-                                               val parser: BodyParsers.Default
-                                             )(implicit val executionContext: ExecutionContext) extends
+  val authConnector: AuthConnector,
+  val parser: BodyParsers.Default
+)(implicit val executionContext: ExecutionContext) extends
   AuthorisedFunctions with ActionBuilder[Request, AnyContent] {
 
-  lazy val applicationIdIsAllowed: Set[String] = config.get[Option[Seq[String]]]("apiDefinition.whitelistedApplicationIds")
-    .getOrElse(Seq.empty[String])
-    .toSet
 
   private val logger = Logger(this.getClass.getSimpleName)
 
@@ -54,14 +50,14 @@ class AuthenticateApplicationAction @Inject()(
   }
 
   override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request = request)
 
     updateContextWithRequestId
 
     authorised(AuthProviders(AuthProvider.StandardApplication)).retrieve(Retrievals.applicationId) {
-      case Some(applicationId) if applicationIdIsAllowed(applicationId) =>
+      case Some(_) =>
         block(request)
-      case _ =>
+      case None =>
         logger.warn(
           LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", "no application id or application id not in request").toString
         )

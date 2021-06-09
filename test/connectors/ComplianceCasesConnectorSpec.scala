@@ -130,7 +130,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       }
     }
 
-    "return an empty option if the call fails with an exceptin" in {
+    "return an empty option if the call fails with an exception" in {
 
       def exception = aResponse.withFault(Fault.CONNECTION_RESET_BY_PEER)
 

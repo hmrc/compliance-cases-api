@@ -2,7 +2,6 @@ import play.core.PlayVersion
 import play.sbt.PlayScala
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
-import uk.gov.hmrc.SbtArtifactory
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "compliance-cases-api"
@@ -28,7 +27,7 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies  ++= Seq(
-  "uk.gov.hmrc"                 %% "bootstrap-play-26"        % "3.2.0",
+  "uk.gov.hmrc"                 %% "bootstrap-play-26"        % "4.0.0",
   "com.github.java-json-tools"  % "json-schema-validator"     % "2.2.14",
   "uk.gov.hmrc"                 %% "auth-client"              % "3.0.0-play-26",
   "org.scalatest"               %% "scalatest"                % "3.0.8"                 % "test",
@@ -45,7 +44,8 @@ ScoverageKeys.coverageFailOnMinimum := true
 ScoverageKeys.coverageHighlighting := true
 
 publishingSettings
-integrationTestSettings
+integrationTestSettings()
 resolvers += Resolver.jcenterRepo
 
-enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+disablePlugins(JUnitXmlReportPlugin)

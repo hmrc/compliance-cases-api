@@ -39,7 +39,7 @@ class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with ScalaFu
         .the.complianceCasesConnector.createsCase(
         Json.parse(fullCaseJson),
         "some-correlation-id",
-        Some(HttpResponse(NO_CONTENT))
+        Some(HttpResponse(NO_CONTENT, ""))
       ).build()
 
       whenReady(service.createCase(Json.parse(fullCaseJson), "some-correlation-id")) {

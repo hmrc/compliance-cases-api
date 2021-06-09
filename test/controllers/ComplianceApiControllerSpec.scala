@@ -64,8 +64,8 @@ class ComplianceApiControllerSpec extends WordSpec with Matchers with MockFactor
         Given
           .the.complianceCasesService.createsCase(
             Json.parse(minimumRepaymentOrganisationJson),
-            correlationId, Some(HttpResponse(ACCEPTED,
-            Some(Json.parse(exampleJsonSuccessResponse))))
+            correlationId,
+            Some(HttpResponse(ACCEPTED,exampleJsonSuccessResponse))
           )
           .the.resourceService.returnsResourceAt("/schemas/caseflowCreateCaseSchema.json","mySchema")
           .and.the.validationService.validate("mySchema", Json.parse(minimumRepaymentOrganisationJson), None)

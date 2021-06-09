@@ -39,7 +39,7 @@ class AuthenticateApplicationActionSpec extends WordSpec with Matchers with Mock
     val mockBodyParser: BodyParsers.Default = new BodyParsers.Default(stubControllerComponents().parsers)
     implicit val ec: ExecutionContext = stubControllerComponents().executionContext
 
-    lazy val action: AuthenticateApplicationAction = new AuthenticateApplicationAction(mockAuthConnector, mockConfig, mockBodyParser)
+    lazy val action: AuthenticateApplicationAction = new AuthenticateApplicationAction(mockAuthConnector, mockBodyParser)
 
 
     def mockBody: Future[Result] = Future.successful(Ok("{}"))
@@ -77,16 +77,6 @@ class AuthenticateApplicationActionSpec extends WordSpec with Matchers with Mock
   }
 
   "action.async" should {
-    s"return a $OK if application id is retrieved" in new Setup {
-      (mockAuthConnector.authorise[Option[String]](_:Predicate,_:Retrieval[Option[String]])(_:HeaderCarrier,_:ExecutionContext))
-        .expects(AuthProviders(StandardApplication),Retrievals.applicationId,*,*)
-        .returns(Future.successful(Some("ID-3")))
-
-      val result: Future[Result] = action.async(mockBody)(FakeRequest())
-
-      status(result) shouldBe OK
-      contentAsJson(result) shouldBe Json.obj()
-    }
     s"return a $UNAUTHORIZED if not authorised by auth" in new Setup {
       Given
         .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), Retrievals.applicationId, Future.failed(BearerTokenExpired("an exception has occurred")))

@@ -24,7 +24,7 @@ import org.slf4j.MDC
 import play.api.libs.json.Json
 import play.api.mvc.Results.{InternalServerError, Unauthorized}
 import play.api.mvc._
-import play.api.{Configuration, Logger}
+import play.api.Logger
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
@@ -35,10 +35,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticateApplicationAction @Inject()(
   val authConnector: AuthConnector,
-  config: Configuration,
   val parser: BodyParsers.Default
 )(implicit val executionContext: ExecutionContext) extends
   AuthorisedFunctions with ActionBuilder[Request, AnyContent] {
+
 
   private val logger = Logger(this.getClass.getSimpleName)
 

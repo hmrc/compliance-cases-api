@@ -71,8 +71,8 @@
         "taxPeriodEnd": "2020-04-05",
         "riskStartDate": "2020-04-20",
         "amounts": {
-          "potentialAmount": -999999999999,
-          "expectedAmount": 999999999999,
+          "potentialAmount": -99999999999,
+          "expectedAmount": 99999999999,
           "emergingAmount": 10011456
         },
         "riskScore": 2.1

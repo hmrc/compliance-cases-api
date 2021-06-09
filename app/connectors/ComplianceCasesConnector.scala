@@ -44,7 +44,8 @@ class ComplianceCasesConnector @Inject()(
   private def headers(correlationId: String) = Seq(
     HeaderNames.CONTENT_TYPE -> ContentTypes.JSON,
     "CorrelationId" -> correlationId,
-    "Environment" -> iFEnvironment
+    "Environment" -> iFEnvironment,
+    "Authorization" -> s"Bearer $bearerToken"
   )
 
   def createCase(request: JsValue, correlationId: String)
@@ -52,12 +53,11 @@ class ComplianceCasesConnector @Inject()(
 
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
-
     // TODO - replace JsValue with CaseFlowCreateRequest case class
     val caseType = (request \ "case" \ "caseType").as[String]
 
     httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
-      implicitly, httpReads(correlationId, caseType), hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken"))), ec
+      implicitly, httpReads(correlationId, caseType), hc.copy(authorization = None), ec
     ).recover {
       case e: Exception =>
         logger.error(

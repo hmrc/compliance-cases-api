@@ -132,16 +132,12 @@
                   "description": "Optional. The person's title.",
                   "type": "string",
                   "enum": [
-                    "Unknown",
                     "Mr",
-                    "Mrs",
-                    "Miss",
+                    "Mrs.",
+                    "Miss.",
                     "Ms",
                     "Dr",
-                    "Sir",
-                    "Rev",
-                    "Professor",
-                    "Lord"
+                    "Other"
                   ]
                 },
                 "firstName": {
@@ -188,7 +184,7 @@
               "referenceValue": {
                 "description": "Mandatory. The value of the reference.",
                 "type": "string",
-                "pattern": "^[A-Z0-9]{5,25}$"
+                "pattern": "^[A-Z0-9]{1,25}$"
               }
             }
           }

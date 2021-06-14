@@ -40,7 +40,7 @@ object ComplianceCasesExamples {
       |      "taxPayerType": "Individual",
       |      "segment": "Micro A",
       |      "nameDetails": {
-      |        "title": "Professor",
+      |        "title": "Mrs.",
       |        "firstName": "first",
       |        "lastName": "last"
       |      },
@@ -365,16 +365,12 @@ object ComplianceCasesExamples {
       |                  "description": "Optional. The person's title.",
       |                  "type": "string",
       |                  "enum": [
-      |                    "Unknown",
       |                    "Mr",
-      |                    "Mrs",
-      |                    "Miss",
+      |                    "Mrs.",
+      |                    "Miss.",
       |                    "Ms",
       |                    "Dr",
-      |                    "Sir",
-      |                    "Rev",
-      |                    "Professor",
-      |                    "Lord"
+      |                    "Other"
       |                  ]
       |                },
       |                "firstName": {
@@ -421,7 +417,7 @@ object ComplianceCasesExamples {
       |              "referenceValue": {
       |                "description": "Mandatory. The value of the reference.",
       |                "type": "string",
-      |                "pattern": "^[A-Z0-9\\/]{5,25}$"
+      |                "pattern": "^[A-Z0-9\\/]{1,25}$"
       |              }
       |            }
       |          }
@@ -506,7 +502,7 @@ object ComplianceCasesExamples {
       |    "oudn": {
       |      "description": "Optional. OUDN of the owner",
       |      "type": "string",
-      |      "pattern": "^[A-Za-z0-9\\&\\-\\'\\_]{8,100}$"
+      |      "pattern": "^[A-Za-z0-9\\&\\-\\'\\_\\,]{8,100}$"
       |    },
       |    "claimDate": {
       |      "$ref": "#/definitions/dateType"
@@ -870,7 +866,7 @@ object ComplianceCasesExamples {
       |      "taxPayerType": "Individual",
       |      "segment": "Micro A",
       |      "nameDetails": {
-      |        "title": "Professor",
+      |        "title": "Other",
       |        "firstName": "first",
       |        "lastName": "last"
       |      },

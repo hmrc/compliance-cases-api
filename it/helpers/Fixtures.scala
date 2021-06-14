@@ -89,7 +89,7 @@ trait Fixtures {
       |    "taxPayerType": "Individual",
       |    "segment": "Micro A",
       |    "nameDetails": {
-      |      "title": "Professor",
+      |      "title": "Dr",
       |      "firstName": "Donald also known as 'A bloke with a very long first name like Robert'",
       |      "lastName": "Duck"
       |    },

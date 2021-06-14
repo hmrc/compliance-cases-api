@@ -48,7 +48,7 @@
       "$ref": "lockType.json"
     }, 
     "oudn": {
-      "pattern": "^[A-Za-z0-9\\&\\-\\'\\_]{8,100}$", 
+      "pattern": "^[A-Za-z0-9\\&\\-\\'\\_\\,]{8,100}$",
       "type": "string", 
       "description": "Optional. OUDN of the owner"
     }, 

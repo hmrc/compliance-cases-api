@@ -17,6 +17,9 @@
 package services
 
 import connectors.ComplianceCasesConnector
+import models.LogMessageHelper
+import play.api.Logger
+
 import javax.inject.Inject
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -25,8 +28,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ComplianceCasesService @Inject()(connector: ComplianceCasesConnector) {
 
+  val className: String = this.getClass.getSimpleName
+  val logger: Logger = Logger(className)
+
+
   def createCase(request: JsValue, correlationId: String)
                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[HttpResponse]] = {
+  def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
+    logger.warn(logMessage(s"request being sent from ComplianceCaseService with Request: $request"))
     connector.createCase(request, correlationId)
   }
 }

@@ -56,6 +56,8 @@ class ComplianceCasesConnector @Inject()(
     // TODO - replace JsValue with CaseFlowCreateRequest case class
     val caseType = (request \ "case" \ "caseType").as[String]
 
+    logger.warn(logMessage(s"request received from ComplianceCasesService and passing on the EIS through ComplianceCasesConnector with request: $request"))
+
     httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
       implicitly, httpReads(correlationId, caseType), hc.copy(authorization = None), ec
     ).recover {

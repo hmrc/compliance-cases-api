@@ -50,14 +50,16 @@ class ComplianceApiController @Inject()(
 
     validator.validateAndRetrieveErrors(schema, input) match {
       case None =>
-        logger.info(logMessage("request received passing on to integration framework"))
-        complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
+        logger.warn(logMessage("request received passing on to integration framework"))
+         val foo = complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
           maybeResponse => maybeResponse.fold(
             ifEmpty = InternalServerError(Json.toJson(ErrorInternalServerError))
           )(
             response => Status(response.status)(response.body)
           )
         )
+        logger.warn(logMessage(s"called EIS with case and received response of ${foo.value} with request: ${Json.toJson(input)}"))
+        foo
       case Some(errors) =>
         logger.warn(logMessage(s"request body didn't match json with errors: ${Json.prettyPrint(errors)}"))
         Future.successful(BadRequest(errors))

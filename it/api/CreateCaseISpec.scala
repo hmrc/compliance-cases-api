@@ -24,9 +24,9 @@ import play.api.test.Helpers._
 class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
 
   "POST /case" should {
-    s"return an $ACCEPTED if $ACCEPTED received from IF for repayments" in {
-      stubPostWithoutResponseBody("/organisations/case", ACCEPTED, correlationId)
-      stubPostWithResponseBody("/auth/authorise", ACCEPTED, Json.obj(
+    s"return an $OK if $OK received from IF for repayments" in {
+      stubPostWithoutResponseBody("/organisations/case", OK, correlationId)
+      stubPostWithResponseBody("/auth/authorise", OK, Json.obj(
         "applicationId" -> "ID-1"
       ).toString)
       stubPostWithoutRequestAndResponseBody("/write/audit", NO_CONTENT)
@@ -36,13 +36,13 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
         .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
         .post(createRepaymentCaseJson))
 
-      response.status mustBe ACCEPTED
+      response.status mustBe OK
       response.body mustBe ""
     }
 
-    s"return an $ACCEPTED if $ACCEPTED received from IF for risk" in {
-      stubPostWithoutResponseBody("/organisations/case", ACCEPTED, correlationId)
-      stubPostWithResponseBody("/auth/authorise", ACCEPTED, Json.obj(
+    s"return an $OK if $OK received from IF for risk" in {
+      stubPostWithoutResponseBody("/organisations/case", OK, correlationId)
+      stubPostWithResponseBody("/auth/authorise", OK, Json.obj(
         "applicationId" -> "ID-1"
       ).toString)
       stubPostWithoutRequestAndResponseBody("/write/audit", NO_CONTENT)
@@ -52,7 +52,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
         .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
         .post(createCaseRiskJson))
 
-      response.status mustBe ACCEPTED
+      response.status mustBe OK
       response.body mustBe ""
     }
 

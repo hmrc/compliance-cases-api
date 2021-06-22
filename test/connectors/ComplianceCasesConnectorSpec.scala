@@ -54,14 +54,14 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
         .withHeader("Environment", equalTo("local"))
         .willReturn(
           aResponse()
-            .withStatus(ACCEPTED)
+            .withStatus(OK)
             .withBody(exampleJsonSuccessResponse)
             .withHeader("contentType", "application/json")
         )
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) { response =>
-        response.get.status mustBe ACCEPTED
+        response.get.status mustBe OK
         response.get.json mustBe Json.parse(exampleJsonSuccessResponse)
       }
     }

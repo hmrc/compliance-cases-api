@@ -52,13 +52,13 @@ trait ComplianceCaseConnectorParser {
           logMessage(s"received an unprocessable entity status when calling $url with body: ${response.body}")
         )
         Some(httpErrorResponse(response, caseType))
-      case status if status != ACCEPTED =>
+      case status if status != OK =>
         logger.warn(
           logMessage(s"received status $status when calling $url ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_RESPONSE )")
         )
         None
       case _ =>
-        logger.info(logMessage(s"received an accepted when calling $url"))
+        logger.info(logMessage(s"received an OK when calling $url"))
         Some(response)
     }
   }

@@ -31,7 +31,7 @@
       "description": "Mandatory. Must be 'Repayment' for a repayment case"
     }, 
     "inYearPeriod": {
-      "pattern": "^[1-12]{1,2}$", 
+      "pattern": "^(1[0-2]|[1-9])$",
       "type": "string", 
       "description": "Optional. In Year Period, expected for VAT returns Only and upto 2 digits."
     }, 

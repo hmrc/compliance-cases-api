@@ -289,8 +289,7 @@ object ComplianceCasesExamples {
       |      "additionalProperties": false,
       |      "required": [
       |        "addressLine1",
-      |        "correspondenceAddress",
-      |        "addressType"
+      |        "correspondenceAddress"
       |      ],
       |      "properties": {
       |        "correspondenceAddress": {
@@ -298,7 +297,7 @@ object ComplianceCasesExamples {
       |          "type": "boolean"
       |        },
       |        "addressType": {
-      |          "description": "Mandatory. The type of the address.",
+      |          "description": "Optional. The type of the address.",
       |          "type": "string",
       |          "pattern": "^[A-Za-z ]{4,20}$"
       |        },
@@ -311,17 +310,17 @@ object ComplianceCasesExamples {
       |        "city": {
       |          "description": "Optional.",
       |          "type": "string",
-      |          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$"
+      |          "pattern": "^.{2,35}$"
       |        },
       |        "county": {
       |          "description": "Optional.",
       |          "type": "string",
-      |          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$"
+      |          "pattern": "^.{2,35}$"
       |        },
       |        "country": {
       |          "description": "Optional.",
       |          "type": "string",
-      |          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{1,35}$"
+      |          "pattern": "^.{2,35}$"
       |        },
       |        "postcode": {
       |          "description": "Optional. Standard UK postcode with optional space between the outcode and incode parts",
@@ -510,7 +509,7 @@ object ComplianceCasesExamples {
       |    "inYearPeriod": {
       |      "description": "Optional. In Year Period, expected for VAT returns Only and upto 2 digits.",
       |      "type": "string",
-      |      "pattern": "^[1-12]{1,2}$"
+      |      "pattern": "^(1[0-2]|[1-9])$"
       |    },
       |    "firstLock": {
       |      "$ref": "#/definitions/lockType"

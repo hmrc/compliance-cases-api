@@ -55,8 +55,7 @@
       "additionalProperties": false,
       "required": [
         "addressLine1",
-        "correspondenceAddress",
-        "addressType"
+        "correspondenceAddress"
       ],
       "properties": {
         "correspondenceAddress": {
@@ -64,7 +63,7 @@
           "type": "boolean"
         },
         "addressType": {
-          "description": "Mandatory. The type of the address.",
+          "description": "Optional. The type of the address.",
           "type": "string",
           "pattern": "^[A-Za-z ]{4,20}$"
         },
@@ -77,17 +76,17 @@
         "city": {
           "description": "Optional.",
           "type": "string",
-          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$"
+          "pattern": "^.{2,35}$"
         },
         "county": {
           "description": "Optional.",
           "type": "string",
-          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$"
+          "pattern": "^.{2,35}$"
         },
         "country": {
           "description": "Optional.",
           "type": "string",
-          "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{1,35}$"
+          "pattern": "^.{2,35}$"
         },
         "postcode": {
           "description": "Optional. Standard UK postcode with optional space between the outcode and incode parts",

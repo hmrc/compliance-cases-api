@@ -70,7 +70,7 @@
     "inYearPeriod": {
       "description": "Optional. In Year Period, expected for VAT returns Only and upto 2 digits.",
       "type": "string",
-      "pattern": "^[1-12]{1,2}$"
+      "pattern": "^(1[0-2]|[1-9])$"
     },
     "firstLock": {
       "$ref": "#/definitions/lockType"

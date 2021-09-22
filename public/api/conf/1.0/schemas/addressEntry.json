@@ -3,28 +3,27 @@
   "$schema": "http://json-schema.org/schema#", 
   "required": [
     "addressLine1", 
-    "correspondenceAddress", 
-    "addressType"
+    "correspondenceAddress"
   ], 
   "type": "object", 
   "properties": {
     "city": {
-      "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$", 
+      "pattern": "^.{2,35}$",
       "type": "string", 
       "description": "Optional."
     }, 
     "addressType": {
       "pattern": "^[A-Za-z ]{4,20}$", 
       "type": "string", 
-      "description": "Mandatory. The type of the address."
+      "description": "Optional. The type of the address."
     }, 
     "country": {
-      "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{1,35}$", 
+      "pattern": "^.{2,35}$",
       "type": "string", 
       "description": "Optional."
     }, 
     "county": {
-      "pattern": "^[A-Za-z\\-\\'\\`\\&\\. ]{2,35}$", 
+      "pattern": "^.{2,35}$",
       "type": "string", 
       "description": "Optional."
     }, 

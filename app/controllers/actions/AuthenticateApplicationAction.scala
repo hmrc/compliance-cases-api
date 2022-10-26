@@ -17,7 +17,7 @@
 package controllers.actions
 
 
-import controllers.{ErrorInternalServerError, ErrorUnauthorized}
+import controllers.{DefaultErrorResponse, ErrorInternalServerError, ErrorUnauthorized}
 
 import javax.inject.Inject
 import models.LogMessageHelper
@@ -62,18 +62,18 @@ class AuthenticateApplicationAction @Inject()(
         logger.warn(
           LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", "no application id or application id not in request").toString
         )
-        Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized())))
+        Future.successful(Unauthorized(Json.toJson[DefaultErrorResponse](ErrorUnauthorized)))
     } recover {
       case _: AuthorisationException =>
         logger.warn(
           LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", "no application id or application id not in request").toString
         )
-        Unauthorized(Json.toJson(ErrorUnauthorized()))
+        Unauthorized(Json.toJson[DefaultErrorResponse](ErrorUnauthorized))
       case e: Throwable =>
         logger.warn(
           LogMessageHelper("AuthenticateApplicationAction", "invokeBlock", "an unexpected exception occurred").toString, e
         )
-        InternalServerError(Json.toJson(ErrorInternalServerError()))
+        InternalServerError(Json.toJson[DefaultErrorResponse](ErrorInternalServerError))
     }
   }
 }

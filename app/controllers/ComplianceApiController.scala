@@ -54,7 +54,7 @@ class ComplianceApiController @Inject()(
         logger.info(logMessage("request received passing on to integration framework"))
         complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
           maybeResponse => maybeResponse.fold(
-            ifEmpty = InternalServerError(Json.toJson(ErrorInternalServerError()))
+            ifEmpty = InternalServerError(Json.toJson[DefaultErrorResponse](ErrorInternalServerError))
           )(
             response => Status(response.status)(response.body)
           )

@@ -23,56 +23,38 @@ sealed trait DefaultErrorResponse extends Product with Serializable {
   val httpStatusCode: Int
   val errorCode:      String
   val message:        String
-  }
-
-
-case class ErrorUnauthorized(httpStatusCode: Int = UNAUTHORIZED,
-                             errorCode: String = "UNAUTHORIZED",
-                             message: String = "Bearer token is missing or not authorized")
-  extends DefaultErrorResponse
-object ErrorUnauthorized {
-  implicit val writes = new Writes[ErrorUnauthorized] {
-    override def writes(o: ErrorUnauthorized): JsValue = Json.obj("code" -> o.errorCode, "message" -> o.message)
-  }
-
 }
 
-case class ErrorGenericBadRequest(httpStatusCode: Int = BAD_REQUEST,
-                                  errorCode: String = "BAD_REQUEST",
-                                  message: String = "Bad Request")
-  extends DefaultErrorResponse
-
-object ErrorGenericBadRequest {
-  implicit val writes = new Writes[ErrorGenericBadRequest] {
-    override def writes(o: ErrorGenericBadRequest): JsValue = Json.obj("code" -> o.errorCode, "message" -> o.message)
-  }
+case object ErrorUnauthorized extends DefaultErrorResponse {
+  override val httpStatusCode: Int = UNAUTHORIZED
+  override val errorCode: String = "UNAUTHORIZED"
+  override val message: String = "Bearer token is missing or not authorized"
 }
 
-case class ErrorInternalServerError(httpStatusCode: Int = INTERNAL_SERVER_ERROR,
-                                    errorCode: String = "INTERNAL_SERVER_ERROR",
-                                    message: String = "Internal server error")
-  extends DefaultErrorResponse
-
-object ErrorInternalServerError {
-  implicit val writes = new Writes[ErrorInternalServerError] {
-    override def writes(o: ErrorInternalServerError): JsValue = Json.obj("code" -> o.errorCode, "message" -> o.message)
-  }
+case class ErrorGenericBadRequest(msg: String = "Bad Request") extends DefaultErrorResponse {
+  override val httpStatusCode: Int = BAD_REQUEST
+  override val errorCode: String = "BAD_REQUEST"
+  override val message: String = msg
 }
 
+case object ErrorInternalServerError extends DefaultErrorResponse {
+  override val httpStatusCode: Int = INTERNAL_SERVER_ERROR
+  override val errorCode: String = "INTERNAL_SERVER_ERROR"
+  override val message: String = "Internal server error"
+}
 
 object DefaultErrorResponse {
+    implicit val writes = new Writes[DefaultErrorResponse] {
+      def writes(e: DefaultErrorResponse): JsValue ={
+        e match {
+          case ErrorUnauthorized => Json.obj("code" -> e.errorCode, "message" -> e.message)
+          case ErrorGenericBadRequest(msg) => Json.obj("code" -> e.errorCode, "message" -> msg)
+          case ErrorInternalServerError => Json.obj("code" -> e.errorCode, "message" -> e.message)
+        }
 
-
-  implicit val writes = new Writes[DefaultErrorResponse] {
-    def writes(e: DefaultErrorResponse): JsValue = {
-      e match {
-        case un: ErrorUnauthorized => Json.writes[ErrorUnauthorized].writes(un)
-        case br: ErrorGenericBadRequest => Json.writes[ErrorGenericBadRequest].writes(br)
-        case is: ErrorInternalServerError => Json.writes[ErrorInternalServerError].writes(is)
       }
-
     }
   }
 
-}
+
 

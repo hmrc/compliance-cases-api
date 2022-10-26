@@ -26,16 +26,17 @@ scalacOptions ++= Seq(
   "-P:silencer:pathFilters=views;routes"
 )
 
+val bootstrapVersion = "7.8.0"
+
 libraryDependencies  ++= Seq(
-  "uk.gov.hmrc"                 %% "bootstrap-play-26"        % "4.0.0",
+  "uk.gov.hmrc"                 %% "bootstrap-backend-play-28"% bootstrapVersion,
   "com.github.java-json-tools"  % "json-schema-validator"     % "2.2.14",
-  "uk.gov.hmrc"                 %% "auth-client"              % "3.0.0-play-26",
-  "org.scalatest"               %% "scalatest"                % "3.0.8"                 % "test",
-  "com.typesafe.play"           %% "play-test"                % PlayVersion.current     % "test",
+  "org.scalatest"               %% "scalatest"                % "3.2.14"                % "test",
+  "uk.gov.hmrc"                 %% "bootstrap-test-play-28"   % bootstrapVersion        % Test,
   "org.pegdown"                 %  "pegdown"                  % "1.6.0"                 % "test, it",
-  "org.scalatestplus.play"      %% "scalatestplus-play"       % "3.1.3"                 % "test, it",
-  "org.scalamock"               %% "scalamock"                % "4.4.0"                 % "test",
-  "com.github.tomakehurst"      % "wiremock-standalone"       % "2.26.3"                % "test, it"
+  "org.scalatestplus.play"      %% "scalatestplus-play"       % "5.1.0"                 % "test, it",
+  "org.scalamock"               %% "scalamock"                % "5.2.0"                 % "test",
+  "com.github.tomakehurst"      % "wiremock-standalone"       % "2.27.2"                % "test, it"
 )
 
 ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*Routes.*;.*GuiceInjector;"

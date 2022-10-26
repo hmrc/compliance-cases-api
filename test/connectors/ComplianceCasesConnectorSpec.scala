@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ import caseData.ComplianceCasesExamples._
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.http.Fault
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.ContentTypes
@@ -31,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite
+class ComplianceCasesConnectorSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite
   with WireMockHelper with ScalaFutures with IntegrationPatience {
 
 
@@ -61,8 +62,8 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) { response =>
-        response.get.status mustBe OK
-        response.get.json mustBe Json.parse(exampleJsonSuccessResponse)
+        response.get.status shouldBe OK
+        response.get.json shouldBe Json.parse(exampleJsonSuccessResponse)
       }
     }
 
@@ -76,7 +77,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.isEmpty mustBe true
+        _.isEmpty shouldBe true
       }
     }
 
@@ -96,7 +97,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.isEmpty mustBe true
+        _.isEmpty shouldBe true
       }
     }
 
@@ -111,7 +112,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.isEmpty mustBe true
+        _.isEmpty shouldBe true
       }
     }
 
@@ -126,7 +127,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.isEmpty mustBe true
+        _.isEmpty shouldBe true
       }
     }
 
@@ -143,7 +144,7 @@ class ComplianceCasesConnectorSpec extends WordSpec with MustMatchers with Guice
       )
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
-        _.isEmpty mustBe true
+        _.isEmpty shouldBe true
       }
     }
   }

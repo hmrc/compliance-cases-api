@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
 package controllers
 
 import java.util.UUID
-
 import caseData.ComplianceCasesExamples._
 import controllers.actions.{RequestWithCorrelationId, ValidateCorrelationIdHeaderAction}
 import helpers.MockHelpers
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.http.Status
 import play.api.libs.json.{JsNull, Json}
 import play.api.mvc._
@@ -33,7 +33,7 @@ import uk.gov.hmrc.http.HttpResponse
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class ComplianceApiControllerSpec extends WordSpec with Matchers with MockFactory with MockHelpers {
+class ComplianceApiControllerSpec extends AnyWordSpecLike with Matchers with MockFactory with MockHelpers {
 
   class Setup {
     val correlationId: String = UUID.randomUUID().toString

@@ -31,7 +31,7 @@ val bootstrapVersion = "7.8.0"
 libraryDependencies  ++= Seq(
   "uk.gov.hmrc"                 %% "bootstrap-backend-play-28"% bootstrapVersion,
   "com.github.java-json-tools"  % "json-schema-validator"     % "2.2.14",
-  "org.scalatest"               %% "scalatest"                % "3.2.14"                % "test",
+  "org.scalatest"               %% "scalatest"                % "3.2.9"                % "test",
   "uk.gov.hmrc"                 %% "bootstrap-test-play-28"   % bootstrapVersion        % Test,
   "org.pegdown"                 %  "pegdown"                  % "1.6.0"                 % "test, it",
   "org.scalatestplus.play"      %% "scalatestplus-play"       % "5.1.0"                 % "test, it",

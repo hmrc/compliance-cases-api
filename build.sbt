@@ -31,13 +31,12 @@ val bootstrapVersion = "7.8.0"
 libraryDependencies  ++= Seq(
   "uk.gov.hmrc"                 %% "bootstrap-backend-play-28"% bootstrapVersion,
   "com.github.java-json-tools"  % "json-schema-validator"     % "2.2.14",
-  "org.scalatest"               %% "scalatest"                % "3.2.14"                % "test",
+  "org.scalatest"               %% "scalatest"                % "3.0.8"                % "test",
   "uk.gov.hmrc"                 %% "bootstrap-test-play-28"   % bootstrapVersion        % Test,
   "org.pegdown"                 %  "pegdown"                  % "1.6.0"                 % "test, it",
   "org.scalatestplus.play"      %% "scalatestplus-play"       % "5.1.0"                 % "test, it",
   "org.scalamock"               %% "scalamock"                % "5.2.0"                 % "test",
-  "com.github.tomakehurst"      % "wiremock-standalone"       % "2.27.2"                % "test, it",
-  "com.vladsch.flexmark"        % "flexmark-all"              % "0.62.2"                % "test, it"
+  "com.github.tomakehurst"      % "wiremock-standalone"       % "2.27.2"                % "test, it"
 )
 
 ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*Routes.*;.*GuiceInjector;"

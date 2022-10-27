@@ -33,7 +33,8 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three",
+          AUTHORIZATION -> "Bearer some-token")
         .post(createRepaymentCaseJson))
 
       response.status mustBe OK
@@ -49,7 +50,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three", AUTHORIZATION -> "Bearer some-token")
         .post(createCaseRiskJson))
 
       response.status mustBe OK
@@ -67,7 +68,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       stubPostWithoutRequestAndResponseBody("/write/audit/merged", NO_CONTENT)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three", AUTHORIZATION -> "Bearer some-token")
         .post(createRepaymentCaseJson))
 
       response.status mustBe INTERNAL_SERVER_ERROR
@@ -96,7 +97,7 @@ class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
       ).toString)
 
       val response = await(buildClient("/case")
-        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three")
+        .withHttpHeaders("CorrelationId" -> correlationId, "X-Request-Id" -> "one-two-three", AUTHORIZATION -> "Bearer some-token")
         .post(createRepaymentCaseJson))
 
       response.status mustBe INTERNAL_SERVER_ERROR

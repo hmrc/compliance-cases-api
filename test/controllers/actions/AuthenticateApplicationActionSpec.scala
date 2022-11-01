@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 package controllers.actions
 
 import helpers.MockHelpers
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.slf4j.MDC
 import play.api.libs.json.Json
 import play.api.mvc.Results.Ok
@@ -25,15 +26,13 @@ import play.api.mvc.{BodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthProvider.StandardApplication
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthProviders, BearerTokenExpired}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, RequestId, SessionId}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticateApplicationActionSpec extends WordSpec with Matchers with MockHelpers {
+class AuthenticateApplicationActionSpec extends AnyWordSpecLike with Matchers with MockHelpers {
 
   class Setup {
     val mockBodyParser: BodyParsers.Default = new BodyParsers.Default(stubControllerComponents().parsers)

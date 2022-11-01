@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,45 @@
 
 package controllers
 
+import play.api.http.Status._
 import play.api.libs.json._
 
-abstract class DefaultErrorResponse(
-  val httpStatusCode: Int,
-  val errorCode:      String,
+sealed trait DefaultErrorResponse extends Product with Serializable {
+  val httpStatusCode: Int
+  val errorCode:      String
   val message:        String
-)
+}
 
-case object ErrorUnauthorized extends DefaultErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
+case object ErrorUnauthorized extends DefaultErrorResponse {
+  override val httpStatusCode: Int = UNAUTHORIZED
+  override val errorCode: String = "UNAUTHORIZED"
+  override val message: String = "Bearer token is missing or not authorized"
+}
 
-case class ErrorGenericBadRequest(msg: String = "Bad Request") extends DefaultErrorResponse(400, "BAD_REQUEST", msg)
+case class ErrorGenericBadRequest(msg: String = "Bad Request") extends DefaultErrorResponse {
+  override val httpStatusCode: Int = BAD_REQUEST
+  override val errorCode: String = "BAD_REQUEST"
+  override val message: String = msg
+}
 
-case object ErrorInternalServerError extends DefaultErrorResponse(500, "INTERNAL_SERVER_ERROR", "Internal server error")
+case object ErrorInternalServerError extends DefaultErrorResponse {
+  override val httpStatusCode: Int = INTERNAL_SERVER_ERROR
+  override val errorCode: String = "INTERNAL_SERVER_ERROR"
+  override val message: String = "Internal server error"
+}
 
 object DefaultErrorResponse {
-  implicit val writes = new Writes[DefaultErrorResponse] {
-    def writes(e: DefaultErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
+    implicit val writes = new Writes[DefaultErrorResponse] {
+      def writes(e: DefaultErrorResponse): JsValue ={
+        e match {
+          case ErrorUnauthorized => Json.obj("code" -> e.errorCode, "message" -> e.message)
+          case ErrorGenericBadRequest(msg) => Json.obj("code" -> e.errorCode, "message" -> msg)
+          case ErrorInternalServerError => Json.obj("code" -> e.errorCode, "message" -> e.message)
+        }
+
+      }
+    }
   }
-}
+
+
 

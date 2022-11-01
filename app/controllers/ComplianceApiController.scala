@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
 package controllers
 
 import controllers.actions.{AuthenticateApplicationAction, ValidateCorrelationIdHeaderAction}
+
 import javax.inject.Inject
 import models.LogMessageHelper
 import play.api.Logger
 import play.api.libs.json.{JsNull, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.{ComplianceCasesService, ResourceService, ValidationService}
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -53,7 +54,7 @@ class ComplianceApiController @Inject()(
         logger.info(logMessage("request received passing on to integration framework"))
         complianceCasesService.createCase(Json.toJson(input), request.correlationId).map(
           maybeResponse => maybeResponse.fold(
-            ifEmpty = InternalServerError(Json.toJson(ErrorInternalServerError))
+            ifEmpty = InternalServerError(Json.toJson[DefaultErrorResponse](ErrorInternalServerError))
           )(
             response => Status(response.status)(response.body)
           )

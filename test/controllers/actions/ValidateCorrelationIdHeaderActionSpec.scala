@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package controllers.actions
 
-import java.util.UUID
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 
-import org.scalatest.{Matchers, WordSpec}
+import java.util.UUID
 import play.api.libs.json.Json
 import play.api.mvc.Results.Ok
 import play.api.mvc.{BodyParsers, Result}
@@ -27,7 +28,7 @@ import play.api.test.Helpers.{contentAsJson, status, stubControllerComponents, _
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ValidateCorrelationIdHeaderActionSpec extends WordSpec with Matchers {
+class ValidateCorrelationIdHeaderActionSpec extends AnyWordSpecLike with Matchers {
 
   class Setup {
     val mockBodyParser: BodyParsers.Default = new BodyParsers.Default(stubControllerComponents().parsers)

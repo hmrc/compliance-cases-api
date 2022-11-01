@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,15 @@ package services
 import caseData.ComplianceCasesExamples._
 import helpers.MockHelpers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with ScalaFutures with IntegrationPatience with MockHelpers {
+class ComplianceCasesServiceSpec extends AnyWordSpecLike with Matchers with ScalaFutures with IntegrationPatience with MockHelpers {
 
   private val service: ComplianceCasesService = new ComplianceCasesService(mockComplianceCasesConnector)
 
@@ -43,7 +44,7 @@ class ComplianceCasesServiceSpec extends WordSpec with MustMatchers with ScalaFu
       ).build()
 
       whenReady(service.createCase(Json.parse(fullCaseJson), "some-correlation-id")) {
-        _.get.status mustBe NO_CONTENT
+        _.get.status shouldBe  NO_CONTENT
       }
     }
   }

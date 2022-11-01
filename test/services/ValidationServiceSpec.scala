@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,14 @@ import caseData.ComplianceCasesExamples._
 import controllers.actions.RequestWithCorrelationId
 import helpers.MockHelpers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.play.PlaySpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.{JsNull, JsString, Json}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationPatience with MockHelpers {
+class ValidationServiceSpec extends AnyWordSpecLike with Matchers with ScalaFutures with IntegrationPatience with MockHelpers {
 
   implicit lazy val hc: HeaderCarrier = HeaderCarrier(sessionId = None)
 
@@ -39,25 +40,25 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
 
     "return None if json is a valid repayment type" in {
       Given.the.resourceService.returnsResourceAt("/schemas/repaymentCaseType.schema.json", caseflowCreateRepaymentCaseSchema).build()
-      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(minimumRepaymentOrganisationJson)) mustBe None
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(minimumRepaymentOrganisationJson)) shouldBe  None
     }
     "return None if json is a valid full repayment type" in {
       Given.the.resourceService.returnsResourceAt("/schemas/repaymentCaseType.schema.json", caseflowCreateRepaymentCaseSchema).build()
-      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(fullCaseJson)) mustBe None
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(fullCaseJson)) shouldBe None
     }
     "return None if json is a valid repayment type with address" in {
       Given.the.resourceService.returnsResourceAt("/schemas/repaymentCaseType.schema.json", caseflowCreateRepaymentCaseSchema).build()
-      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(addressJson)) mustBe None
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(addressJson)) shouldBe None
     }
     "return None if json is a valid risk type" in {
       Given.the.resourceService.returnsResourceAt("/schemas/riskCaseType.schema.json", caseflowCreateRiskCaseSchema).build()
-      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(minimumRiskJson)) mustBe None
+      validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, Json.parse(minimumRiskJson)) shouldBe None
     }
 
     "return json schema errors for json that is not an object" in {
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
         JsString(""))
-        .get mustBe Json.parse(
+        .get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -72,7 +73,7 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
 
     "return json schema errors if no Json (JsNull) is passed in" in {
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema, JsNull)
-        .get mustBe Json.parse(
+        .get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -88,7 +89,7 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
     "return json schema errors for multiple errors and no case" in {
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
         Json.parse("""{"sourceSystemId": "CNT", "sourceSystemKey": [], "sourceSystemURL": "http://me.com", "case": [], "love": "yelp"}"""))
-        .get mustBe Json.parse(
+        .get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -108,7 +109,7 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
       Given.the.resourceService.returnsResourceAt("/schemas/riskCaseType.schema.json", caseflowCreateRiskCaseSchema).build()
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
         Json.parse(multipleInvalidFieldsWithValidRiskCaseField))
-        .get mustBe Json.parse(
+        .get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -127,7 +128,7 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
       Given.the.resourceService.returnsResourceAt("/schemas/repaymentCaseType.schema.json", caseflowCreateRepaymentCaseSchema).build()
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
         Json.parse(multipleInvalidFieldsWithValidRepaymentCaseField))
-        .get mustBe Json.parse(
+        .get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -145,7 +146,7 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
     "return invalid fields in risk" in {
       Given.the.resourceService.returnsResourceAt("/schemas/riskCaseType.schema.json", caseflowCreateRiskCaseSchema).build()
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
-        Json.parse(invalidRiskCaseJson)).get mustBe Json.parse(
+        Json.parse(invalidRiskCaseJson)).get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -164,7 +165,7 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
       Given.the.resourceService.returnsResourceAt("/schemas/repaymentCaseType.schema.json", caseflowCreateRepaymentCaseSchema).build()
 
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
-        Json.parse(invalidRepaymentCaseJson)).get mustBe Json.parse(
+        Json.parse(invalidRepaymentCaseJson)).get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -184,7 +185,7 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
 
     "return invalid caseType using incorrect datatype" in {
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
-        Json.parse(invalidCaseTypeUsingIncorrectDatatypeJson)).get mustBe Json.parse(
+        Json.parse(invalidCaseTypeUsingIncorrectDatatypeJson)).get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",
@@ -200,7 +201,7 @@ class ValidationServiceSpec extends PlaySpec with ScalaFutures with IntegrationP
 
     "return invalid caseType" in {
       validationService.validateAndRetrieveErrors(caseflowCreateCaseSchema,
-        Json.parse(invalidCaseType)).get mustBe Json.parse(
+        Json.parse(invalidCaseType)).get shouldBe Json.parse(
         """
           |{
           | "code": "INVALID_PAYLOAD",

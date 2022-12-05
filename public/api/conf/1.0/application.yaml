@@ -1,0 +1,850 @@
+openapi: 3.0.0
+info:
+  title: Compliance Cases
+  description: "This API will support the information transfer of case data between two systems: SAS to Caseflow.\n\n## Project Summary\n\nThe Protect Connect Project aims to reduce the load and dependency on the current Connect Platform which is inflexible in meeting changing business requirements due to its bespoke design. Also, because of growth of data volumes and restrictions on expanding the current platform, system performance has degraded over time and is directly impacting HMRC's ability to identify non-compliance and respond effectively to business demands due to latency and capacity issues. Therefore the Protect Connect Project will migrate the TRUCE service and parts of Connect to a new service provider.\n\n\nThe chosen provider is SAS Software Inc and the service will be provided as a PaaS hosted on AWS. The SAS solution includes SAS Visual Investigator which will be used by operators to manage risk alerts raised as the result of risk rules. Risk alerts which are deemed to require further, more complex investigation &/or contact with the customer will be transferred to Caseflow.\n\nIn addition to the endpoint description below you can download the full JSON schemas and examples for request and response payloads.\n\n<p class=\"govuk-body-l\" style=\"font-size: 24px;\">\n  <a href=\"/api-documentation/docs/api/download/compliance-cases-api/1.0/JSON_Examples.zip\" class=\"govuk-link\">JSON schemas and examples</a>\n</p>\n\n<p class=\"govuk-body-s\" style=\"font-size: 16px;margin-bottom: 15px;\">ZIP, 13KB</p>\n\n<p class=\"govuk-body-s\" style=\"font-size: 16px;margin-bottom: 15px;\">The ZIP file contains JSON files. Open in your preferred file viewer.</p>\nWhen an API changes in a way that is backwards-incompatible, we increase the version number of the API. \nSee our [reference guide](/api-documentation/docs/reference-guide#versioning) for more on\nversioning.\nWe use standard HTTP status codes to show whether an API request succeeded or not. They are usually in the range:\n\n- 200 to 299 if it succeeded, including code 202 if it was accepted by an API that needs to wait for further action\n- 400 to 499 if it failed because of a client error by your application\n- 500 to 599 if it failed because of an error on our server\n\nErrors specific to each API are shown in the Endpoints section, under Response. See our [reference guide](https://developer.service.hmrc.gov.uk/api-documentation/docs/reference-guide#errors) for more on errors.\n\nResponses with HTTP 422 (Unprocessable Entity) status code contain errors relating to particular fields in the request:  \n\nExample error response: Repayment\n<pre>\n{\n  \"code\": \"UNPROCESSABLE_ENTITY\",\n  \"message\": \"Unprocessable Entity\",\n  \"caseType\": \"Repayment\",\n  \"errors\": [\n    {\n      \"code\": \"001\",\n      \"message\": \"Repayment amount must greater than 0\",\n      \"path\": \"case/repaymentAmount\"\n    }\n  ]\n}</pre>\n\nExample error response: Risk\n<pre>\n{\n  \"code\": \"UNPROCESSABLE_ENTITY\",\n  \"message\": \"Unprocessable Entity\",\n  \"caseType\": \"Risk\",\n  \"errors\": [\n    {\n      \"code\": \"001\",\n      \"message\": \"...\",\n      \"path\": \"case/campaignId\"\n    }\n  ]\n}\n</pre>\n\nThe full list of <code>errors.code</code> and <code>errors.message</code> is provided in the Endpoints section.\nYou can use the sandbox environment to [test this API](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing).\n\n[Access a set of mock campaignId to test 422 error codes for caseType Risk](https://github.com/hmrc/compliance-cases-api/tree/master/public/api/conf/1.0/test-data) to use when testing in the sandbox environment.\n\n[Access a set of mock projectId to test 422 error codes for caseType Repayment](https://github.com/hmrc/compliance-cases-api/tree/master/public/api/conf/1.0/test-data) to use when testing in the sandbox environment.\n\nN.b. the last 3 digits of the test-data campaignId and projectId will match the returned error code e.g. CID-00000105 will return code 105. \n\nAny 422 codes not listed can be tested using real data i.e. Repayment codes 001, 003, 004, 010 & Risk codes 009, 107, 108, 109, 112, 113, 114 will be returned if incorrect dates and amounts are supplied in the Json payload."
+  contact: {}
+  version: '1.0'
+servers:
+  - url: https://api.service.hmrc.gov.uk/
+    variables: {}
+paths:
+  /misc/compliance-cases/case:
+    post:
+      tags:
+        - misc
+      summary: create-case-api
+      description: Passing Create Case data to integration framework
+      operationId: create-case-api
+      parameters:
+        - name: CorrelationId
+          in: header
+          description: A UUID identifier of the transaction.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: a1e8057e-fbbc-47a8-a8b4-78d9f015c253
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MiscComplianceCasesCaserequest'
+                - {}
+            examples:
+              example-2:
+                description: example create risk case body
+                value:
+                  sourceSystemId: CNT
+                  sourceSystemKey: VI00004-1
+                  sourceSystemURL: http://localhost:7052
+                  taxPayer:
+                    taxPayerType: Individual
+                    segment: Micro A
+                    nameDetails:
+                      title: Miss.
+                      firstName: Donald also known as 'A bloke with a very long first name like Robert'
+                      lastName: Duck
+                    referenceNumbers:
+                      - referenceType: VIRef
+                        referenceValue: VI000002343Z
+                    addresses:
+                      - correspondenceAddress: true
+                        addressType: Registered Address
+                        addressLine1: Megabucks House
+                        addressLine2: Richville Place
+                        city: Richville
+                        county: Wadshire
+                        postcode: ZZ11 2YY
+                      - correspondenceAddress: false
+                        addressType: Main Office
+                        addressLine1: The Hovel
+                        addressLine2: Downtrodden Way
+                        city: Poorsville
+                        county: Wadshire
+                        country: UK
+                        postcode: ZZ11 2YY
+                  case:
+                    caseType: Risk
+                    sourceSystemRef: CFSB
+                    campaignId: CID-00002344
+                    projectId: PID-98765432
+                    targetRIS: AB_C
+                    complianceStream: Fraud
+                    enquiryType: AB/00123-C
+                    vatOfficeCode: VAT-0063476P
+                    lastDateForEnquiry: 2021-01-30
+                    confidenceScore: 1.3
+                    archiveApproach: Extended
+                    interactionTitle: Slow and careful
+                    authorisationType: Dictatorial
+                    suggestedOfficerGrade: Major
+                    interventionSubType: Customer lead
+                    risks:
+                      - taxRegime: VATC
+                        riskDescription: Something dodgy
+                        subRegime: Returns
+                        firstComplianceCheck: Check_1
+                        secondComplianceCheck: Check_2
+                        inaccuracyCategory: Wildly
+                        inaccuracyDescription: All_over_the_place
+                        behaviours:
+                          potentialBehaviour: Concerning
+                          emergingBehaviour: Devious
+                        taxPeriodStart: 2019-04-06
+                        taxPeriodEnd: 2020-04-05
+                        riskStartDate: 2020-04-20
+                        amounts:
+                          potentialAmount: -99999999999
+                          expectedAmount: 99999999999
+                          emergingAmount: 10011456
+                        riskScore: 2.1
+        required: true
+      responses:
+        '202':
+          description: ''
+          headers: {}
+          content: {}
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse'
+                  - example:
+                      code: INVALID_PAYLOAD
+              examples:
+                example-1:
+                  description: Submission has not passed validation. Invalid payload..
+                  value:
+                    code: INVALID_PAYLOAD
+                example-2:
+                  description: Submission has not passed validation. Missing header CorrelationId.
+                  value:
+                    code: MISSING_CORRELATION_ID
+                example-3:
+                  description: Submission has not passed validation. Invalid header CorrelationId.
+                  value:
+                    code: INVALID_CORRELATION_ID
+                example-4:
+                  description: An invalid value provided
+                  value:
+                    code: INVALID_FIELD
+                example-5:
+                  description: Invalid value in field
+                  value:
+                    code: MISSING_FIELD
+                example-6:
+                  description: Unexpected field found
+                  value:
+                    code: UNEXPECTED_FIELD
+                example-7:
+                  description: Invalid Json type as payload
+                  value:
+                    code: INVALID_JSON_TYPE
+        '401':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse'
+                  - example:
+                      code: UNAUTHORIZED
+              example:
+                code: UNAUTHORIZED
+        '422':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse'
+                  - example:
+                      code: '001'
+              examples:
+                example-1:
+                  description: 'Repayment Case: repaymentAmount must be greater than 0'
+                  value:
+                    code: '001'
+                example-2:
+                  description: 'Repayment Case: taxRegime must be defined Caseflow value. IT, CT etc'
+                  value:
+                    code: '002'
+                example-3:
+                  description: 'Repayment Case: taxPeriodFrom must not be in the future and must not be greater or equal to taxPeriodEnd'
+                  value:
+                    code: '003'
+                example-4:
+                  description: 'Repayment Case: taxPeriodEnd can not be in future'
+                  value:
+                    code: '004'
+                example-5:
+                  description: 'Repayment Case: repaymentClaimDate can not be in future'
+                  value:
+                    code: '005'
+                example-6:
+                  description: 'Repayment Case: campaignId must match Caseflow equivalent'
+                  value:
+                    code: '006'
+                example-7:
+                  description: 'Repayment Case: projectId must match Caseflow equivalent'
+                  value:
+                    code: '007'
+                example-8:
+                  description: 'Repayment Case: caseOwnerId must match with a valid caseowner in Caseflow'
+                  value:
+                    code: '008'
+                example-9:
+                  description: 'Repayment Case: oudn must match Caseflow equivalent'
+                  value:
+                    code: '009'
+                example-10:
+                  description: 'Repayment Case: repaymentAmount must be less than 100 billion'
+                  value:
+                    code: '010'
+                example-11:
+                  description: 'Repayment Case: caseOwnerId must match a user in an INT business area role in Caseflow'
+                  value:
+                    code: '011'
+                example-12:
+                  description: 'Repayment Case: Either caseOwnerId or oudn must be present, but not both'
+                  value:
+                    code: '012'
+                example-13:
+                  description: "Repayment Case: As in Caseflow, taxPayerType must be 'Individual', 'Partnership' etc"
+                  value:
+                    code: '201'
+                example-14:
+                  description: "Repayment Case: segment must be any of the pre-defined values in Caseflow like 'small', 'large'. This is applicable for some specific taxPayerTypes"
+                  value:
+                    code: '202'
+                example-15:
+                  description: 'Repayment Case: Title of taxpayer has to be any of the pre defined value in caseflow like Dr., Mr., Mrs. etc'
+                  value:
+                    code: '203'
+                example-16:
+                  description: 'Repayment Case: Depending on taxPayerType either firstName and lastName, or companyName is mandatory'
+                  value:
+                    code: '204'
+                example-17:
+                  description: "Repayment Case: referenceType has to be a pre-defined value in caseflow, like 'NINO', 'ATED' etc"
+                  value:
+                    code: '301'
+                example-18:
+                  description: "Repayment Case: referenceValue is a specific format, like NINO, e.g 'AA123456A'"
+                  value:
+                    code: '302'
+                example-19:
+                  description: 'Repayment Case: Must be only one correspondenceAddress'
+                  value:
+                    code: '310'
+                example-20:
+                  description: "Repayment Case: addressType must be 'home', 'office', etc"
+                  value:
+                    code: '311'
+                example-21:
+                  description: 'Repayment Case: An error has occurred in case creation due to pega internal process failure'
+                  value:
+                    code: '999'
+                example-22:
+                  description: 'Risk Case: campaignId must match Caseflow equivalent'
+                  value:
+                    code: '001'
+                example-23:
+                  description: 'Risk Case: projectId must match Caseflow equivalent'
+                  value:
+                    code: '002'
+                example-24:
+                  description: 'Risk Case: targetRIS must match any of the pre-defined values in Caseflow'
+                  value:
+                    code: '004'
+                example-25:
+                  description: 'Risk Case: complianceStream must match any of the pre-defined values in Caseflow'
+                  value:
+                    code: '005'
+                example-26:
+                  description: 'Risk Case: enquiryType must match any of the pre-defined values in Caseflow'
+                  value:
+                    code: '006'
+                example-27:
+                  description: 'Risk Case: vatOfficeCode be an existing VAT code'
+                  value:
+                    code: '008'
+                example-28:
+                  description: 'Risk Case: lastDateForEnquiry must not be in the future'
+                  value:
+                    code: '009'
+                example-29:
+                  description: "Risk Case: authorisationType must match any of the pre-defined values in Caseflow e.g. 'Mandatory'"
+                  value:
+                    code: '010'
+                example-30:
+                  description: "Risk Case: suggestedOfficerGrade must match any of the pre-defined values in Caseflow e.g. 'AA', 'O'"
+                  value:
+                    code: '011'
+                example-31:
+                  description: "Risk Case: interventionSubType must match any of the pre-defined values in Caseflow e.g. 'Customer Lead'"
+                  value:
+                    code: '012'
+                example-32:
+                  description: "Risk Case: taxRegime must match any of the pre-defined values in Caseflow e.g. 'AMLS', 'CT'"
+                  value:
+                    code: '101'
+                example-33:
+                  description: 'Risk Case: subRegime must match any of the pre-defined values in Caseflow related to regime'
+                  value:
+                    code: '102'
+                example-34:
+                  description: 'Risk Case: firstComplianceCheck must match any of the pre-defined values in Caseflow related to subRegime'
+                  value:
+                    code: '103'
+                example-35:
+                  description: 'Risk Case: secondComplianceCheck must match any of the pre-defined values in Caseflow related to firstComplianceCheck'
+                  value:
+                    code: '104'
+                example-36:
+                  description: 'Risk Case: inaccuracyCategory must match any of the pre-defined values in Caseflow related to subRegime'
+                  value:
+                    code: '105'
+                example-37:
+                  description: 'Risk Case: inaccuracyDescription must match any of the pre-defined values in Caseflow related to category'
+                  value:
+                    code: '106'
+                example-38:
+                  description: 'Risk Case: taxPeriodStart must not be in future and must not be greater than or equal to taxPeriodEnd'
+                  value:
+                    code: '107'
+                example-39:
+                  description: 'Risk Case: taxPeriodEnd must not be in the future'
+                  value:
+                    code: '108'
+                example-40:
+                  description: 'Risk Case: riskStartDate must not be in the future'
+                  value:
+                    code: '109'
+                example-41:
+                  description: "Risk Case: potentialBehaviour must match any of the pre-defined values in Caseflow e.g. 'Compliant', 'Deliberate'"
+                  value:
+                    code: '110'
+                example-42:
+                  description: "Risk Case: emergingBehaviour must match any of the pre-defined values in Caseflow e.g. 'Compliant', 'Deliberate'"
+                  value:
+                    code: '111'
+                example-43:
+                  description: 'Risk Case: potentialAmount must be from -100bn, up to +100bn'
+                  value:
+                    code: '112'
+                example-44:
+                  description: 'Risk Case: emergingAmount must be from -100bn, up to +100bn'
+                  value:
+                    code: '113'
+                example-45:
+                  description: 'Risk Case: expectedAmount must be from -100bn, up to +100bn'
+                  value:
+                    code: '114'
+                example-46:
+                  description: 'Risk Case: taxPayerType must be Individual, Partnership etc'
+                  value:
+                    code: '201'
+                example-47:
+                  description: "Risk Case: segment must be any of the pre-defined values in Caseflow like 'small', 'large'. This is applicable for some specific taxPayerTypes"
+                  value:
+                    code: '202'
+                example-48:
+                  description: 'Risk Case: title must be Dr, Mr, Mrs, etc'
+                  value:
+                    code: '203'
+                example-49:
+                  description: 'Risk Case: Depending on taxPayerType either firstName and lastName, or companyName is mandatory'
+                  value:
+                    code: '204'
+                example-50:
+                  description: "Risk Case: referenceType must be pre-defined value like 'NINO', 'ATED' etc"
+                  value:
+                    code: '301'
+                example-51:
+                  description: 'Risk Case: referenceValue is a specific format, like a NINO - AA123456A'
+                  value:
+                    code: '302'
+                example-52:
+                  description: 'Risk Case: There must be only one correspondenceAddress'
+                  value:
+                    code: '310'
+                example-53:
+                  description: "Risk Case: addressType must specify 'home', 'office' etc"
+                  value:
+                    code: '311'
+                example-54:
+                  description: 'Risk Case: An error has occurred in case creation due to pega internal process failure'
+                  value:
+                    code: '999'
+        '500':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse'
+                  - example:
+                      code: INTERNAL_SERVER_ERROR
+              example:
+                code: INTERNAL_SERVER_ERROR
+      deprecated: false
+components:
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+    Address:
+      title: Address
+      required:
+        - correspondenceAddress
+        - addressLine1
+      type: object
+      properties:
+        city:
+          pattern: ^.{2,35}$
+          type: string
+          description: Optional.
+        addressType:
+          pattern: ^[A-Za-z ]{4,20}$
+          type: string
+          description: Optional. The type of the address.
+        country:
+          pattern: ^.{2,35}$
+          type: string
+          description: Optional.
+        county:
+          pattern: ^.{2,35}$
+          type: string
+          description: Optional.
+        correspondenceAddress:
+          type: boolean
+          description: Mandatory. Whether this address is a correspondence one (true) or not (false).
+        addressLine2:
+          pattern: ^[A-Za-z0-9 \-,\.&\'\/]{1,35}$
+          type: string
+        postcode:
+          pattern: ^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$
+          type: string
+          description: Optional. Standard UK postcode with optional space between the outcode and incode parts
+        addressLine1:
+          pattern: ^[A-Za-z0-9 \-,\.&\'\/]{1,35}$
+          type: string
+    Amounts:
+      title: Amounts
+      type: object
+      properties:
+        emergingAmount:
+          multipleOf: 1
+          maximum: 999999999999
+          minimum: -999999999999
+          type: number
+          description: A number representing a positive or negative amount in pounds from -999999999999 to 999999999999
+        potentialAmount:
+          multipleOf: 1
+          maximum: 999999999999
+          minimum: -999999999999
+          type: number
+          description: A number representing a positive or negative amount in pounds from -999999999999 to 999999999999
+        expectedAmount:
+          multipleOf: 1
+          maximum: 999999999999
+          minimum: -999999999999
+          type: number
+          description: A number representing a positive or negative amount in pounds from -999999999999 to 999999999999
+      description: Optional. Contains the potential, expected, and emerging amounts (all optional)
+    Behaviours:
+      title: Behaviours
+      type: object
+      properties:
+        potentialBehaviour:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,100}$
+          type: string
+          description: Optional.
+        emergingBehaviour:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,100}$
+          type: string
+          description: Optional.
+      description: Optional. Contains the potential and emerging behaviours (both optional)
+    Case:
+      title: Case
+      required:
+        - caseType
+        - campaignId
+        - suggestedOfficerGrade
+        - projectId
+        - interventionSubType
+        - sourceSystemRef
+      type: object
+      properties:
+        caseType:
+          enum:
+            - Risk
+          type: string
+          description: Mandatory. Has to be 'Risk' for a Risk case
+        campaignId:
+          pattern: ^CID-[0-9]{1,15}$
+          type: string
+          description: The campaign id relating to this case
+        complianceStream:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{2,30}$
+          type: string
+          description: Optional.
+        interactionTitle:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,100}$
+          type: string
+          description: Optional.
+        authorisationType:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,30}$
+          type: string
+          description: Optional.
+        archiveApproach:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,100}$
+          type: string
+          description: Optional.
+        confidenceScore:
+          multipleOf: 0.1
+          maximum: 99.9
+          minimum: 0
+          type: number
+          description: Optional.
+        targetRIS:
+          pattern: ^[A-Za-z_]{2,50}$
+          type: string
+          description: Optional. The target RIS of the case
+        suggestedOfficerGrade:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,20}$
+          type: string
+          description: Optional.
+        risks:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Risk'
+          description: Optional. A collection of risks associated with the Risk case
+        lastDateForEnquiry:
+          pattern: ^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\-]02[\-]29|((19|20)[0-9]{2}[\-](0[469]|11)[\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\-](0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\-]02[\-](0[1-9]|1[0-9]|2[0-8])))$
+          type: string
+          description: A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.
+        projectId:
+          pattern: ^PID-[0-9]{1,15}$
+          type: string
+          description: The project id relating to this case
+        interventionSubType:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,100}$
+          type: string
+        sourceSystemRef:
+          allOf:
+            - $ref: '#/components/schemas/SourceSystemRef'
+            - description: Mandatory. An identify reference; 'CFSP' or 'CFSB' for a 'Risk'
+        vatOfficeCode:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,20}$
+          type: string
+          description: Optional.
+        enquiryType:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{2,30}$
+          type: string
+          description: Optional.
+      description: Risk Case
+    Case1:
+      title: Case1
+      required:
+        - caseType
+        - campaignId
+        - projectId
+        - taxRegime
+        - claimDate
+        - repaymentAmount
+        - taxPeriodStart
+        - taxPeriodEnd
+        - sourceSystemRef
+      type: object
+      properties:
+        secondLock:
+          pattern: ^([a-zA-Z0-9]{1,6})$
+          type: string
+          description: Optional. The Lock for each repayment line up to 6 in length
+        triggeredRiskRuleRef:
+          pattern: ^R[0-9]{1,10}$
+          type: string
+          description: Optional. A reference for the triggered risk rule on the source system
+        caseType:
+          enum:
+            - Repayment
+          type: string
+          description: Mandatory. Must be 'Repayment' for a repayment case
+        inYearPeriod:
+          pattern: ^(1[0-2]|[1-9])$
+          type: string
+          description: Optional. In Year Period, expected for VAT returns Only and upto 2 digits.
+        campaignId:
+          pattern: ^CID-[0-9]{1,15}$
+          type: string
+          description: The campaign id relating to this case
+        projectId:
+          pattern: ^PID-[0-9]{1,15}$
+          type: string
+          description: The project id relating to this case
+        firstLock:
+          pattern: ^([a-zA-Z0-9]{1,6})$
+          type: string
+          description: Optional. The Lock for each repayment line up to 6 in length
+        thirdLock:
+          pattern: ^([a-zA-Z0-9]{1,6})$
+          type: string
+          description: Optional. The Lock for each repayment line up to 6 in length
+        oudn:
+          pattern: ^[A-Za-z0-9\&\-\'\_\,]{8,100}$
+          type: string
+          description: Optional. OUDN of the owner
+        taxRegime:
+          pattern: ^[a-zA-Z_]{2,15}$
+          type: string
+          description: Mandatory. The tax regime of the Repayment case or of a risk for a Risk case
+        claimDate:
+          pattern: ^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\-]02[\-]29|((19|20)[0-9]{2}[\-](0[469]|11)[\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\-](0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\-]02[\-](0[1-9]|1[0-9]|2[0-8])))$
+          type: string
+          description: A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.
+        repaymentAmount:
+          multipleOf: 1
+          maximum: 999999999999
+          minimum: 0
+          type: number
+          description: A number representing a positive amount in pounds from 0 to 999999999999
+        taxPeriodStart:
+          pattern: ^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\-]02[\-]29|((19|20)[0-9]{2}[\-](0[469]|11)[\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\-](0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\-]02[\-](0[1-9]|1[0-9]|2[0-8])))$
+          type: string
+          description: A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.
+        taxPeriodEnd:
+          pattern: ^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\-]02[\-]29|((19|20)[0-9]{2}[\-](0[469]|11)[\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\-](0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\-]02[\-](0[1-9]|1[0-9]|2[0-8])))$
+          type: string
+          description: A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.
+        sourceSystemRef:
+          enum:
+            - CFSRP
+          type: string
+          description: Mandatory. An identify reference; 'CFSRP' for a 'Repayment'
+        caseOwnerId:
+          multipleOf: 1
+          maximum: 9999999
+          minimum: 1
+          type: number
+          description: Optional. The numeric id of the owner of the case.
+      description: Repayment Case
+    MiscComplianceCasesCaserequest:
+      title: MiscComplianceCasesCaserequest
+      required:
+        - sourceSystemURL
+        - case
+        - taxPayer
+        - sourceSystemId
+        - sourceSystemKey
+      type: object
+      properties:
+        sourceSystemURL:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Mandatory. Full URL of a record on the source system
+        case:
+          oneOf:
+            - $ref: '#/components/schemas/Case'
+            - $ref: '#/components/schemas/Case1'
+        taxPayer:
+          allOf:
+            - $ref: '#/components/schemas/TaxPayer'
+            - description: Mandatory. All the details of the tax payer.
+        sourceSystemId:
+          enum:
+            - CNT
+          type: string
+          description: Mandatory. To identify the source system. Currently only 'CNT' (Connect) supported
+        sourceSystemKey:
+          pattern: ^[A-Za-z0-9/\$\.\-]{1,50}$
+          type: string
+          description: Mandatory. Primary key of a record on the source system
+    NameDetails:
+      title: NameDetails
+      required:
+        - lastName
+        - firstName
+      type: object
+      properties:
+        lastName:
+          pattern: ^[a-zA-Z &`\-\'\.^]{1,70}$
+          type: string
+        firstName:
+          pattern: ^[a-zA-Z &`\-\'\.^]{1,70}$
+          type: string
+        title:
+          allOf:
+            - $ref: '#/components/schemas/Title'
+            - description: Optional. The person's title.
+    NameDetails1:
+      title: NameDetails1
+      required:
+        - organisationName
+      type: object
+      properties:
+        organisationName:
+          pattern: ^[ -~¡-ÿĀ-ʯḀ-ỿ‐-―‘-‟₠-₿ÅK]{1,255}$
+          type: string
+          description: Allow Unicode blocks Basic Latin (Space to Tilde), printable Latin-1 Supplement (¡ to ÿ), and all of Latin Extended-A and Latin Extended-B and IP Extensions (Ā to ʯ), all the Latin Extended Additional characters (Ḁ to ỿ), General Punctuation characters Hyphen to Horizontal Bar (‐ to ―), General Punctuation characters (‘ to ‟), Currency Symbol characters (₠ to ₿), Letterlike Symbols Å and K
+    ReferenceNumber:
+      title: ReferenceNumber
+      required:
+        - referenceValue
+        - referenceType
+      type: object
+      properties:
+        referenceValue:
+          pattern: ^[A-Z0-9\/]{1,25}$
+          type: string
+          description: Mandatory. The value of the reference.
+        referenceType:
+          pattern: ^[A-Za-z\/\-\. ]{1,100}$
+          type: string
+          description: Mandatory. The type of the reference.
+    Risk:
+      title: Risk
+      required:
+        - subRegime
+        - inaccuracyCategory
+        - inaccuracyDescription
+        - taxRegime
+        - riskStartDate
+        - firstComplianceCheck
+        - secondComplianceCheck
+        - riskScore
+      type: object
+      properties:
+        riskDescription:
+          pattern: ^[A-Za-z0-9 \.\/\&_-]{1,100}$
+          type: string
+          description: Optional. A free text description of the risk
+        subRegime:
+          pattern: ^[A-Za-z0-9_]{2,35}$
+          type: string
+          description: Mandatory. A sub categorisation of the main tax regime
+        inaccuracyCategory:
+          pattern: ^[A-Za-z0-9_]{3,100}$
+          type: string
+          description: Mandatory. Alphanumeric string with underscore separator
+        inaccuracyDescription:
+          pattern: ^[A-Za-z0-9_]{3,100}$
+          type: string
+          description: Mandatory. Alphanumeric string with underscore separator
+        taxPeriodStart:
+          pattern: ^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\-]02[\-]29|((19|20)[0-9]{2}[\-](0[469]|11)[\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\-](0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\-]02[\-](0[1-9]|1[0-9]|2[0-8])))$
+          type: string
+          description: A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.
+        taxRegime:
+          pattern: ^[a-zA-Z_]{2,15}$
+          type: string
+          description: Mandatory. The tax regime of the Repayment case or of a risk for a Risk case
+        amounts:
+          allOf:
+            - $ref: '#/components/schemas/Amounts'
+            - description: Optional. Contains the potential, expected, and emerging amounts (all optional)
+        riskStartDate:
+          pattern: ^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\-]02[\-]29|((19|20)[0-9]{2}[\-](0[469]|11)[\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\-](0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\-]02[\-](0[1-9]|1[0-9]|2[0-8])))$
+          type: string
+          description: A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.
+        firstComplianceCheck:
+          pattern: ^[A-Za-z0-9_]{3,100}$
+          type: string
+          description: Mandatory. Alphanumeric string with underscore separator
+        secondComplianceCheck:
+          pattern: ^[A-Za-z0-9_]{3,100}$
+          type: string
+          description: Mandatory. Alphanumeric string with underscore separator
+        taxPeriodEnd:
+          pattern: ^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[\-]02[\-]29|((19|20)[0-9]{2}[\-](0[469]|11)[\-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[\-](0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[\-]02[\-](0[1-9]|1[0-9]|2[0-8])))$
+          type: string
+          description: A date in the format CCYY-MM-DD. Earliest 1900-01-01, latest 2099-12-31, leap years accommodated.
+        riskScore:
+          multipleOf: 0.1
+          maximum: 99.9
+          minimum: 0
+          type: number
+          description: Mandatory. The risk's score between 0.0 and 99.9
+        behaviours:
+          allOf:
+            - $ref: '#/components/schemas/Behaviours'
+            - description: Optional. Contains the potential and emerging behaviours (both optional)
+      description: All the details of an identified risk
+    SourceSystemRef:
+      title: SourceSystemRef
+      enum:
+        - CFSP
+        - CFSB
+      type: string
+      description: Mandatory. An identify reference; 'CFSP' or 'CFSB' for a 'Risk'
+    TaxPayer:
+      title: TaxPayer
+      required:
+        - taxPayerType
+        - referenceNumbers
+        - addresses
+      type: object
+      properties:
+        taxPayerType:
+          pattern: ^[A-Za-z0-9\/\-\. ]{1,40}$
+          type: string
+          description: Mandatory. A categorisation of the tax payer e.g. Individual, Partnership, Organisation
+        referenceNumbers:
+          maxItems: 50
+          minItems: 1
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ReferenceNumber'
+          description: Mandatory. An array of key/value pairs representing a reference for the customer.
+        segment:
+          pattern: ^[A-Za-z0-9\/\- ]{1,60}$
+          type: string
+          description: >-
+            Optional. The segment of the tax payer e.g. Micro A; needed
+                for an organisation type tax payer
+        nameDetails:
+          oneOf:
+            - $ref: '#/components/schemas/NameDetails'
+            - $ref: '#/components/schemas/NameDetails1'
+          description: Optional. The name of the individual or organisation tax payer
+        addresses:
+          maxItems: 50
+          minItems: 1
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          description: Mandatory. A list of addresses of the tax payer
+      description: Mandatory. All the details of the tax payer.
+    Title:
+      title: Title
+      enum:
+        - Mr
+        - Mrs.
+        - Miss.
+        - Ms
+        - Dr
+        - Other
+      type: string
+      description: Optional. The person's title.
+tags:
+  - name: misc
+    description: ''

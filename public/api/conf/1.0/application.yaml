@@ -1,7 +1,73 @@
 openapi: 3.0.0
 info:
   title: Compliance Cases
-  description: "This API will support the information transfer of case data between two systems: SAS to Caseflow.\n\n## Project Summary\n\nThe Protect Connect Project aims to reduce the load and dependency on the current Connect Platform which is inflexible in meeting changing business requirements due to its bespoke design. Also, because of growth of data volumes and restrictions on expanding the current platform, system performance has degraded over time and is directly impacting HMRC's ability to identify non-compliance and respond effectively to business demands due to latency and capacity issues. Therefore the Protect Connect Project will migrate the TRUCE service and parts of Connect to a new service provider.\n\n\nThe chosen provider is SAS Software Inc and the service will be provided as a PaaS hosted on AWS. The SAS solution includes SAS Visual Investigator which will be used by operators to manage risk alerts raised as the result of risk rules. Risk alerts which are deemed to require further, more complex investigation &/or contact with the customer will be transferred to Caseflow.\n\nIn addition to the endpoint description below you can download the full JSON schemas and examples for request and response payloads.\n\n<p class=\"govuk-body-l\" style=\"font-size: 24px;\">\n  <a href=\"/api-documentation/docs/api/download/compliance-cases-api/1.0/JSON_Examples.zip\" class=\"govuk-link\">JSON schemas and examples</a>\n</p>\n\n<p class=\"govuk-body-s\" style=\"font-size: 16px;margin-bottom: 15px;\">ZIP, 13KB</p>\n\n<p class=\"govuk-body-s\" style=\"font-size: 16px;margin-bottom: 15px;\">The ZIP file contains JSON files. Open in your preferred file viewer.</p>\nWhen an API changes in a way that is backwards-incompatible, we increase the version number of the API. \nSee our [reference guide](/api-documentation/docs/reference-guide#versioning) for more on\nversioning.\nWe use standard HTTP status codes to show whether an API request succeeded or not. They are usually in the range:\n\n- 200 to 299 if it succeeded, including code 202 if it was accepted by an API that needs to wait for further action\n- 400 to 499 if it failed because of a client error by your application\n- 500 to 599 if it failed because of an error on our server\n\nErrors specific to each API are shown in the Endpoints section, under Response. See our [reference guide](https://developer.service.hmrc.gov.uk/api-documentation/docs/reference-guide#errors) for more on errors.\n\nResponses with HTTP 422 (Unprocessable Entity) status code contain errors relating to particular fields in the request:  \n\nExample error response: Repayment\n<pre>\n{\n  \"code\": \"UNPROCESSABLE_ENTITY\",\n  \"message\": \"Unprocessable Entity\",\n  \"caseType\": \"Repayment\",\n  \"errors\": [\n    {\n      \"code\": \"001\",\n      \"message\": \"Repayment amount must greater than 0\",\n      \"path\": \"case/repaymentAmount\"\n    }\n  ]\n}</pre>\n\nExample error response: Risk\n<pre>\n{\n  \"code\": \"UNPROCESSABLE_ENTITY\",\n  \"message\": \"Unprocessable Entity\",\n  \"caseType\": \"Risk\",\n  \"errors\": [\n    {\n      \"code\": \"001\",\n      \"message\": \"...\",\n      \"path\": \"case/campaignId\"\n    }\n  ]\n}\n</pre>\n\nThe full list of <code>errors.code</code> and <code>errors.message</code> is provided in the Endpoints section.\nYou can use the sandbox environment to [test this API](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing).\n\n[Access a set of mock campaignId to test 422 error codes for caseType Risk](https://github.com/hmrc/compliance-cases-api/tree/master/public/api/conf/1.0/test-data) to use when testing in the sandbox environment.\n\n[Access a set of mock projectId to test 422 error codes for caseType Repayment](https://github.com/hmrc/compliance-cases-api/tree/master/public/api/conf/1.0/test-data) to use when testing in the sandbox environment.\n\nN.b. the last 3 digits of the test-data campaignId and projectId will match the returned error code e.g. CID-00000105 will return code 105. \n\nAny 422 codes not listed can be tested using real data i.e. Repayment codes 001, 003, 004, 010 & Risk codes 009, 107, 108, 109, 112, 113, 114 will be returned if incorrect dates and amounts are supplied in the Json payload."
+  description: |
+    This API will support the information transfer of case data between two systems: SAS to Caseflow.
+
+    ## Project Summary
+    The Protect Connect Project aims to reduce the load and dependency on the current Connect Platform which is inflexible in meeting changing business requirements due to its bespoke design. Also, because of growth of data volumes and restrictions on expanding the current platform, system performance has degraded over time and is directly impacting HMRC's ability to identify non-compliance and respond effectively to business demands due to latency and capacity issues. Therefore the Protect Connect Project will migrate the TRUCE service and parts of Connect to a new service provider.
+
+    The chosen provider is SAS Software Inc and the service will be provided as a PaaS hosted on AWS. The SAS solution includes SAS Visual Investigator which will be used by operators to manage risk alerts raised as the result of risk rules. Risk alerts which are deemed to require further, more complex investigation &/or contact with the customer will be transferred to Caseflow.
+    In addition to the endpoint description below you can download the full JSON schemas and examples for request and response payloads.
+    <p class=\"govuk-body-l\" style=\"font-size: 24px;\">
+    <a href=\"/api-documentation/docs/api/download/compliance-cases-api/1.0/JSON_Examples.zip\" class=\"govuk-link\">JSON schemas and examples</a>
+    </p>
+    <p class=\"govuk-body-s\" style=\"font-size: 16px;margin-bottom: 15px;\">ZIP, 13KB</p>
+
+    <p class=\"govuk-body-s\" style=\"font-size: 16px;margin-bottom: 15px;\">The ZIP file contains JSON files. Open in your preferred file viewer.</p>
+    When an API changes in a way that is backwards-incompatible, we increase the version number of the API.
+    See our [reference guide](/api-documentation/docs/reference-guide#versioning) for more on\nversioning.
+    We use standard HTTP status codes to show whether an API request succeeded or not. They are usually in the range:
+
+    - 200 to 299 if it succeeded, including code 202 if it was accepted by an API that needs to wait for further action
+    - 400 to 499 if it failed because of a client error by your application
+    - 500 to 599 if it failed because of an error on our server
+
+    Errors specific to each API are shown in the Endpoints section, under Response. See our [reference guide](https://developer.service.hmrc.gov.uk/api-documentation/docs/reference-guide#errors) for more on errors.
+
+    Responses with HTTP 422 (Unprocessable Entity) status code contain errors relating to particular fields in the request:
+
+    Example error response: Repayment
+    <pre>
+    {
+      "code": "UNPROCESSABLE_ENTITY",
+      "message": "Unprocessable Entity",
+      "caseType": "Repayment",
+      "errors": [
+        {
+          "code": "001",
+          "message": "Repayment amount must greater than 0",
+          "path": "case/repaymentAmount"
+        }
+      ]
+    }</pre>
+
+    Example error response: Risk
+    <pre>
+    {
+      "code": "UNPROCESSABLE_ENTITY",
+      "message": "Unprocessable Entity",
+      "caseType": "Risk",
+      "errors": [
+        {
+         "code": "001",
+          "message": "...",
+          "path": "case/campaignId"
+        }
+      ]
+    }
+    </pre>
+
+    The full list of <code>errors.code</code> and <code>errors.message</code> is provided in the Endpoints section.
+    You can use the sandbox environment to [test this API](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing).
+
+    [Access a set of mock campaignId to test 422 error codes for caseType Risk](https://github.com/hmrc/compliance-cases-api/tree/master/public/api/conf/1.0/test-data) to use when testing in the sandbox environment.
+
+    [Access a set of mock projectId to test 422 error codes for caseType Repayment](https://github.com/hmrc/compliance-cases-api/tree/master/public/api/conf/1.0/test-data) to use when testing in the sandbox environment.
+
+    N.b. the last 3 digits of the test-data campaignId and projectId will match the returned error code e.g. CID-00000105 will return code 105.
+
+    Any 422 codes not listed can be tested using real data i.e. Repayment codes 001, 003, 004, 010 & Risk codes 009, 107, 108, 109, 112, 113, 114 will be returned if incorrect dates and amounts are supplied in the Json payload."
   contact: {}
   version: '1.0'
 servers:

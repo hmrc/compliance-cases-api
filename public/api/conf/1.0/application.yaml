@@ -16,12 +16,12 @@ info:
 
     <p class=\"govuk-body-s\" style=\"font-size: 16px;margin-bottom: 15px;\">The ZIP file contains JSON files. Open in your preferred file viewer.</p>
 
-    #Versioning
+    # Versioning
 
     When an API changes in a way that is backwards-incompatible, we increase the version number of the API.
     See our [reference guide](/api-documentation/docs/reference-guide#versioning) for more on\nversioning.
 
-    #Errors
+    # Errors
 
     We use standard HTTP status codes to show whether an API request succeeded or not. They are usually in the range:
 
@@ -66,7 +66,7 @@ info:
 
     The full list of <code>errors.code</code> and <code>errors.message</code> is provided in the Endpoints section.
 
-    #Testing
+    # Testing
 
     You can use the sandbox environment to [test this API](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing).
 

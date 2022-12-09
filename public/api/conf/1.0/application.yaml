@@ -475,6 +475,7 @@ paths:
       security:
         - userRestricted:
             - write:protect-connect
+        - applicationRestricted: []
 components:
   schemas:
     errorResponse:

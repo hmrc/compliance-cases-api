@@ -6,7 +6,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "compliance-cases-api"
 
-scalaVersion := "2.12.11"
+scalaVersion := "2.13.10"
 majorVersion := 0
 PlayKeys.playDefaultPort := 7052
 
@@ -14,16 +14,10 @@ lazy val microservice = Project(appName, file("."))
   .disablePlugins(JUnitXmlReportPlugin)
   .configs(IntegrationTest)
 
-// ***************
-// Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
-val silencerVersion = "1.7.0"
-libraryDependencies ++= Seq(
-  compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-  "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-)
-// ***************
+
 scalacOptions ++= Seq(
-  "-P:silencer:pathFilters=views;routes"
+  "-Wconf:cat=unused-imports&src=html/.*:s",
+  "-Wconf:src=routes/.*:s"
 )
 
 val bootstrapVersion = "7.8.0"

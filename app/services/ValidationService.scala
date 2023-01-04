@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import play.api.Logger
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._
+import scala.collection.Seq
 
 class ValidationService @Inject()(resources: ResourceService) {
 
@@ -57,10 +58,10 @@ class ValidationService @Inject()(resources: ResourceService) {
         } else {
           caseTypeName
             .map(caseType =>
-              BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors, caseType = caseType)
+              BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors.toSeq, caseType = caseType)
             )
             // TODO make caseType optional
-            .orElse(Some(BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors)))
+            .orElse(Some(BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors.toSeq)))
             .map(Json.toJson(_))
         }
       case _ => Some(

@@ -20,7 +20,7 @@ scalacOptions ++= Seq(
   "-Wconf:src=routes/.*:s"
 )
 
-val bootstrapVersion = "7.8.0"
+val bootstrapVersion = "7.9.0"
 
 libraryDependencies  ++= Seq(
   "uk.gov.hmrc"                 %% "bootstrap-backend-play-28"% bootstrapVersion,
@@ -30,7 +30,7 @@ libraryDependencies  ++= Seq(
   "org.pegdown"                 %  "pegdown"                  % "1.6.0"                 % "test, it",
   "org.scalatestplus.play"      %% "scalatestplus-play"       % "5.1.0"                 % "test, it",
   "org.scalamock"               %% "scalamock"                % "5.2.0"                 % "test",
-  "com.github.tomakehurst"      % "wiremock-standalone"       % "2.27.2"                % "test, it",
+  "com.github.tomakehurst"      % "wiremock-standalone"       % "3.0.0-beta-2"                % "test, it",
   "com.vladsch.flexmark"        % "flexmark-all"              % "0.35.10"                % "test, it"
 )
 

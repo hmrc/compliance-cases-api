@@ -20,9 +20,12 @@ import helpers.{Fixtures, WireMockSpec}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
+import akka.util.Timeout
+
+import scala.concurrent.duration.Duration
 
 class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
-
+  implicit val timeout:Timeout = Timeout.durationToTimeout(Duration.create(30,"s"))
   "POST /case" should {
     s"return an $OK if $OK received from IF for repayments" in {
       stubPostWithoutResponseBody("/organisations/case", OK, correlationId)

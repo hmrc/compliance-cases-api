@@ -17,6 +17,7 @@
 package models.responses
 
 import play.api.libs.json.{Json, Writes}
+import scala.collection.Seq
 
 case class BadRequestErrorResponse(code: String, message: String, caseType: Option[String], errors: Seq[FieldError])
 

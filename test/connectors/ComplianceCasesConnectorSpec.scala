@@ -21,6 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.http.Fault
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -35,6 +36,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ComplianceCasesConnectorSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite
   with WireMockHelper with ScalaFutures with IntegrationPatience {
 
+  implicit val defaultPatience = PatienceConfig(timeout =  Span(30, Seconds), interval = Span(5, Millis))
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .configure("integration-framework.base-url" -> s"http://localhost:${server.port}", "auditing.enabled" -> false)

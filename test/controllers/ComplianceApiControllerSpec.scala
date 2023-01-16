@@ -48,7 +48,7 @@ class ComplianceApiControllerSpec extends AnyWordSpecLike with Matchers with Moc
       }
     }
 
-    (mockAuthApplicationAction.andThen[Request](_:  ValidateCorrelationIdHeaderAction)) expects * once() returns StubbedCorrelationIdAction
+    (mockAuthApplicationAction.andThen[Request](_:  ValidateCorrelationIdHeaderAction)).expects(*).once().returns(StubbedCorrelationIdAction)
 
     implicit val executionContext: ExecutionContext = stubControllerComponents().executionContext
 

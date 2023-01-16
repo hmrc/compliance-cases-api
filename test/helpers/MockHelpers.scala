@@ -16,7 +16,6 @@
 
 package helpers
 
-import scala.language.higherKinds
 import connectors.ComplianceCasesConnector
 import controllers.actions.{AuthenticateApplicationAction, RequestWithCorrelationId}
 import org.scalamock.handlers.CallHandler

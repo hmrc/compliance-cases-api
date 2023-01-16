@@ -6,7 +6,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "compliance-cases-api"
 
-scalaVersion := "2.12.11"
+scalaVersion := "2.13.10"
 majorVersion := 0
 PlayKeys.playDefaultPort := 7052
 
@@ -14,19 +14,13 @@ lazy val microservice = Project(appName, file("."))
   .disablePlugins(JUnitXmlReportPlugin)
   .configs(IntegrationTest)
 
-// ***************
-// Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
-val silencerVersion = "1.7.0"
-libraryDependencies ++= Seq(
-  compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-  "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-)
-// ***************
+
 scalacOptions ++= Seq(
-  "-P:silencer:pathFilters=views;routes"
+  "-Wconf:cat=unused-imports&src=html/.*:s",
+  "-Wconf:src=routes/.*:s"
 )
 
-val bootstrapVersion = "7.8.0"
+val bootstrapVersion = "7.9.0"
 
 libraryDependencies  ++= Seq(
   "uk.gov.hmrc"                 %% "bootstrap-backend-play-28"% bootstrapVersion,
@@ -36,7 +30,7 @@ libraryDependencies  ++= Seq(
   "org.pegdown"                 %  "pegdown"                  % "1.6.0"                 % "test, it",
   "org.scalatestplus.play"      %% "scalatestplus-play"       % "5.1.0"                 % "test, it",
   "org.scalamock"               %% "scalamock"                % "5.2.0"                 % "test",
-  "com.github.tomakehurst"      % "wiremock-standalone"       % "2.27.2"                % "test, it",
+  "com.github.tomakehurst"      % "wiremock-standalone"       % "3.0.0-beta-2"                % "test, it",
   "com.vladsch.flexmark"        % "flexmark-all"              % "0.35.10"                % "test, it"
 )
 

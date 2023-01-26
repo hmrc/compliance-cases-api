@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: Compliance Cases
   description: |
@@ -932,7 +932,8 @@ components:
       flows:
         clientCredentials:
           tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
-          scopes: { }
+          scopes:
+            write:protect-connect: protect-connect
 tags:
   - name: misc
     description: ''

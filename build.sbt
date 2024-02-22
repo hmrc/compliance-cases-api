@@ -23,24 +23,23 @@ scalacOptions ++= Seq(
 val bootstrapVersion = "8.4.0"
 val playVersion = "play-30"
 
-libraryDependencies  ++= Seq(
+val compileDependencies = Seq(
   "uk.gov.hmrc"                 %% s"bootstrap-backend-$playVersion"    % bootstrapVersion,
   "com.github.java-json-tools"  % "json-schema-validator"               % "2.2.14",
-  "org.scalatest"               %% "scalatest"                          % "3.2.17"                 % "test,it",
-  "uk.gov.hmrc"                 %% s"bootstrap-test-$playVersion"       % bootstrapVersion        % Test,
-  "org.pegdown"                 %  "pegdown"                            % "1.6.0"                 % "test, it",
-  "org.scalatestplus.play"      %% "scalatestplus-play"                 % "7.0.1"                 % "test, it",
-  "org.scalamock"               %% "scalamock"                          % "5.2.0"                 % "test",
-  "org.wiremock"                % "wiremock-standalone"                 % "3.4.1"                 % "test, it",
-  "com.vladsch.flexmark"        % "flexmark-all"                        % "0.64.8"               % "test, it"
 )
+
+val testDependencies = Seq(
+  "uk.gov.hmrc"                 %% s"bootstrap-test-$playVersion"       % bootstrapVersion,
+  "org.scalamock"               %% "scalamock"                          % "5.2.0"
+).map(_ % "test, it")
+
+libraryDependencies  ++= compileDependencies ++ testDependencies
 
 ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*Routes.*;.*GuiceInjector;"
 ScoverageKeys.coverageMinimumStmtTotal := 100
 ScoverageKeys.coverageFailOnMinimum := true
 ScoverageKeys.coverageHighlighting := true
 
-publishingSettings
 integrationTestSettings()
 resolvers += Resolver.jcenterRepo
 

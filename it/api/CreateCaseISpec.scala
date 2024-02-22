@@ -20,7 +20,7 @@ import helpers.{Fixtures, WireMockSpec}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 
 import scala.concurrent.duration.Duration
 

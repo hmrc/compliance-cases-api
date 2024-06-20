@@ -20,7 +20,7 @@ scalacOptions ++= Seq(
   "-Wconf:src=routes/.*:s"
 )
 
-val bootstrapVersion = "8.4.0"
+val bootstrapVersion = "8.6.0"
 val playVersion = "play-30"
 
 val compileDependencies = Seq(

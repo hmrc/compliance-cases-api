@@ -27,7 +27,7 @@ import models.responses._
 import play.api.Logger
 import play.api.libs.json._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.Seq
 
 class ValidationService @Inject()(resources: ResourceService) {

@@ -36,7 +36,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ComplianceCasesConnectorSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite
   with WireMockHelper with ScalaFutures with IntegrationPatience {
 
-  implicit val defaultPatience = PatienceConfig(timeout =  Span(30, Seconds), interval = Span(5, Millis))
+  implicit val defaultPatience: PatienceConfig = PatienceConfig(timeout = Span(30, Seconds), interval = Span(5, Millis))
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .configure("integration-framework.base-url" -> s"http://localhost:${server.port}", "auditing.enabled" -> false)

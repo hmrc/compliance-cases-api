@@ -1,8 +1,6 @@
-import play.core.PlayVersion
 import play.sbt.PlayScala
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "compliance-cases-api"
 
@@ -25,7 +23,7 @@ ScoverageKeys.coverageHighlighting := true
 integrationTestSettings()
 resolvers += Resolver.jcenterRepo
 
-enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+enablePlugins(PlayScala, SbtDistributablesPlugin)
 disablePlugins(JUnitXmlReportPlugin)
 
 lazy val microservice = Project(appName, file("."))

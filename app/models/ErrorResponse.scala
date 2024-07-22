@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class Error(
   code: String,
@@ -25,7 +25,7 @@ case class Error(
 )
 
 case object Error {
-  implicit val format = Json.format[Error]
+  implicit val format: OFormat[Error] = Json.format[Error]
 }
 
 case class ErrorResponse(
@@ -34,5 +34,5 @@ case class ErrorResponse(
 )
 
 case object ErrorResponse {
-  implicit val format = Json.format[ErrorResponse]
+  implicit val format: OFormat[ErrorResponse] = Json.format[ErrorResponse]
 }

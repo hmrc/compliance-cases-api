@@ -44,16 +44,16 @@ case object ErrorInternalServerError extends DefaultErrorResponse {
 }
 
 object DefaultErrorResponse {
-    implicit val writes = new Writes[DefaultErrorResponse] {
-      def writes(e: DefaultErrorResponse): JsValue ={
-        e match {
-          case ErrorUnauthorized => Json.obj("code" -> e.errorCode, "message" -> e.message)
-          case ErrorGenericBadRequest(msg) => Json.obj("code" -> e.errorCode, "message" -> msg)
-          case ErrorInternalServerError => Json.obj("code" -> e.errorCode, "message" -> e.message)
-        }
-
+  implicit val writes: Writes[DefaultErrorResponse] = new Writes[DefaultErrorResponse] {
+    def writes(e: DefaultErrorResponse): JsValue = {
+      e match {
+        case ErrorUnauthorized => Json.obj("code" -> e.errorCode, "message" -> e.message)
+        case ErrorGenericBadRequest(msg) => Json.obj("code" -> e.errorCode, "message" -> msg)
+        case ErrorInternalServerError => Json.obj("code" -> e.errorCode, "message" -> e.message)
       }
+
     }
+  }
   }
 
 

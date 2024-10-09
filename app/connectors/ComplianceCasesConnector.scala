@@ -21,10 +21,12 @@ import connectors.httpParsers.ComplianceCaseConnectorParser
 import javax.inject.{Inject, Singleton}
 import models.LogMessageHelper
 import play.api.http.{ContentTypes, HeaderNames}
+import play.api.libs.json.JsValue.jsValueToJsLookup
 import play.api.libs.json.JsValue
 import play.api.{Configuration, Logger}
+import play.libs.Scala.None
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,35 +44,36 @@ class ComplianceCasesConnector @Inject()(
   lazy val ifBaseUrl: String = config.get[String]("integration-framework.base-url")
   lazy val createCaseUri: String = config.get[String]("integration-framework.endpoints.create-case")
 
-  def createCase(request: JsValue, correlationId: String)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[IFResponse] = {
+  private def headers(correlationId: String) = Seq(
+    HeaderNames.CONTENT_TYPE -> ContentTypes.JSON,
+    "CorrelationId" -> correlationId,
+    "Environment" -> iFEnvironment,
+    "Authorization" -> s"Bearer $bearerToken"
+  )
 
-    def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
+    def createCase(request: JsValue, correlationId: String)
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[HttpResponse]] = {
 
-    // TODO - replace JsValue with CaseFlowCreateRequest case class
-    val caseType = (request \ "case" \ "caseType").as[String]
+      def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
-    val url = s"$ifBaseUrl$createCaseUri"
-    val headers = Seq(
-      HeaderNames.CONTENT_TYPE -> ContentTypes.JSON,
-      "CorrelationId" -> correlationId,
-      "Environment" -> iFEnvironment,
-      "Authorization" -> s"Bearer $bearerToken",
-      "CaseType" -> caseType
-    )
+      // TODO - replace JsValue with CaseFlowCreateRequest case class
+      val caseType = (request \ "case" \ "caseType").as[String]
 
-    httpClient.post(url"$url")
-      .withBody(request)
-      .setHeader(headers: _*)
-      .execute[IFResponse]
-      .recover {
-        case e: Exception =>
-          logger.error(
-            logMessage(
-              s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
-            ), e
-          )
-          None
-      }
+      val url = s"$ifBaseUrl$createCaseUri"
+
+      httpClient.post(url"$url")
+        .setHeader(headers(correlationId):_*)
+        .withBody[JsValue](request)
+        .execute[HttpResponse]
+        .flatMap(httpReads(correlationId, caseType, url))
+        .recover {
+          case e: Exception =>
+            logger.error(
+              logMessage(
+                s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
+              ), e
+            )
+            None
+        }
+    }
   }
-}

@@ -21,22 +21,23 @@ import play.api.Configuration
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json._
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
+import scala.concurrent.Future
 
 trait ComplianceCaseConnectorParser {
 
   val className: String
-  type IFResponse = Option[HttpResponse]
+  type IFResponse = Future[Option[HttpResponse]]
 
   val config: Configuration
   lazy val errorResponseMap: Map[String, String] = config.get[Map[String, String]]("errorMessages")
 
   val logger: Logger = Logger(getClass)
 
-  def httpReads(correlationId: String, caseType: String): HttpReads[IFResponse] = (_, url, response) => {
+  def httpReads(correlationId: String, caseType: String, url: String)(response: HttpResponse): IFResponse = {
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
-    response.status match {
+    Future.successful(response.status match {
       case NOT_FOUND =>
         logger.warn(
           logMessage(s"received a not found status when calling $url ( IF_CREATE_CASE_ENDPOINT_NOT_FOUND_RESPONSE )")
@@ -60,7 +61,7 @@ trait ComplianceCaseConnectorParser {
       case _ =>
         logger.info(logMessage(s"received an OK when calling $url"))
         Some(response)
-    }
+    })
   }
 
   def httpErrorResponse(response: HttpResponse, caseType: String): HttpResponse = {

@@ -20,13 +20,14 @@ import connectors.httpParsers.ComplianceCaseConnectorParser
 
 import javax.inject.{Inject, Singleton}
 import models.LogMessageHelper
+import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.http.{ContentTypes, HeaderNames}
 import play.api.libs.json.JsValue.jsValueToJsLookup
 import play.api.libs.json.JsValue
 import play.api.{Configuration, Logger}
 import play.libs.Scala.None
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,29 +52,32 @@ class ComplianceCasesConnector @Inject()(
     "Authorization" -> s"Bearer $bearerToken"
   )
 
-    def createCase(request: JsValue, correlationId: String)
-                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[HttpResponse]] = {
+  def createCase(request: JsValue, correlationId: String)
+                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[HttpResponse]] = {
 
-      def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
+    def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
 
-      // TODO - replace JsValue with CaseFlowCreateRequest case class
-      val caseType = (request \ "case" \ "caseType").as[String]
+    // TODO - replace JsValue with CaseFlowCreateRequest case class
+    val caseType = (request \ "case" \ "caseType").as[String]
 
-      val url = s"$ifBaseUrl$createCaseUri"
+    val url = s"$ifBaseUrl$createCaseUri"
 
-      httpClient.post(url"$url")
-        .setHeader(headers(correlationId):_*)
-        .withBody[JsValue](request)
-        .execute[HttpResponse]
-        .flatMap(httpReads(correlationId, caseType, url))
-        .recover {
-          case e: Exception =>
-            logger.error(
-              logMessage(
-                s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
-              ), e
-            )
-            None
-        }
-    }
+    httpClient.post(url"$url")
+      .setHeader(headers(correlationId): _*)
+      .withBody[JsValue](request)
+      .execute[HttpResponse]
+      .flatMap(httpReads(correlationId, caseType, url))
+      .recover {
+        case e: UpstreamErrorResponse if e.statusCode == UNPROCESSABLE_ENTITY =>
+          logger.warn(logMessage(s"422 Unprocessable Entity: ${e.message}"))
+          Some(HttpResponse(UNPROCESSABLE_ENTITY, e.message))
+        case e: Exception =>
+          logger.error(
+            logMessage(
+              s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
+            ), e
+          )
+          None
+      }
   }
+}

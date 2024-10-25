@@ -38,13 +38,6 @@ class DefinitionControllerISpec extends PlaySpec with GuiceOneServerPerSuite wit
       response.body[JsValue] mustBe Json.parse(
         s"""
            |{
-           |  "scopes": [
-           |    {
-           |      "key": "write:protect-connect",
-           |      "name": "Protect Connect",
-           |      "description": "Scope for accessing protect connect APIs"
-           |    }
-           |  ],
            |  "api": {
            |    "name": "Compliance Cases",
            |    "description": "Api to manage compliance cases in CaseFlow",

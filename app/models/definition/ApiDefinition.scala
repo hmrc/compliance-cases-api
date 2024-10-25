@@ -16,17 +16,9 @@
 
 package models.definition
 
-import play.api.libs.json.{JsArray, JsValue, Json, Writes}
+import play.api.libs.json.{JsValue, Json, Writes}
 
 case class ApiDefinition(endpointsEnabled: Boolean, status: String){
-  val scopes: JsArray = Json.arr(
-    Json.obj(
-      "key" -> "write:protect-connect",
-      "name" -> "Protect Connect",
-      "description" -> "Scope for accessing protect connect APIs"
-    )
-  )
-
   val apiConfig: JsValue = Json.obj(
     "name" -> "Compliance Cases",
     "description" -> "Api to manage compliance cases in CaseFlow",
@@ -49,7 +41,6 @@ case class ApiDefinition(endpointsEnabled: Boolean, status: String){
 object ApiDefinition {
   implicit def definitionWrites: Writes[ApiDefinition] = (definition: ApiDefinition) => {
     Json.obj(
-      "scopes" -> definition.scopes,
       "api" -> definition.apiConfig
     )
   }

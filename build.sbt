@@ -12,11 +12,10 @@ scalacOptions ++= Seq(
   "-Wconf:cat=unused-imports&src=html/.*:s",
   "-Wconf:src=routes/.*:s"
 )
-
 libraryDependencies  ++= AppDependencies.all
 
 ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*Routes.*;.*GuiceInjector;"
-ScoverageKeys.coverageMinimumStmtTotal := 74
+ScoverageKeys.coverageMinimumStmtTotal := 87
 ScoverageKeys.coverageFailOnMinimum := true
 ScoverageKeys.coverageHighlighting := true
 

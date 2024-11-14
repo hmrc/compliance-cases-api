@@ -21,7 +21,7 @@ import play.api.Configuration
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json._
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
 
 trait ComplianceCaseConnectorParser {
 
@@ -33,9 +33,8 @@ trait ComplianceCaseConnectorParser {
 
   val logger: Logger = Logger(getClass)
 
-  def httpReads(correlationId: String, caseType: String): HttpReads[IFResponse] = (_, url, response) => {
+  def customHttpRead(correlationId: String, caseType: String): (String, HttpResponse) => IFResponse = (url, response) => {
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
-
     response.status match {
       case NOT_FOUND =>
         logger.warn(
@@ -82,7 +81,7 @@ trait ComplianceCaseConnectorParser {
   def error(code: String, caseType: String): Error = {
     Error(
       code,
-      errorResponseMap.get(s"$caseType:$code").fold(throw new RuntimeException("missing configuration message"))(identity)
+      errorResponseMap.get(s"$caseType-$code").fold(throw new RuntimeException("missing configuration message"))(identity)
     )
   }
 

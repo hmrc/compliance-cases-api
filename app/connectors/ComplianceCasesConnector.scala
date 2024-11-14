@@ -23,14 +23,15 @@ import models.LogMessageHelper
 import play.api.http.{ContentTypes, HeaderNames}
 import play.api.libs.json.JsValue
 import play.api.{Configuration, Logger}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ComplianceCasesConnector @Inject()(
-  httpClient: HttpClient,
-  val config: Configuration
+                                          httpClient: HttpClientV2,
+                                          val config: Configuration
 ) extends ComplianceCaseConnectorParser {
 
   override val className: String = this.getClass.getSimpleName
@@ -56,16 +57,22 @@ class ComplianceCasesConnector @Inject()(
     // TODO - replace JsValue with CaseFlowCreateRequest case class
     val caseType = (request \ "case" \ "caseType").as[String]
 
-    httpClient.POST[JsValue, IFResponse](s"$ifBaseUrl$createCaseUri", request, headers(correlationId))(
-      implicitly, httpReads(correlationId, caseType), hc.copy(authorization = None), ec
-    ).recover {
-      case e: Exception =>
-        logger.error(
-          logMessage(
-            s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
-          ), e
-        )
-        None
-    }
+    val url = s"$ifBaseUrl$createCaseUri"
+    val httpRead = customHttpRead(correlationId, caseType)
+
+    httpClient.post(url"$url")(hc.copy(authorization = None))
+      .withBody(request)
+      .setHeader(headers(correlationId): _*)
+      .execute[HttpResponse]
+      .map(httpRead(url, _))
+      .recover {
+        case e: Exception =>
+          logger.error(
+            logMessage(
+              s"Exception from when trying to talk to $ifBaseUrl$createCaseUri - ${e.getMessage} ( IF_CREATE_CASE_ENDPOINT_UNEXPECTED_EXCEPTION )"
+            ), e
+          )
+          None
+      }
   }
 }

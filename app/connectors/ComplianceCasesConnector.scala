@@ -64,7 +64,6 @@ class ComplianceCasesConnector @Inject()(
       .withBody(request)
       .setHeader(headers(correlationId): _*)
       .execute[HttpResponse]
-      .map(implicitly)
       .map(httpRead(url, _))
       .recover {
         case e: Exception =>

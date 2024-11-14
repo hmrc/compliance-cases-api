@@ -33,8 +33,7 @@ trait ComplianceCaseConnectorParser {
 
   val logger: Logger = Logger(getClass)
 
-  //      TODO: Split out calls
-  def customHttpRead(correlationId: String, caseType: String)(url: String, response: HttpResponse): IFResponse = {
+  def customHttpRead(correlationId: String, caseType: String): (String, HttpResponse) => IFResponse = (url, response) => {
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
     response.status match {
       case NOT_FOUND =>

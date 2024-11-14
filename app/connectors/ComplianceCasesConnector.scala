@@ -58,14 +58,14 @@ class ComplianceCasesConnector @Inject()(
     val caseType = (request \ "case" \ "caseType").as[String]
 
     val url = s"$ifBaseUrl$createCaseUri"
+    val httpRead = customHttpRead(correlationId, caseType)
 
     httpClient.post(url"$url")(hc.copy(authorization = None))
       .withBody(request)
       .setHeader(headers(correlationId): _*)
       .execute[HttpResponse]
       .map(implicitly)
-//      TODO: Split out calls
-      .map(customHttpRead(correlationId, caseType)(url, _))
+      .map(httpRead(url, _))
       .recover {
         case e: Exception =>
           logger.error(

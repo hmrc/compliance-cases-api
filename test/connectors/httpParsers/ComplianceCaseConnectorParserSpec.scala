@@ -17,34 +17,30 @@
 package connectors.httpParsers
 
 import helpers.{LoggerHelper, MockHelpers}
-import models.{Error, ErrorResponse}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.Configuration
-import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK, UNPROCESSABLE_ENTITY, INTERNAL_SERVER_ERROR}
-import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HttpResponse}
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK, UNPROCESSABLE_ENTITY}
+import play.api.libs.json.{JsArray, JsObject, JsString, JsValue, Json}
+import uk.gov.hmrc.http.HttpResponse
 
 class ComplianceCaseConnectorParserSpec extends AnyWordSpecLike with Matchers with MockHelpers with LoggerHelper {
 
-  val correlationId: String = "some-correlation-id"
-  val caseType = "caseType"
+  private val correlationId: String = "some-correlation-id"
+  private val caseType = "caseType"
+
+  private val url = "some_url"
+
+  private val errorMessage = "You messed up!!!"
 
   object connectorParser extends ComplianceCaseConnectorParser {
     override val className: String = "className"
-    override val config: Configuration = Configuration()
+    override val config: Configuration = Configuration(
+      "errorMessages" -> Map(s"$caseType-001" -> errorMessage)
+    )
   }
 
-  val httpRead = connectorParser.customHttpRead(correlationId, caseType)
-
-  val url = "some_url"
-
-  val headers = Seq(
-    "Content-Type" -> "JSON",
-    "CorrelationId" -> correlationId,
-    "Environment" -> "UnitTests",
-    "Authorization" -> "Bearer because i said so"
-  )
+  private val httpRead = connectorParser.customHttpRead(correlationId, caseType)
 
   "customDesRead" should {
     "return IFResponse None for HttpResponse NOT_FOUND" in {
@@ -59,14 +55,13 @@ class ComplianceCaseConnectorParserSpec extends AnyWordSpecLike with Matchers wi
       ifResponse shouldBe None
     }
 
-//    "return IFResponse Some(HttpErrorResponse) for HttpResponse UNPROCESSABLE_ENTITY" in {
-//    TODO: ADD CORRECT JSON HERE
-//      val failureJson = Json.toJson("{}")
-//      val unprocessableEntityResponse = HttpResponse(UNPROCESSABLE_ENTITY, failureJson, Map.empty)
-//      val ifResponse = httpRead(url, unprocessableEntityResponse)
-//
-//      ifResponse.get.status shouldBe UNPROCESSABLE_ENTITY
-//    }
+    "return IFResponse Some(HttpErrorResponse) for HttpResponse UNPROCESSABLE_ENTITY" in {
+      val failureJson = Json.toJson(JsObject(Seq("failures" -> JsArray(Seq(JsObject(Seq("code" -> JsString("001"))))))))
+      val unprocessableEntityResponse = HttpResponse(UNPROCESSABLE_ENTITY, failureJson, Map.empty)
+      val ifResponse = httpRead(url, unprocessableEntityResponse)
+      ifResponse.get.status shouldBe UNPROCESSABLE_ENTITY
+      ifResponse.get.body.isEmpty shouldBe false
+    }
 
     "return IFResponse None for HttpResponse != OK" in {
       val notFoundResponse = HttpResponse(INTERNAL_SERVER_ERROR, Json.toJson(""), Map.empty)

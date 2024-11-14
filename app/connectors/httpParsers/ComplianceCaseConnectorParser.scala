@@ -81,7 +81,7 @@ trait ComplianceCaseConnectorParser {
   def error(code: String, caseType: String): Error = {
     Error(
       code,
-      errorResponseMap.get(s"$caseType:$code").fold(throw new RuntimeException("missing configuration message"))(identity)
+      errorResponseMap.get(s"$caseType-$code").fold(throw new RuntimeException("missing configuration message"))(identity)
     )
   }
 

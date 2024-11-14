@@ -21,7 +21,7 @@ import play.api.Configuration
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json._
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
 
 trait ComplianceCaseConnectorParser {
 
@@ -33,9 +33,9 @@ trait ComplianceCaseConnectorParser {
 
   val logger: Logger = Logger(getClass)
 
-  def httpReads(correlationId: String, caseType: String): HttpReads[IFResponse] = (_, url, response) => {
+  //      TODO: Split out calls
+  def customHttpRead(correlationId: String, caseType: String)(url: String, response: HttpResponse): IFResponse = {
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
-
     response.status match {
       case NOT_FOUND =>
         logger.warn(

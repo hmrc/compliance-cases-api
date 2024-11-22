@@ -27,7 +27,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.ContentTypes
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -66,6 +66,33 @@ class ComplianceCasesConnectorSpec extends AnyWordSpecLike with Matchers with Gu
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) { response =>
         response.get.status shouldBe OK
         response.get.json shouldBe Json.parse(exampleJsonSuccessResponse)
+      }
+    }
+
+    "return a HttpErrorResponse if the call fails with a 422" in {
+      val errorCode = "001"
+      val failureJson = Json.toJson(JsObject(
+        Seq("failures" -> JsArray(
+          Seq(JsObject(Seq("code" -> JsString(errorCode), "reason" -> JsString("businessValidationError"))))
+        ))
+      ))
+      server.stubFor(post(urlEqualTo("/organisations/case"))
+        .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
+        .withHeader("CorrelationId", equalTo(correlationId))
+        .withHeader("Authorization", equalTo("Bearer some-token"))
+        .withHeader("Environment", equalTo("local"))
+        .willReturn(
+          aResponse()
+            .withStatus(UNPROCESSABLE_ENTITY)
+            .withBody(failureJson.toString())
+            .withHeader("contentType", "application/json")
+        )
+      )
+      whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) { response =>
+        val responseJson = response.get.json
+        response.get.status shouldBe UNPROCESSABLE_ENTITY
+        responseJson.asInstanceOf[JsObject].value("caseType").as[String]shouldBe "Repayment"
+        responseJson.asInstanceOf[JsObject].value("errors").head.get("code").as[String] shouldBe errorCode
       }
     }
 

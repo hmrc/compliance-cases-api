@@ -35,7 +35,6 @@ trait ComplianceCaseConnectorParser {
 
   def httpReads(correlationId: String, caseType: String): HttpReads[IFResponse] = (_, url, response) => {
     def logMessage(message: String): String = LogMessageHelper(className, "createCase", message, correlationId).toString
-
     response.status match {
       case NOT_FOUND =>
         logger.warn(
@@ -82,7 +81,7 @@ trait ComplianceCaseConnectorParser {
   def error(code: String, caseType: String): Error = {
     Error(
       code,
-      errorResponseMap.get(s"$caseType:$code").fold(throw new RuntimeException("missing configuration message"))(identity)
+      errorResponseMap.get(s"$caseType-$code").fold(throw new RuntimeException("missing configuration message"))(identity)
     )
   }
 

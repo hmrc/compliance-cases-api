@@ -39,6 +39,7 @@ trait MockHelpers extends MockFactory {
   lazy val mockAuthConnector: AuthConnector = mock[AuthConnector]
   lazy val mockConfig: Configuration = mock[Configuration]
   lazy val mockAuthApplicationAction: AuthenticateApplicationAction = mock[AuthenticateApplicationAction]
+  //lazy val mockAuthApplicationAction: AuthenticateApplicationAction = mock[AuthenticateApplicationAction].asInstanceOf[AuthenticateApplicationAction]
 
   object Given extends MockPredicate()
 

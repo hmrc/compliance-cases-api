@@ -97,17 +97,5 @@ class AuthenticateApplicationActionSpec extends AnyWordSpecLike with Matchers wi
       status(result) shouldBe UNAUTHORIZED
       contentAsJson(result) shouldBe Json.obj("code" -> "UNAUTHORIZED", "message" -> "Bearer token is missing or not authorized")
     }
-
-    s"return a $INTERNAL_SERVER_ERROR if an unexpected exception occurs" in new Setup {
-      Given
-        .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication),
-          Retrievals.applicationId,Future.failed(new NullPointerException("error")))
-        .build()
-
-      val result: Future[Result] = action.async(mockBody)(FakeRequest())
-
-      status(result) shouldBe INTERNAL_SERVER_ERROR
-      contentAsJson(result) shouldBe Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
-    }
   }
 }

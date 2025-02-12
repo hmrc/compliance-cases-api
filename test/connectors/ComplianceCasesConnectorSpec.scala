@@ -16,10 +16,9 @@
 
 package connectors
 
-import caseData.ComplianceCasesExamples.*
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import caseData.ComplianceCasesExamples._
+import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.http.Fault
-import models.{Error, ErrorResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -29,7 +28,7 @@ import play.api.Application
 import play.api.http.ContentTypes
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsArray, JsObject, JsString, Json}
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -175,33 +174,6 @@ class ComplianceCasesConnectorSpec extends AnyWordSpecLike with Matchers with Gu
 
       whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) {
         _.isEmpty shouldBe true
-      }
-    }
-
-    val err = new Error("", "", None)
-    val err1 = new Error("", "", None)
-
-    val errorsList = List(err, err1)
-    val errorModel: JsObject = Json.obj(
-      "code" -> "SERVER_ERROR",
-      "reason" -> "Service is unavailable",
-      "path" -> None
-    )
-
-    val errorResponseModel: JsObject = Json.obj(
-      "caseType" -> "error response",
-      "errors" -> errorsList
-    )
-
-    "The Error" should {
-      "parse to Json for Error" in {
-        val underTest = Error("SERVER_ERROR", "Service is unavailable", None)
-        underTest eq Some(errorModel)
-      }
-
-      "parse to Json for ErrorResponse" in {
-        val underTest = ErrorResponse("error response", errorsList)
-        underTest eq Some(errorResponseModel)
       }
     }
   }

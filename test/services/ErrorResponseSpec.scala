@@ -18,43 +18,40 @@ package services
 
 import models.ErrorResponse
 import models.Error
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers.mustBe
-import play.api.http.Status.SERVICE_UNAVAILABLE
-import play.api.libs.json.{JsObject, JsValue, Json}
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import org.scalatest.funsuite.AnyFunSuite
+import play.api.libs.json.{JsSuccess, JsError, Json}
 
-class ErrorResponseSpec extends AnyWordSpec
-  with FutureAwaits with DefaultAwaitTimeout
-  with Matchers {
+class ErrorResponseSpec extends AnyFunSuite {
 
-  val err = new Error("", "", None)
-  val err1 = new Error("", "", None)
-  
-  val errorsList = List(err, err1)
-  val errorModel: JsObject = Json.obj(
-    "code" -> "SERVER_ERROR",
-    "reason" -> "Service is unavailable",
-    "path" -> None
-  )
+  test("should serialize Error Class to correct JSON ") {
+    val error = Error("404", "Not Found", Some("/path"))
+    val json = Json.toJson(error)
 
-  val errorResponseModel: JsObject = Json.obj(
-    "caseType" -> "error response",
-    "errors" -> errorsList
-  )
-
-  "The Error" should {
-    "parse to Json for Error" in {
-      val underTest = Error("SERVER_ERROR", "Service is unavailable", None)
-      underTest eq Some(errorModel)
-    }
-
-    "parse to Json for ErrorResponse" in {
-      val underTest = ErrorResponse("error response", errorsList)
-      underTest eq Some(errorResponseModel)
-    }
+    val expectedJson = Json.parse("""{"code":"404","message":"Not Found","path":"/path"}""")
+    assert(json == expectedJson)
   }
+
+  test("should deserialize Error Class to correct JSON ") {
+    val json = Json.parse("""{"code":"404","message":"Not Found","path":"/path"}""")
+    val result = json.validate[Error]
+
+    assert(result == JsSuccess(Error("404", "Not Found", Some("/path"))))
+  }
+
+  test("should serialize ErrorResponse Class to correct JSON ") {
+    val errorResponse = ErrorResponse("Risk", List(Error("404", "Not Found", Some("/path"))))
+    val json = Json.toJson(errorResponse)
+
+    val expectedJson = Json.parse("""{"caseType":"Risk","errors":[{"code":"404","message":"Not Found","path":"/path"}]}""")
+    assert(json == expectedJson)
+  }
+
+  test("should deserialize ErrorResponse Class to correct JSON ") {
+    val json = Json.parse("""{"caseType":"Risk","errors":[{"code":"404","message":"Not Found","path":"/path"}]}""")
+
+    val result = json.validate[ErrorResponse]
+    assert(result == JsSuccess(ErrorResponse("Risk", List(Error("404", "Not Found", Some("/path"))))))
+  }
+
 }
 

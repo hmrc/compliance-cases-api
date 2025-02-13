@@ -17,7 +17,7 @@ scalacOptions ++= Seq(
 libraryDependencies  ++= AppDependencies.all
 
 ScoverageKeys.coverageExcludedPackages := Seq("<empty>","Reverse.*",".*Routes.*",".*GuiceInjector","$anon").mkString(",")
-ScoverageKeys.coverageMinimumStmtTotal := 90
+ScoverageKeys.coverageMinimumStmtTotal := 91
 ScoverageKeys.coverageFailOnMinimum := true
 ScoverageKeys.coverageHighlighting := true
 

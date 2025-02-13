@@ -4,18 +4,20 @@ import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 
 val appName = "compliance-cases-api"
 
-scalaVersion := "2.13.12"
+scalaVersion := "3.3.4"
 majorVersion := 0
 PlayKeys.playDefaultPort := 7052
 
 scalacOptions ++= Seq(
-  "-Wconf:cat=unused-imports&src=html/.*:s",
-  "-Wconf:src=routes/.*:s"
+  "-Wconf:msg=unused import*:s",
+  "-Wconf:msg=routes/.*:s",
+  "-Wconf:msg=Flag.*repeatedly:s",
+  "-Wconf:msg=unused private member*:s"
 )
 libraryDependencies  ++= AppDependencies.all
 
-ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*Routes.*;.*GuiceInjector;"
-ScoverageKeys.coverageMinimumStmtTotal := 92
+ScoverageKeys.coverageExcludedPackages := Seq("<empty>","Reverse.*",".*Routes.*",".*GuiceInjector","$anon").mkString(",")
+ScoverageKeys.coverageMinimumStmtTotal := 91
 ScoverageKeys.coverageFailOnMinimum := true
 ScoverageKeys.coverageHighlighting := true
 

@@ -78,7 +78,8 @@ class AuthenticateApplicationActionSpec extends AnyWordSpecLike with Matchers wi
   "action.async" should {
     s"return a $UNAUTHORIZED if not authorised by auth" in new Setup {
       Given
-        .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), Retrievals.applicationId, Future.failed(BearerTokenExpired("an exception has occurred")))
+        .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), 
+          Retrievals.applicationId, Future.failed(BearerTokenExpired("an exception has occurred")))
         .build()
 
       val result: Future[Result] = action.async(mockBody)(FakeRequest())
@@ -99,7 +100,8 @@ class AuthenticateApplicationActionSpec extends AnyWordSpecLike with Matchers wi
 
     s"return a $INTERNAL_SERVER_ERROR if an unexpected exception occurs" in new Setup {
       Given
-        .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), Retrievals.applicationId,Future.failed(new NullPointerException("error")))
+        .the.authConnector.authenticatesWithResult(AuthProviders(StandardApplication), 
+          Retrievals.applicationId,Future.failed(new NullPointerException("error")))
         .build()
 
       val result: Future[Result] = action.async(mockBody)(FakeRequest())

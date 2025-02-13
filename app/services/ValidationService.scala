@@ -129,7 +129,7 @@ class ValidationService @Inject()(resources: ResourceService) {
   private def getSequenceOfFieldErrorsFromReport(result: ProcessingReport, prefix: String = ""): Seq[FieldError] = {
     result.iterator.asScala.toList
       .flatMap {
-        error: ProcessingMessage =>
+        (error: ProcessingMessage) =>
           val missingAndUnexpectedFields = getMissingFields(error, prefix) ++ getUnexpectedFields(error, prefix)
 
           if (missingAndUnexpectedFields.isEmpty) {

@@ -7,6 +7,11 @@ To run the service, in the repository's main directory, run ```sbt run```
 This service is intended to run on port 7052
 You need to be a standard application to be able to use this API.
 
+Start the service via service manager profile:
+```
+sm2 --start IDRS_ALL  
+```
+
 ### Routes
     POST /case
 

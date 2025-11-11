@@ -46,7 +46,7 @@ trait MockHelpers extends MockitoSugar {
 
   private[helpers] case class ConfigPredicate(private val stubs: Seq[() => OngoingStubbing[?]]) extends MockPredicate(stubs) {
     def getsConfigAt[A](address: String, configValue: A): ConfigPredicate = copy(
-      stubs = stubs :+ (() => when(mockConfig.get[A](ArgumentMatchers.eq(address))(ArgumentMatchers.any())).thenReturn(configValue))
+      stubs = stubs :+ (() => when(mockConfig.get[A](ArgumentMatchers.eq(address))(using ArgumentMatchers.any())).thenReturn(configValue))
     )
   }
 
@@ -63,7 +63,7 @@ trait MockHelpers extends MockitoSugar {
           mockComplianceCasesService.createCase(
             ArgumentMatchers.eq(input),
             ArgumentMatchers.eq(correlationId)
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(using ArgumentMatchers.any(), ArgumentMatchers.any())
         ).thenReturn(Future.successful(httpResponse)))
     )
   }
@@ -74,7 +74,7 @@ trait MockHelpers extends MockitoSugar {
         mockComplianceCasesConnector.createCase(
           ArgumentMatchers.eq(input),
           ArgumentMatchers.eq(correlationId)
-        )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )(using ArgumentMatchers.any(), ArgumentMatchers.any())
       ).thenReturn(Future.successful(httpResponse)))
     )
   }
@@ -85,7 +85,7 @@ trait MockHelpers extends MockitoSugar {
         mockValidationService.validateAndRetrieveErrors(
           ArgumentMatchers.eq(schema),
           ArgumentMatchers.eq(json)
-        )(ArgumentMatchers.any())).thenReturn(expectedOutcome))
+        )(using ArgumentMatchers.any())).thenReturn(expectedOutcome))
     )
   }
 
@@ -96,7 +96,7 @@ trait MockHelpers extends MockitoSugar {
           mockAuthConnector.authorise(
             ArgumentMatchers.eq(predicate),
             ArgumentMatchers.eq(retrieval)
-          )(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          )(using ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(expectedOutcome))
       )
   }

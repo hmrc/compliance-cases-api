@@ -41,7 +41,7 @@ class ComplianceApiControllerSpec extends AnyWordSpecLike with Matchers with Moc
     object StubbedCorrelationIdAction extends ValidateCorrelationIdHeaderAction(
       new BodyParsers.Default(stubControllerComponents().parsers)
     )(
-      stubControllerComponents().executionContext
+      using stubControllerComponents().executionContext
     ) {
       override def invokeBlock[A](request: Request[A], block: RequestWithCorrelationId[A] => Future[Result]): Future[Result] = {
         block(RequestWithCorrelationId(request, correlationId))

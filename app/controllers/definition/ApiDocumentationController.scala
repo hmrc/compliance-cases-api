@@ -24,15 +24,16 @@ import play.api.Configuration
 import play.api.http.HttpErrorHandler
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, DefaultActionBuilder}
-
+import play.api.Environment
 import scala.concurrent.Future
 
 class ApiDocumentationController @Inject()(
   defaultActionBuilder: DefaultActionBuilder,
   httpErrorHandler: HttpErrorHandler,
   meta: AssetsMetadata,
-  config: Configuration
-) extends AssetsBuilder(httpErrorHandler, meta){
+  config: Configuration,
+  env: Environment
+) extends AssetsBuilder(httpErrorHandler, meta, env){
 
   lazy val status: String = config.get[String]("apiDefinition.status")
 

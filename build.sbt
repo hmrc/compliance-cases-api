@@ -5,7 +5,7 @@ import uk.gov.hmrc.DefaultBuildSettings
 val appName = "compliance-cases-api"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.6.4"
+ThisBuild / scalaVersion := "3.7.1"
 
 ScoverageKeys.coverageExcludedPackages := Seq("<empty>","Reverse.*",".*Routes.*",".*GuiceInjector","$anon").mkString(",")
 ScoverageKeys.coverageMinimumStmtTotal := 91

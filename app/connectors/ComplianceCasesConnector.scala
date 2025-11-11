@@ -61,7 +61,7 @@ class ComplianceCasesConnector @Inject()(
 
     val url = s"$ifBaseUrl$createCaseUri"
 
-    httpClient.post(url"$url")(hc.copy(authorization = None))
+    httpClient.post(url"$url")(using hc.copy(authorization = None))
       .withBody(request)
       .setHeader(headers(correlationId)*)
       .execute[IFResponse](using httpReads(correlationId, caseType), ec)

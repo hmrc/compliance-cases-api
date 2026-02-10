@@ -1,20 +1,11 @@
 import play.sbt.PlayScala
 import scoverage.ScoverageKeys
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.DefaultBuildSettings
 
 val appName = "compliance-cases-api"
 
-scalaVersion := "3.3.4"
-majorVersion := 0
-PlayKeys.playDefaultPort := 7052
-
-scalacOptions ++= Seq(
-  "-Wconf:msg=unused import*:s",
-  "-Wconf:msg=routes/.*:s",
-  "-Wconf:msg=Flag.*repeatedly:s",
-  "-Wconf:msg=unused private member*:s"
-)
-libraryDependencies  ++= AppDependencies.all
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "3.7.3"
 
 ScoverageKeys.coverageExcludedPackages := Seq("<empty>","Reverse.*",".*Routes.*",".*GuiceInjector","$anon").mkString(",")
 ScoverageKeys.coverageMinimumStmtTotal := 91
@@ -34,5 +25,27 @@ enablePlugins(PlayScala, SbtDistributablesPlugin)
 disablePlugins(JUnitXmlReportPlugin)
 
 lazy val microservice = Project(appName, file("."))
+  .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
-  .configs(IntegrationTest)
+  .settings(
+    libraryDependencies ++= AppDependencies.all,
+    // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
+    // suppress warnings in generated routes files
+    scalacOptions += s"-Wconf:msg=unused import:s,msg=unused explicit parameter:s,src=.*[\\\\/]routes[\\\\/].*:s",
+    Compile / scalacOptions --= Seq("-deprecation","-unchecked","-encoding","UTF-8"),
+    Test    / scalacOptions --= Seq("-deprecation","-unchecked","-encoding","UTF-8")
+  )
+  .settings(
+    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
+  )
+  .settings(PlayKeys.playDefaultPort := 7052)
+addCommandAlias("testAll", "; test ; it/test")
+
+lazy val it = (project in file("it"))
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "compile->compile,test;test->compile,test")
+  .settings(DefaultBuildSettings.itSettings())
+  .settings(libraryDependencies ++= AppDependencies.test,
+    Test    / scalacOptions --= Seq("-deprecation","-unchecked","-encoding","UTF-8")
+  )
+  .settings( Test / scalaSource := baseDirectory.value / "scala")

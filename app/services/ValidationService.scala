@@ -44,7 +44,7 @@ class ValidationService @Inject()(resources: ResourceService) {
   private val logger = Logger(this.getClass.getSimpleName)
 
   def validateAndRetrieveErrors(schemaString: String, input: JsValue)(
-    implicit request: RequestWithCorrelationId[_]
+    implicit request: RequestWithCorrelationId[?]
   ): Option[JsValue] = {
     input.asOpt[JsObject] match {
       case Some(jsObject) =>
@@ -70,7 +70,7 @@ class ValidationService @Inject()(resources: ResourceService) {
     }
   }
 
-  private def logMessage(methodName: String, message: String)(implicit request: RequestWithCorrelationId[_]): String =
+  private def logMessage(methodName: String, message: String)(implicit request: RequestWithCorrelationId[?]): String =
     LogMessageHelper(this.getClass.getSimpleName, methodName, message, request.correlationId).toString
 
   private def validateAgainstSchema(json: JsonNode, schema: JsonSchema): ProcessingReport =
@@ -91,7 +91,7 @@ class ValidationService @Inject()(resources: ResourceService) {
   private def getUnexpectedFields(processingMessage: ProcessingMessage, prefix: String): List[UnexpectedField] =
     getUnwantedOrMissingFields("unwanted", processingMessage, prefix) map UnexpectedField.apply
 
-  private def validateCaseType(caseJson: JsValue)(implicit request: RequestWithCorrelationId[_]): (Option[String], Seq[FieldError]) = {
+  private def validateCaseType(caseJson: JsValue)(implicit request: RequestWithCorrelationId[?]): (Option[String], Seq[FieldError]) = {
     val methodName: String = "validateCaseType"
 
     def getResult(schema: String, caseType: String): (Option[String], Seq[FieldError]) = {

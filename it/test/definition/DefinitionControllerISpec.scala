@@ -20,10 +20,10 @@ import helpers.WireMockSpec
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.JsonBodyReadables.readableAsJson
 import play.api.libs.ws.WSClient
 import play.api.test.Helpers.{NO_CONTENT, OK}
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-import play.api.libs.ws.JsonBodyReadables.readableAsJson
 
 class DefinitionControllerISpec extends PlaySpec with GuiceOneServerPerSuite with FutureAwaits with DefaultAwaitTimeout with WireMockSpec {
 

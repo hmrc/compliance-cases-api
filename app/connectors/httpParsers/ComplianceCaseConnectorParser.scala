@@ -78,15 +78,6 @@ trait ComplianceCaseConnectorParser {
       error((failure \ "code").as[String], caseType)
     }.toList
 
-/*
-  def error(code: String, caseType: String): Error = {
-    Error(
-      code,
-      errorResponseMap.get(s"$caseType-$code").fold(throw new RuntimeException("missing configuration message"))(identity)
-    )
-  }
-*/
-
   def error(code: String, caseType: String): Error = {
     val resolvedCode =
       if (errorResponseMap.contains(s"$caseType-$code")) {

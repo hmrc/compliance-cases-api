@@ -28,9 +28,7 @@ Global / excludeLintKeys ++= Set(
   IntegrationTest / sourceDirectories
 )
 
-
 integrationTestSettings()
-resolvers += Resolver.jcenterRepo
 
 enablePlugins(PlayScala, SbtDistributablesPlugin)
 disablePlugins(JUnitXmlReportPlugin)

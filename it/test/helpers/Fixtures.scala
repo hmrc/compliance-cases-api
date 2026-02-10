@@ -16,9 +16,9 @@
 
 package helpers
 
-import java.util.UUID
-
 import play.api.libs.json.{JsValue, Json}
+
+import java.util.UUID
 
 
 trait Fixtures {

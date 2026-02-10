@@ -24,7 +24,7 @@ import play.api.{Configuration, Environment}
 import play.api.http.HttpErrorHandler
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, DefaultActionBuilder}
-
+import play.api.Environment
 import scala.concurrent.Future
 
 class ApiDocumentationController @Inject()(

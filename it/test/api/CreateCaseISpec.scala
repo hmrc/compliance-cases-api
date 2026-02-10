@@ -17,14 +17,14 @@
 package api
 
 import helpers.{Fixtures, WireMockSpec}
+import org.apache.pekko.util.Timeout
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import play.api.test.Helpers._
-import org.apache.pekko.util.Timeout
+import play.api.libs.ws.DefaultBodyReadables.readableAsString
+import play.api.libs.ws.writeableOf_JsValue
+import play.api.test.Helpers.*
 
 import scala.concurrent.duration.Duration
-import play.api.libs.ws.writeableOf_JsValue
-import play.api.libs.ws.DefaultBodyReadables.readableAsString
 
 class CreateCaseISpec extends PlaySpec with WireMockSpec with Fixtures {
   implicit val timeout:Timeout = Timeout.durationToTimeout(Duration.create(30,"s"))

@@ -44,64 +44,64 @@ trait MockHelpers extends MockitoSugar {
 
   object Given extends MockPredicate()
 
-  private[helpers] case class ConfigPredicate(private val stubs: Seq[() => OngoingStubbing[_]]) extends MockPredicate(stubs) {
+  private[helpers] case class ConfigPredicate(private val stubs: Seq[() => OngoingStubbing[?]]) extends MockPredicate(stubs) {
     def getsConfigAt[A](address: String, configValue: A): ConfigPredicate = copy(
-      stubs = stubs :+ (() => when(mockConfig.get[A](ArgumentMatchers.eq(address))(ArgumentMatchers.any())).thenReturn(configValue))
+      stubs = stubs :+ (() => when(mockConfig.get[A](ArgumentMatchers.eq(address))(using ArgumentMatchers.any())).thenReturn(configValue))
     )
   }
 
-  private[helpers] case class ResourceServicePredicate(private val stubs: Seq[() => OngoingStubbing[_]]) extends MockPredicate(stubs) {
+  private[helpers] case class ResourceServicePredicate(private val stubs: Seq[() => OngoingStubbing[?]]) extends MockPredicate(stubs) {
     def returnsResourceAt(address: String, resourceAsString: String): ResourceServicePredicate = copy(
       stubs = stubs :+ (() => when(mockResourceService.getFile(ArgumentMatchers.eq(address))).thenReturn(resourceAsString))
     )
   }
 
-  private[helpers] case class ComplianceCasesServicePredicate(private val stubs: Seq[() => OngoingStubbing[_]]) extends MockPredicate(stubs) {
+  private[helpers] case class ComplianceCasesServicePredicate(private val stubs: Seq[() => OngoingStubbing[?]]) extends MockPredicate(stubs) {
     def createsCase(input: JsValue, correlationId: String, httpResponse: Option[HttpResponse]): ComplianceCasesServicePredicate = copy(
       stubs = stubs :+ (() =>
         when(
           mockComplianceCasesService.createCase(
             ArgumentMatchers.eq(input),
             ArgumentMatchers.eq(correlationId)
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(using ArgumentMatchers.any(), ArgumentMatchers.any())
         ).thenReturn(Future.successful(httpResponse)))
     )
   }
 
-  private[helpers] case class ComplianceCasesConnectorPredicate(private val stubs: Seq[() => OngoingStubbing[_]]) extends MockPredicate(stubs) {
+  private[helpers] case class ComplianceCasesConnectorPredicate(private val stubs: Seq[() => OngoingStubbing[?]]) extends MockPredicate(stubs) {
     def createsCase(input: JsValue, correlationId: String, httpResponse: Option[HttpResponse]): ComplianceCasesConnectorPredicate = copy(
       stubs = stubs :+ (() => when(
         mockComplianceCasesConnector.createCase(
           ArgumentMatchers.eq(input),
           ArgumentMatchers.eq(correlationId)
-        )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )(using ArgumentMatchers.any(), ArgumentMatchers.any())
       ).thenReturn(Future.successful(httpResponse)))
     )
   }
 
-  private[helpers] case class ValidationServicePredicate(private val stubs: Seq[() => OngoingStubbing[_]]) extends MockPredicate(stubs) {
+  private[helpers] case class ValidationServicePredicate(private val stubs: Seq[() => OngoingStubbing[?]]) extends MockPredicate(stubs) {
     def validate(schema: String, json: JsValue, expectedOutcome: Option[JsValue]): ValidationServicePredicate = copy(
       stubs = stubs :+ (() => when(
         mockValidationService.validateAndRetrieveErrors(
           ArgumentMatchers.eq(schema),
           ArgumentMatchers.eq(json)
-        )(ArgumentMatchers.any())).thenReturn(expectedOutcome))
+        )(using ArgumentMatchers.any())).thenReturn(expectedOutcome))
     )
   }
 
-  private[helpers] case class AuthConnectorPredicate(private val stubs: Seq[() => OngoingStubbing[_]]) extends MockPredicate(stubs) {
+  private[helpers] case class AuthConnectorPredicate(private val stubs: Seq[() => OngoingStubbing[?]]) extends MockPredicate(stubs) {
     def authenticatesWithResult[A](predicate: Predicate, retrieval: Retrieval[A], expectedOutcome: Future[A]): AuthConnectorPredicate =
       copy(
         stubs = stubs :+ (() => when(
           mockAuthConnector.authorise(
             ArgumentMatchers.eq(predicate),
             ArgumentMatchers.eq(retrieval)
-          )(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          )(using ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(expectedOutcome))
       )
   }
 
-  abstract class MockPredicate(private val stubs: Seq[() => OngoingStubbing[_]] = Seq()) {
+  abstract class MockPredicate(private val stubs: Seq[() => OngoingStubbing[?]] = Seq()) {
     def build(): Unit = stubs.foreach(_.apply())
 
     def and: MockPredicate = this

@@ -21,6 +21,14 @@ ScoverageKeys.coverageMinimumStmtTotal := 91
 ScoverageKeys.coverageFailOnMinimum := true
 ScoverageKeys.coverageHighlighting := true
 
+Global / excludeLintKeys ++= Set(
+  IntegrationTest / javaSource,
+  IntegrationTest / scalaSource,
+  IntegrationTest / semanticdbTargetRoot,
+  IntegrationTest / sourceDirectories
+)
+
+
 integrationTestSettings()
 resolvers += Resolver.jcenterRepo
 

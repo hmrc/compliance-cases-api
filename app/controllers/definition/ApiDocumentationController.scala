@@ -20,7 +20,7 @@ import controllers.{AssetsBuilder, AssetsMetadata}
 
 import javax.inject.Inject
 import models.definition.ApiDefinition
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import play.api.http.HttpErrorHandler
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, DefaultActionBuilder}
@@ -31,8 +31,9 @@ class ApiDocumentationController @Inject()(
   defaultActionBuilder: DefaultActionBuilder,
   httpErrorHandler: HttpErrorHandler,
   meta: AssetsMetadata,
-  config: Configuration
-) extends AssetsBuilder(httpErrorHandler, meta){
+  config: Configuration,
+  environment: Environment
+) extends AssetsBuilder(httpErrorHandler, meta, environment){
 
   lazy val status: String = config.get[String]("apiDefinition.status")
 

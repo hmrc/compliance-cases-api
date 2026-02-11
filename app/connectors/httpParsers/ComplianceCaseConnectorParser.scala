@@ -79,22 +79,13 @@ trait ComplianceCaseConnectorParser {
     }.toList
 
   def error(code: String, caseType: String): Error = {
-    val requestedKey = s"$caseType-$code"
-    val resolvedCode =
-      if (errorResponseMap.contains(requestedKey)) {
-        code
-      }
-      else {
-        "999"
-      }
-    val resolvedKey = s"$caseType-$resolvedCode"
+    val key = s"$caseType-$code"
+    val defaultKey = s"$caseType-999"
 
-    Error(
-      resolvedCode,
-      errorResponseMap.getOrElse(
-        resolvedKey,
-        "An error has occurred in case creation due to internal process failure"
-      )
-    )
+    val message = errorResponseMap.getOrElse(key, errorResponseMap(defaultKey))
+    val resolvedCode = if (errorResponseMap.contains(key)) code else defaultKey.split("-").last
+
+    Error(resolvedCode, message)
   }
+
 }

@@ -208,5 +208,37 @@ class ComplianceCasesConnectorSpec extends AnyWordSpecLike with Matchers with Gu
         responseJson.value("errors").head.get("code").as[String] shouldBe "999"
       }
     }
+
+    "return the original error code when IF returns a known 422 error code" in {
+      val failureJson = Json.obj(
+        "failures" -> Json.arr(
+          Json.obj(
+            "code" -> "001",
+            "reason" -> "someError"
+          )
+        )
+      )
+
+      server.stubFor(
+        post(urlEqualTo("/organisations/case"))
+          .withHeader(CONTENT_TYPE, matching(ContentTypes.JSON))
+          .withHeader("CorrelationId", equalTo(correlationId))
+          .withHeader("Authorization", equalTo("Bearer some-token"))
+          .withHeader("Environment", equalTo("local"))
+          .willReturn(
+            aResponse()
+              .withStatus(UNPROCESSABLE_ENTITY)
+              .withBody(failureJson.toString())
+              .withHeader("contentType", "application/json")
+          )
+      )
+
+      whenReady(connector.createCase(Json.parse(fullCaseJson), correlationId)) { response =>
+        val responseJson = response.get.json.as[JsObject]
+
+        response.get.status shouldBe UNPROCESSABLE_ENTITY
+        responseJson.value("errors").head.get("code").as[String] shouldBe "001"
+      }
+    }
   }
 }

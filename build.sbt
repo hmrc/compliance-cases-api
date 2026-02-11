@@ -4,7 +4,7 @@ import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 
 val appName = "compliance-cases-api"
 
-scalaVersion := "3.3.4"
+scalaVersion := "3.7.4"
 majorVersion := 0
 PlayKeys.playDefaultPort := 7052
 

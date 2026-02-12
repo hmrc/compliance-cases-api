@@ -80,12 +80,16 @@ trait ComplianceCaseConnectorParser {
 
   def error(code: String, caseType: String): Error = {
     val key = s"$caseType-$code"
-    val defaultKey = s"$caseType-999"
+    val defaultKey = "Default-999"
 
-    val message = errorResponseMap.getOrElse(key, errorResponseMap(defaultKey))
-    val resolvedCode = if (errorResponseMap.contains(key)) code else defaultKey.split("-").last
+    errorResponseMap.get(key) match {
+      case Some(message) =>
+        Error(code, message)
 
-    Error(resolvedCode, message)
+      case None =>
+        logger.warn(s"Missing error mapping for key [$key]. Falling back to [$defaultKey].")
+        Error("999", errorResponseMap(defaultKey))
+    }
   }
 
 }

@@ -79,10 +79,17 @@ trait ComplianceCaseConnectorParser {
     }.toList
 
   def error(code: String, caseType: String): Error = {
-    Error(
-      code,
-      errorResponseMap.get(s"$caseType-$code").fold(throw new RuntimeException("missing configuration message"))(identity)
-    )
+    val key = s"$caseType-$code"
+    val defaultKey = "Default-999"
+
+    errorResponseMap.get(key) match {
+      case Some(message) =>
+        Error(code, message)
+
+      case None =>
+        logger.warn(s"Missing error mapping for key [$key]. Falling back to [$defaultKey].")
+        Error("999", errorResponseMap(defaultKey))
+    }
   }
 
 }

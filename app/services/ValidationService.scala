@@ -16,10 +16,8 @@
 
 package services
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.github.fge.jackson.JsonLoader
-import com.github.fge.jsonschema.core.report.{ListReportProvider, LogLevel, ProcessingMessage, ProcessingReport}
-import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.networknt.schema.{Error, SchemaRegistry, SpecificationVersion}
 import com.google.inject.Inject
 import controllers.actions.RequestWithCorrelationId
 import models.LogMessageHelper
@@ -36,10 +34,9 @@ class ValidationService @Inject()(resources: ResourceService) {
 
   private lazy val riskCaseSchema = resources.getFile("/schemas/riskCaseType.schema.json")
 
-  private val factory = JsonSchemaFactory
-    .newBuilder()
-    .setReportProvider(new ListReportProvider(LogLevel.ERROR, LogLevel.FATAL))
-    .freeze()
+  private val mapper: ObjectMapper = new ObjectMapper()
+  private val schemaRegistry: SchemaRegistry =
+    SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_4)
 
   private val logger = Logger(this.getClass.getSimpleName)
 
@@ -48,20 +45,23 @@ class ValidationService @Inject()(resources: ResourceService) {
   ): Option[JsValue] = {
     input.asOpt[JsObject] match {
       case Some(jsObject) =>
-        val result: ProcessingReport = validate(schemaString, jsObject)
+        val schemaErrors = validate(schemaString, jsObject)
         val (caseTypeName, caseFieldErrors): (Option[String], Seq[FieldError]) = (input \ "case").asOpt[JsObject].map(
           validateCaseType(_)
         ).getOrElse(None -> Seq.empty[FieldError])
 
-        if (result.isSuccess && caseFieldErrors.isEmpty) {
+        if (schemaErrors.isEmpty && caseFieldErrors.isEmpty) {
           None
         } else {
+          val combinedErrors =
+            getFieldErrorsFromReport(schemaErrors) ++ caseFieldErrors
+
           caseTypeName
             .map(caseType =>
-              BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors.toSeq, caseType = caseType)
+              BadRequestErrorResponse(combinedErrors, caseType = caseType)
             )
             // TODO make caseType optional
-            .orElse(Some(BadRequestErrorResponse(getSequenceOfFieldErrorsFromReport(result) ++ caseFieldErrors.toSeq)))
+            .orElse(Some(BadRequestErrorResponse(combinedErrors)))
             .map(Json.toJson(_))
         }
       case _ => Some(
@@ -70,34 +70,19 @@ class ValidationService @Inject()(resources: ResourceService) {
     }
   }
 
-  private def logMessage(methodName: String, message: String)(implicit request: RequestWithCorrelationId[?]): String =
-    LogMessageHelper(this.getClass.getSimpleName, methodName, message, request.correlationId).toString
+  private def validateCaseType(caseJson: JsValue)(
+    implicit request: RequestWithCorrelationId[?]
+  ): (Option[String], Seq[FieldError]) = {
 
-  private def validateAgainstSchema(json: JsonNode, schema: JsonSchema): ProcessingReport =
-    schema.validate(json, true)
-
-  private def getFieldName(processingMessage: ProcessingMessage, prefix: String): String =
-    processingMessage.asJson().get("instance").asScala.map(instanceName => prefix + instanceName.asText).headOption.getOrElse("Field cannot be found")
-
-  private def getUnwantedOrMissingFields(fieldType: String, processingMessage: ProcessingMessage, prefix: String): List[String] = {
-    Option(processingMessage.asJson().get(fieldType)).map(_.asScala.map(
-      instanceName => s"${getFieldName(processingMessage, prefix)}/${instanceName.asText()}"
-    ).toList).getOrElse(List())
-  }
-
-  private def getMissingFields(processingMessage: ProcessingMessage, prefix: String): List[MissingField] =
-    getUnwantedOrMissingFields("missing", processingMessage, prefix) map MissingField.apply
-
-  private def getUnexpectedFields(processingMessage: ProcessingMessage, prefix: String): List[UnexpectedField] =
-    getUnwantedOrMissingFields("unwanted", processingMessage, prefix) map UnexpectedField.apply
-
-  private def validateCaseType(caseJson: JsValue)(implicit request: RequestWithCorrelationId[?]): (Option[String], Seq[FieldError]) = {
-    val methodName: String = "validateCaseType"
+    val methodName = "validateCaseType"
 
     def getResult(schema: String, caseType: String): (Option[String], Seq[FieldError]) = {
-      val result = validate(schema, caseJson)
-      if (result.isSuccess) None -> Seq.empty else {
-        Some(caseType) -> getSequenceOfFieldErrorsFromReport(result, "/case")
+      val errors = validate(schema, caseJson)
+      if (errors.isEmpty) {
+        None -> Seq.empty
+      }
+      else {
+        Some(caseType) -> getFieldErrorsFromReport(errors, "/case")
       }
     }
 
@@ -119,30 +104,75 @@ class ValidationService @Inject()(resources: ResourceService) {
     }
   }
 
-  private def validate(schemaString: String, input: JsValue): ProcessingReport = {
-    val schemaJson = JsonLoader.fromString(schemaString)
-    val json = JsonLoader.fromString(Json.stringify(input))
-    val schema = factory.getJsonSchema(schemaJson)
-    validateAgainstSchema(json, schema)
+  private def validate(schemaString: String, input: JsValue): java.util.List[Error] = {
+    val schemaNode = mapper.readTree(schemaString)
+    val jsonNode   = mapper.readTree(Json.stringify(input))
+    val schema     = schemaRegistry.getSchema(schemaNode)
+    schema.validate(jsonNode)
   }
 
-  private def getSequenceOfFieldErrorsFromReport(result: ProcessingReport, prefix: String = ""): Seq[FieldError] = {
-    result.iterator.asScala.toList
-      .flatMap {
-        (error: ProcessingMessage) =>
-          val missingAndUnexpectedFields = getMissingFields(error, prefix) ++ getUnexpectedFields(error, prefix)
+  private def getFieldErrorsFromReport(
+                                        report: java.util.List[Error],
+                                        prefix: String = ""
+                                      ): Seq[FieldError] = {
 
-          if (missingAndUnexpectedFields.isEmpty) {
-            List(InvalidField(getFieldName(error, prefix)))
-          } else {
-            missingAndUnexpectedFields
-          }
+    val extracted = report.asScala.toList.flatMap { error =>
+      val missing = getMissingFields(error, prefix)
+      val unexpected = getUnexpectedFields(error, prefix)
+
+      if (unexpected.nonEmpty) {
+        unexpected
       }
-  }
+      else if (missing.nonEmpty) {
+        missing
+      }
+      else {
+        List(InvalidField(getFieldName(error, prefix)))
+      }
+    }
 
-  private def toInvalidField(mappingErrors: Seq[(JsPath, Seq[JsonValidationError])]): Seq[InvalidField] = {
-    mappingErrors.map {
-      x => InvalidField(path = x._1.toString())
+    extracted.sortBy {
+      case _: UnexpectedField => (0, "")
+      case _: MissingField    => (1, "")
+      case i: InvalidField    => (2, i.path)
     }
   }
+
+  private def getFieldName(error: Error, prefix: String): String =
+    Option(error.getInstanceLocation)
+      .map(loc => prefix + loc.toString)
+      .getOrElse("Field cannot be found")
+
+  private def getMissingFields(error: Error, prefix: String): List[MissingField] = {
+    if (error.getKeyword == "required") {
+      Option(error.getProperty)
+        .map(prop => List(MissingField(s"${getFieldName(error, prefix)}/$prop")))
+        .getOrElse(Nil)
+    } else {
+      Nil
+    }
+  }
+
+  private def getUnexpectedFields(error: Error, prefix: String): List[UnexpectedField] = {
+    if (error.getKeyword == "additionalProperties") {
+      Option(error.getProperty)
+        .map(prop => List(UnexpectedField(s"${getFieldName(error, prefix)}/$prop")))
+        .getOrElse(Nil)
+    } else {
+      Nil
+    }
+  }
+
+  private def toInvalidField(mappingErrors: Seq[(JsPath, Seq[JsonValidationError])]): Seq[InvalidField] =
+    mappingErrors.map { case (path, _) => InvalidField(path.toString()) }
+
+  private def logMessage(methodName: String, message: String)(
+    implicit request: RequestWithCorrelationId[?]
+  ): String =
+    LogMessageHelper(
+      this.getClass.getSimpleName,
+      methodName,
+      message,
+      request.correlationId
+    ).toString
 }

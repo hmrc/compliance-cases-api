@@ -10,7 +10,7 @@ PlayKeys.playDefaultPort := 7052
 
 scalacOptions ++= Seq(
   "-Wconf:msg=unused import*:s",
-  "-Wconf:msg=routes/.*:s",
+  "-Wconf:src=routes/.*:s",
   "-Wconf:msg=Flag.*repeatedly:s",
   "-Wconf:msg=unused private member*:s"
 )

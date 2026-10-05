@@ -49,9 +49,7 @@ class DefinitionControllerISpec extends PlaySpec with GuiceOneServerPerSuite wit
            |        "version": "1.0",
            |        "status": "ALPHA",
            |        "endpointsEnabled": false,
-           |        "access": {
-           |          "type": "PRIVATE"
-           |        }
+           |        "access": "PUBLIC"
            |      }
            |    ]
            |  }

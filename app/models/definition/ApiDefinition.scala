@@ -29,7 +29,7 @@ case class ApiDefinition(endpointsEnabled: Boolean, status: String){
         "version" -> "1.0",
         "status" -> status,
         "endpointsEnabled" -> endpointsEnabled,
-        "access" -> "PUBLIC"
+        "access" -> "INTERNAL"
       )
     )
   )
